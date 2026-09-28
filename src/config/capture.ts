@@ -32,8 +32,14 @@ export const CAPTURE_SOURCES: CaptureSource[] = [
   { pkg: 'com.android.mms', label: 'Mensajes (Android)', bank: null, kind: 'sms-app' },
 ];
 
-/** Selección recomendada la primera vez que se abre la app (antes de que el usuario elija la suya). */
-export const DEFAULT_CAPTURE_APPS: CaptureAppChoice[] = CAPTURE_SOURCES.map(({ pkg, label }) => ({ pkg, label }));
+/**
+ * Selección de la primera vez que se abre la app (antes de que el usuario elija la suya): solo las apps de SMS,
+ * porque ahí llegan los mensajes del banco. Las apps de los bancos (Nu, etc.) NO vienen marcadas: cada quien
+ * las elige en Configuración ▸ Captura automática ▸ Elegir apps.
+ */
+export const DEFAULT_CAPTURE_APPS: CaptureAppChoice[] = CAPTURE_SOURCES.filter((source) => source.kind === 'sms-app').map(
+  ({ pkg, label }) => ({ pkg, label }),
+);
 
 /** Nombres de apps elegidas por el usuario que no están en `CAPTURE_SOURCES` (la registra `captureAppsService`). */
 let customSourceLabels: Record<string, string> = {};

@@ -234,7 +234,7 @@ Notificación ─▶ CaptureListenerService (Java) ─┬▶ aviso "al instante"
 
 1. **Lector nativo** (`native/android/`, se instala con `npm run android:sync`). Es un `NotificationListenerService` que solo mira las
    apps que el usuario eligió en **Configuración ▸ Captura automática ▸ Elegir apps** (o, la primera vez, las recomendadas de
-   `DEFAULT_CAPTURE_APPS` en `src/config/capture.ts`: **Nu** (`com.nu.production`) y las apps de SMS de Google, Samsung y Android).
+   `DEFAULT_CAPTURE_APPS` en `src/config/capture.ts`: solo las apps de SMS de Google, Samsung y Android; el resto, como Nu, las eliges tú).
    De ellas guarda solo lo que parece traer un monto en pesos (un `$`, `COP` o `pesos`; un número con separador de miles como `25.000`; o una palabra de gasto seguida de un número, como `compra por 25000`); lo demás se descarta en el acto. Funciona con la app cerrada.
    Los SMS del banco se leen como notificación de la app de mensajes, por eso **no se pide el permiso de SMS** (que además Google Play restringe).
 2. **Aviso al instante**: apenas el lector guarda un mensaje en la cola, `CaptureListenerService` muestra de una vez un aviso del
