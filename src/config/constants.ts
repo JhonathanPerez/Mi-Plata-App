@@ -1,0 +1,69 @@
+import type { PaymentMethodType } from '@/types/models';
+
+export const APP_NAME = 'Mi Plata';
+export const APP_VERSION = __APP_VERSION__;
+export const APP_AUTHOR = '@Jperez.Ortega';
+export const DB_NAME = 'miplata';
+
+/** Moneda de la app. Los montos se guardan como enteros en pesos. */
+export const CURRENCY = 'COP';
+/** 12 dígitos: 999.999.999.999 (dentro del rango seguro de enteros de JS). */
+export const MAX_AMOUNT = 999_999_999_999;
+
+export const NOTE_MAX_LENGTH = 200;
+export const NAME_MAX_LENGTH = 30;
+
+export const BACKUP_FORMAT = 'mi-plata-backup';
+/** v2: estado pagado/por pagar de los gastos, reglas de ciclo de las tarjetas y fechas de extractos. */
+export const BACKUP_VERSION = 2;
+
+export const SETTING_KEYS = {
+  theme: 'theme',
+  lastPaymentMethodId: 'last_payment_method_id',
+  seeded: 'seeded',
+  biometricLock: 'biometric_lock',
+  lockDelaySeconds: 'lock_delay_seconds',
+  reminders: 'payment_reminders',
+  reminderLeadDays: 'reminder_lead_days',
+  reminderHour: 'reminder_hour',
+  pendingReminders: 'pending_reminders',
+  pendingReminderMinutes: 'pending_reminder_minutes',
+  captureApps: 'capture_apps',
+  hideAmounts: 'hide_amounts',
+} as const;
+
+export const CATEGORY_COLORS = [
+  '#E4572E',
+  '#F29E4C',
+  '#E9C46A',
+  '#8AB17D',
+  '#2A9D8F',
+  '#3D8FD1',
+  '#5C6BC0',
+  '#9B5DE5',
+  '#D65DB1',
+  '#E76F7A',
+  '#7A6F66',
+  '#4C5C68',
+];
+
+export const CATEGORY_ICONS = [
+  '🍔', '🛒', '☕', '🍽️', '🍺', '🚌', '🚗', '⛽', '🏠', '💡',
+  '🔧', '🧹', '🎬', '🎮', '🎵', '🛍️', '👕', '💇', '🧴', '💊',
+  '🏥', '🏋️', '🎓', '📚', '✈️', '🏖️', '🔁', '📱', '🧾', '🎁',
+  '🐾', '👶', '💼', '🌱', '🏦', '📦',
+];
+
+export const PAYMENT_ICONS = ['💵', '💳', '🏦', '📱', '💰', '🧾'];
+
+export const PAYMENT_TYPE_LABELS: Record<PaymentMethodType, string> = {
+  cash: 'Efectivo',
+  debit_card: 'Tarjeta débito',
+  credit_card: 'Tarjeta de crédito',
+  other: 'Otro',
+};
+
+export const PAYMENT_TYPES: PaymentMethodType[] = ['cash', 'debit_card', 'credit_card', 'other'];
+
+export const DEFAULT_CATEGORY_ICON = '📦';
+export const DEFAULT_PAYMENT_ICON = '💳';

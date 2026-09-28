@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="es-CO">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <meta name="theme-color" content="#F3F6F2" />
+    <meta name="color-scheme" content="light dark" />
+    <title>Mi Plata</title>
+    <style>
+      /*
+        Splash "de arranque": pinta el logo y el spinner apenas el WebView tiene el HTML, sin
+        esperar a que cargue el bundle de JS ni a que React monte la app. Evita el hueco donde
+        solo se veía el logo del tema nativo y el spinner aparecía segundos después.
+        Los colores están repetidos a mano (no puede depender de src/styles/tokens.css, que
+        todavía no cargó) — si cambias la paleta ahí, actualiza también este bloque.
+        React reemplaza este contenido en cuanto monta (ver src/main.tsx y DatabaseGate.tsx),
+        con la misma pinta, así que no hay salto visual.
+      */
+      html, body, #root {
+        height: 100%;
+      }
+      body {
+        margin: 0;
+        background: #f3f6f2;
+        font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+      }
+      #boot-splash {
+        min-height: 100dvh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+        padding: 24px;
+        text-align: center;
+      }
+      #boot-splash .boot-splash__mark {
+        width: 72px;
+        height: 72px;
+        padding: 11px;
+        border-radius: 24px;
+        display: grid;
+        place-items: center;
+        background: #0e3a33;
+      }
+      #boot-splash .boot-splash__mark svg {
+        width: 100%;
+        height: 100%;
+        display: block;
+      }
+      #boot-splash .ring-seg {
+        fill: none;
+        stroke-width: 9.5;
+        stroke-linecap: round;
+        animation: ring-draw 0.45s cubic-bezier(0.3, 0.9, 0.4, 1) forwards;
+      }
+      #boot-splash .s1 { stroke-dasharray: 36.757 400; stroke-dashoffset: 36.757; animation-delay: 0s; }
+      #boot-splash .s2 { stroke-dasharray: 31.102 400; stroke-dashoffset: 31.102; animation-delay: 0.12s; }
+      #boot-splash .s3 { stroke-dasharray: 28.274 400; stroke-dashoffset: 28.274; animation-delay: 0.24s; }
+      #boot-splash .s4 { stroke-dasharray: 25.447 400; stroke-dashoffset: 25.447; animation-delay: 0.36s; }
+      #boot-splash .s5 { stroke-dasharray: 19.792 400; stroke-dashoffset: 19.792; animation-delay: 0.48s; }
+      #boot-splash .center-dot {
+        transform-origin: 54px 52px;
+        transform: scale(0);
+        opacity: 0;
+        animation: dot-pop 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+        animation-delay: 0.85s;
+      }
+      @keyframes ring-draw {
+        to { stroke-dashoffset: 0; }
+      }
+      @keyframes dot-pop {
+        to { transform: scale(1); opacity: 1; }
+      }
+      #boot-splash .boot-splash__name {
+        font-size: 30px;
+        font-weight: 750;
+        letter-spacing: -0.02em;
+        color: #10262a;
+        margin: 0;
+      }
+      #boot-splash .boot-splash__spinner {
+        width: 28px;
+        height: 28px;
+        margin-top: 4px;
+        border-radius: 50%;
+        border: 3px solid #e8efea;
+        border-top-color: #0b7a63;
+        animation: boot-splash-spin 0.8s linear infinite;
+      }
+      #boot-splash .boot-splash__text {
+        color: #4a6166;
+        margin: 0;
+      }
+      @keyframes boot-splash-spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+      @media (prefers-color-scheme: dark) {
+        body {
+          background: #0b1719;
+        }
+        #boot-splash .boot-splash__mark {
+          background: #12352f;
+        }
+        #boot-splash .boot-splash__name {
+          color: #e8f1ee;
+        }
+        #boot-splash .boot-splash__spinner {
+          border-color: #1b3136;
+          border-top-color: #3ccba6;
+        }
+        #boot-splash .boot-splash__text {
+          color: #9db4b0;
+        }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        #boot-splash .boot-splash__spinner {
+          animation-duration: 1ms;
+        }
+        #boot-splash .ring-seg {
+          animation: none;
+          stroke-dashoffset: 0;
+        }
+        #boot-splash .center-dot {
+          animation: none;
+          transform: scale(1);
+          opacity: 1;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root">
+      <div id="boot-splash" role="status" aria-label="Cargando Mi Plata">
+        <div class="boot-splash__mark" aria-hidden="true">
+          <svg viewBox="0 0 108 108">
+            <circle class="ring-seg s1" cx="54" cy="52" r="25" stroke="#E4572E" transform="rotate(-90 54 52)" />
+            <circle class="ring-seg s2" cx="54" cy="52" r="25" stroke="#9B5DE5" transform="rotate(1.44 54 52)" />
+            <circle class="ring-seg s3" cx="54" cy="52" r="25" stroke="#2A9D8F" transform="rotate(79.92 54 52)" />
+            <circle class="ring-seg s4" cx="54" cy="52" r="25" stroke="#3D8FD1" transform="rotate(151.92 54 52)" />
+            <circle class="ring-seg s5" cx="54" cy="52" r="25" stroke="#4C5C68" transform="rotate(217.44 54 52)" />
+            <circle class="center-dot" cx="54" cy="52" r="8.6" fill="#F5B301" />
+          </svg>
+        </div>
+        <h1 class="boot-splash__name">Mi Plata</h1>
+        <div class="boot-splash__spinner"></div>
+        <p class="boot-splash__text">Abriendo tus datos…</p>
+      </div>
+    </div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

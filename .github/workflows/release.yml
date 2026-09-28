@@ -1,0 +1,174 @@
+name: Release
+
+# Cada push a main decide, según los mensajes de commit (Conventional Commits), si hay una versión
+# nueva que publicar:
+#   fix: ...                -> sube el PATCH  (1.0.0 -> 1.0.1)
+#   feat: ...               -> sube el MINOR  (1.0.0 -> 1.1.0)
+#   feat!: ...  /  BREAKING CHANGE: en el cuerpo -> sube el MAJOR (1.0.0 -> 2.0.0)
+#   chore:, docs:, refactor:, test:, ci:, style: -> no publica versión nueva
+#
+# Si hay versión nueva: semantic-release crea el tag vX.Y.Z, actualiza package.json y CHANGELOG.md,
+# los commitea de vuelta a main, y crea el Release en GitHub. Después se compila el APK RELEASE
+# (firmado, no debug) con esa misma versión (via scripts/sync-android-version.mjs) y se adjunta
+# al Release.
+#
+# El APK se firma siempre con el mismo keystore (secrets.ANDROID_KEYSTORE_B64 y compañía), para
+# que Android trate cada versión como una actualización de la anterior en vez de un paquete en
+# conflicto. Ver scripts/apply-android-signing.mjs.
+#
+# También se puede compilar el APK de un tag existente a mano:
+#   Actions > Release > Run workflow > escribir el tag (ej. v1.1.0)
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Tag existente cuyo APK se quiere compilar (ej. v1.1.0)"
+        required: true
+        type: string
+
+permissions:
+  contents: write
+  issues: write
+  pull-requests: write
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+jobs:
+  release:
+    if: "github.event_name == 'push' && !contains(github.event.head_commit.message, 'chore(release):')"
+    runs-on: ubuntu-latest
+    outputs:
+      new_release_published: ${{ steps.semrel.outputs.new_release_published }}
+      new_release_version: ${{ steps.semrel.outputs.new_release_version }}
+    steps:
+      - name: Descargar el código (con historial completo)
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: true
+
+      - name: Configurar Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Instalar dependencias
+        run: npm ci
+
+      - name: Revisar tipos y pruebas antes de publicar
+        run: |
+          npm run typecheck
+          npm test
+
+      - name: Calcular versión y publicar release
+        id: semrel
+        uses: cycjimmy/semantic-release-action@v4
+        with:
+          semantic_version: 24
+          extra_plugins: |
+            @semantic-release/changelog
+            @semantic-release/git
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  build-android:
+    needs: release
+    # Corre si el release publicó una versión nueva, o si se lanzó a mano con un tag.
+    if: |
+      always() && (
+        github.event_name == 'workflow_dispatch' ||
+        (needs.release.result == 'success' && needs.release.outputs.new_release_published == 'true')
+      )
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      TAG: ${{ github.event_name == 'workflow_dispatch' && inputs.tag || format('v{0}', needs.release.outputs.new_release_version) }}
+    steps:
+      - name: Descargar el código en el tag
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ env.TAG }}
+
+      - name: Configurar Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      # Capacitor 7 requiere JDK 21.
+      # Sin 'cache: gradle' aquí: en este punto android/ aún no existe (se genera más abajo)
+      # y setup-java falla al no encontrar archivos *.gradle para calcular la clave de caché.
+      # NO se usa android-actions/setup-android: ubuntu-latest ya trae el Android SDK
+      # y esa acción fallaba con "Failed to find package 'tools'".
+      - name: Configurar JDK 21
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - name: Instalar dependencias
+        run: npm ci
+
+      - name: Compilar la parte web
+        run: npm run build
+
+      # Si android/ no está en el repo, se genera (cap add + versión sincronizada).
+      # Si ya está commiteada, cap add fallaría, así que solo se sincroniza (build + versión + cap sync).
+      - name: Preparar el proyecto Android
+        run: |
+          if [ ! -d android ]; then
+            npm run android:add
+          else
+            npm run android:sync
+          fi
+
+      - name: Aceptar licencias del SDK
+        run: yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses > /dev/null || true
+
+      # Descifra el keystore de release en un archivo temporal (no queda en el repo ni en el
+      # runner una vez termina el job). La ruta se pasa a Gradle en el paso siguiente.
+      - name: Restaurar el keystore de release
+        env:
+          KEYSTORE_B64: ${{ secrets.ANDROID_KEYSTORE_B64 }}
+        run: echo "$KEYSTORE_B64" | base64 -d > "${{ runner.temp }}/miplata.jks"
+
+      # Enlaza android/app/signing.gradle a build.gradle (ver scripts/apply-android-signing.mjs).
+      # La firma real la aplica Gradle en el siguiente paso, leyendo las variables de entorno.
+      - name: Aplicar la configuración de firma
+        run: npm run android:sign
+
+      - name: Compilar el APK firmado
+        working-directory: android
+        env:
+          MIPLATA_KEYSTORE_PATH: ${{ runner.temp }}/miplata.jks
+          MIPLATA_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          MIPLATA_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          MIPLATA_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          chmod +x gradlew
+          ./gradlew assembleRelease --no-daemon
+
+      - name: Renombrar el APK con la versión
+        run: |
+          mkdir -p dist-android
+          cp android/app/build/outputs/apk/release/app-release.apk "dist-android/mi-plata-${TAG}.apk"
+
+      - name: Guardar el APK como artefacto
+        uses: actions/upload-artifact@v4
+        with:
+          name: mi-plata-${{ env.TAG }}
+          path: dist-android/*.apk
+          if-no-files-found: error
+
+      - name: Adjuntar el APK al Release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release upload "${TAG}" "dist-android/mi-plata-${TAG}.apk" --clobber

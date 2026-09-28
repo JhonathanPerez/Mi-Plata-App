@@ -1,0 +1,391 @@
+/*
+ * Capa de refinamiento visual. Se carga al final: solo pule sombras, degradados, movimiento y detalles.
+ * Para volver al aspecto anterior basta con quitar su import en main.tsx.
+ * Todo lo que usa `color-mix()` tiene un valor de respaldo anterior (WebView antiguos lo ignoran sin romperse).
+ */
+:root {
+  --shadow: 0 1px 1px rgba(16, 38, 42, 0.04), 0 3px 8px rgba(16, 38, 42, 0.04), 0 16px 32px -12px rgba(16, 38, 42, 0.12);
+  --shadow-lift: 0 2px 4px rgba(16, 38, 42, 0.08), 0 20px 40px -14px rgba(11, 58, 51, 0.5);
+  --radius-l: 24px;
+  --hero-grad: linear-gradient(155deg, #17604f 0%, #0e3a33 46%, #092a25 100%);
+  --skeleton-shine: rgba(255, 255, 255, 0.7);
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+:root[data-theme='dark'] {
+  --hero-grad: linear-gradient(155deg, #1b5245 0%, #12352f 50%, #0c2521 100%);
+  --skeleton-shine: rgba(255, 255, 255, 0.07);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --hero-grad: linear-gradient(155deg, #1b5245 0%, #12352f 50%, #0c2521 100%);
+    --skeleton-shine: rgba(255, 255, 255, 0.07);
+  }
+}
+
+html {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Un velo de verde muy suave arriba, para que el fondo no sea plano. */
+body {
+  background-image: radial-gradient(120% 46% at 50% -6%, rgba(11, 122, 99, 0.13), transparent 70%);
+  background-repeat: no-repeat;
+}
+
+/* ---------- Tarjetas y valores ---------- */
+.tile {
+  box-shadow: var(--shadow);
+}
+
+number-flow-react {
+  font-variant-numeric: tabular-nums;
+}
+
+.hero {
+  position: relative;
+  overflow: hidden;
+  border-radius: 30px;
+  background: var(--hero-grad);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1), var(--shadow-lift);
+}
+
+/* Resplandor cálido en la esquina: da profundidad sin añadir ruido. */
+.hero::before {
+  content: '';
+  position: absolute;
+  top: -35%;
+  right: -22%;
+  width: 78%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgba(94, 214, 180, 0.22), transparent);
+  pointer-events: none;
+}
+
+.hero > * {
+  position: relative;
+}
+
+.hero__value {
+  font-size: 50px;
+  text-shadow: 0 2px 18px rgba(0, 0, 0, 0.18);
+}
+
+.pending-banner {
+  background: linear-gradient(135deg, #ffcb3d 0%, #f5b301 58%, #e9a400 100%);
+  box-shadow: 0 10px 22px -12px rgba(245, 179, 1, 0.9), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+}
+
+/* ---------- Botones ---------- */
+.btn,
+.chip,
+.choice,
+.segmented__item,
+.toggle__track,
+.icon-btn {
+  transition: background-color 0.18s, color 0.18s, border-color 0.18s, box-shadow 0.18s, transform 0.14s var(--ease-out);
+}
+
+.btn--primary {
+  background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0) 60%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.24), 0 8px 16px -8px rgba(11, 122, 99, 0.65);
+}
+
+.chip:active,
+.choice:active {
+  transform: scale(0.96);
+}
+
+.choice.is-selected {
+  box-shadow: 0 0 0 1px var(--primary), 0 8px 18px -10px rgba(11, 122, 99, 0.55);
+}
+
+/* ---------- Selector con píldora deslizante ---------- */
+.segmented__item {
+  position: relative;
+}
+
+.segmented__item.is-active {
+  background: transparent;
+  box-shadow: none;
+}
+
+.segmented__thumb {
+  position: absolute;
+  inset: 0;
+  border-radius: 10px;
+  background: var(--surface);
+  box-shadow: 0 1px 2px rgba(16, 38, 42, 0.14), 0 4px 10px -4px rgba(16, 38, 42, 0.18);
+}
+
+.segmented__label {
+  position: relative;
+  z-index: 1;
+}
+
+/* ---------- Navegación: cristal esmerilado e indicador que se desliza ---------- */
+.bottom-nav {
+  background: var(--surface);
+  background: color-mix(in srgb, var(--surface) 80%, transparent);
+  -webkit-backdrop-filter: blur(22px) saturate(1.6);
+  backdrop-filter: blur(22px) saturate(1.6);
+  border-top-color: rgba(16, 38, 42, 0.06);
+}
+
+.bottom-nav__item.is-active::before {
+  content: none;
+}
+
+.bottom-nav__indicator {
+  position: absolute;
+  top: 7px;
+  left: calc(50% - 30px);
+  width: 60px;
+  height: 34px;
+  border-radius: 17px;
+  background: rgba(11, 122, 99, 0.14);
+}
+
+:root[data-theme='dark'] .bottom-nav__indicator {
+  background: rgba(60, 203, 166, 0.18);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) .bottom-nav__indicator {
+    background: rgba(60, 203, 166, 0.18);
+  }
+}
+
+.bottom-nav__item > svg,
+.bottom-nav__item > span:not(.bottom-nav__indicator) {
+  position: relative;
+  z-index: 1;
+}
+
+.fab {
+  border-radius: 24px;
+  background: linear-gradient(145deg, #ffcf47 0%, #f5b301 55%, #e6a100 100%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.5), 0 2px 4px rgba(16, 38, 42, 0.18), 0 14px 26px -8px rgba(230, 161, 0, 0.75);
+}
+
+/* ---------- Hoja inferior (Vaul) ---------- */
+.sheet-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  background: rgba(6, 20, 22, 0.5);
+}
+
+.sheet {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 61;
+  margin-inline: auto;
+  border-radius: 30px 30px 0 0;
+  box-shadow: 0 -18px 50px rgba(6, 20, 22, 0.28);
+  outline: none;
+  animation: none;
+}
+
+.sheet__grabber {
+  flex: none;
+  width: 42px;
+  height: 5px;
+  margin: 10px auto 0;
+  border-radius: 3px;
+  background: var(--line);
+}
+
+.sheet__header {
+  padding-top: 8px;
+}
+
+/* ---------- Avisos ---------- */
+.toast {
+  animation: none;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2), 0 16px 32px -10px rgba(0, 0, 0, 0.5);
+}
+
+/* ---------- Estado vacío ---------- */
+.empty__emoji {
+  display: grid;
+  place-items: center;
+  width: 88px;
+  height: 88px;
+  margin-bottom: 4px;
+  border-radius: 50%;
+  font-size: 40px;
+  background: var(--surface-2);
+  background: radial-gradient(circle at 32% 26%, var(--surface) 0%, var(--surface-2) 100%);
+  box-shadow: 0 0 0 9px rgba(11, 122, 99, 0.07), var(--shadow);
+}
+
+/* ---------- Gastos por categorizar: deslizar para descartar ---------- */
+.pending-row {
+  position: relative;
+  display: block;
+  overflow: hidden;
+  background: var(--danger);
+}
+
+.pending-row__front {
+  position: relative;
+  display: flex;
+  align-items: stretch;
+  background: var(--surface);
+  touch-action: pan-y;
+  will-change: transform;
+}
+
+/* La franja visible al deslizar mide unos 96 px: el ícono va sobre el texto para que quepa. */
+.pending-row__reveal {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding-right: 16px;
+  color: var(--on-danger);
+  font-weight: 700;
+}
+
+.pending-row__reveal-inner {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  font-size: 12px;
+  transform-origin: right center;
+}
+
+/* Ya no hay botón "×": el descarte se hace deslizando (o con el botón oculto para lector de pantalla). */
+.pending-row__main {
+  padding-right: 16px;
+}
+
+/* ---------- Esqueletos de carga ---------- */
+.skeleton {
+  display: block;
+  background: linear-gradient(100deg, transparent 30%, var(--skeleton-shine) 50%, transparent 70%) 0 0 / 220% 100%, var(--line);
+  animation: shimmer 1.4s linear infinite;
+}
+
+@keyframes shimmer {
+  from {
+    background-position: 120% 0, 0 0;
+  }
+  to {
+    background-position: -120% 0, 0 0;
+  }
+}
+
+.page-skeleton {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.skeleton-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 18px 16px;
+}
+
+.skeleton-row + .skeleton-row {
+  border-top: 1px solid var(--line);
+}
+
+.skeleton-row__body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+.picker-link,
+.option-row {
+  transition: background-color 0.18s, border-color 0.18s, box-shadow 0.18s, transform 0.14s var(--ease-out);
+}
+
+.option-row:active,
+.picker-link:active {
+  transform: scale(0.985);
+}
+
+.option-row.is-selected {
+  box-shadow: 0 0 0 1px var(--primary), 0 8px 18px -12px rgba(11, 122, 99, 0.55);
+}
+
+/* ---------- Modo privacidad (el ojito) ---------- */
+.privacy-toggle {
+  width: 44px;
+  height: 44px;
+  color: var(--ink-2);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow);
+}
+
+.privacy-toggle[aria-pressed='true'] {
+  color: var(--primary);
+  background: var(--surface-2);
+  border-color: transparent;
+}
+
+.privacy-toggle:active {
+  transform: scale(0.92);
+}
+
+/* Los montos ocultos aparecen "desenfocados" y se aclaran al mostrarlos; en la dona, más compactos. */
+.amount-mask {
+  display: inline-block;
+  letter-spacing: 0.1em;
+  white-space: nowrap;
+  user-select: none;
+  animation: amount-mask-in 0.24s var(--ease-out) both;
+}
+
+.donut__total .amount-mask {
+  font-size: 0.8em;
+  letter-spacing: 0.06em;
+}
+
+@keyframes amount-mask-in {
+  from {
+    opacity: 0;
+    filter: blur(6px);
+  }
+  to {
+    opacity: 1;
+    filter: none;
+  }
+}

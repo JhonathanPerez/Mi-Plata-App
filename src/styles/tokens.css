@@ -1,0 +1,70 @@
+/*
+ * Sistema de diseño de Mi Plata.
+ * Identidad: verde esmeralda profundo (Colombia), un solo acento amarillo para la acción principal
+ * y la "regla del presupuesto" como elemento memorable. Todo lo demás es silencioso.
+ */
+:root {
+  --bg: #f3f6f2;
+  --surface: #ffffff;
+  --surface-2: #e8efea;
+  --ink: #10262a;
+  --ink-2: #4a6166;
+  --line: #d4ddd7;
+  --primary: #0b7a63;
+  --on-primary: #ffffff;
+  --accent: #f5b301;
+  --on-accent: #10262a;
+  --danger: #b93a26;
+  --on-danger: #ffffff;
+  --hero-bg: #0e3a33;
+  --hero-ink: #f1faf6;
+  --hero-ink-2: #a9d3c7;
+  --hero-track: rgba(255, 255, 255, 0.14);
+  --shadow: 0 1px 2px rgba(16, 38, 42, 0.06), 0 6px 18px rgba(16, 38, 42, 0.06);
+
+  --font-display: 'Bricolage Grotesque Variable', 'Figtree Variable', system-ui, sans-serif;
+  --font-body: 'Figtree Variable', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+
+  --radius-s: 10px;
+  --radius-m: 14px;
+  --radius-l: 22px;
+  --nav-h: 64px;
+  --tap: 48px;
+  --content-max: 560px;
+
+  color-scheme: light;
+}
+
+:root[data-theme='dark'] {
+  --bg: #0b1719;
+  --surface: #132428;
+  --surface-2: #1b3136;
+  --ink: #e8f1ee;
+  --ink-2: #9db4b0;
+  --line: #24393d;
+  --primary: #3ccba6;
+  --on-primary: #06231c;
+  --danger: #ff8a73;
+  --on-danger: #2a0d07;
+  --hero-bg: #12352f;
+  --shadow: none;
+  color-scheme: dark;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --bg: #0b1719;
+    --surface: #132428;
+    --surface-2: #1b3136;
+    --ink: #e8f1ee;
+    --ink-2: #9db4b0;
+    --line: #24393d;
+    --primary: #3ccba6;
+    --on-primary: #06231c;
+    --danger: #ff8a73;
+    --on-danger: #2a0d07;
+    --hero-bg: #12352f;
+    --shadow: none;
+    color-scheme: dark;
+  }
+}

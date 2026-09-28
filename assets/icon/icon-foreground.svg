@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 108 108">
+  <!--
+    Capa frontal del icono adaptativo (lienzo de 108, zona segura central de 66).
+    Anillo de "regla del presupuesto": 5 tramos con los colores de categorías,
+    igual que el DonutChart de Estadísticas, + punto dorado central.
+  -->
+  <circle cx="54" cy="52" r="25" fill="none" stroke="#E4572E" stroke-width="9.5" stroke-linecap="round"
+          stroke-dasharray="36.757 400" transform="rotate(-90 54 52)"/>
+  <circle cx="54" cy="52" r="25" fill="none" stroke="#9B5DE5" stroke-width="9.5" stroke-linecap="round"
+          stroke-dasharray="31.102 400" transform="rotate(1.44 54 52)"/>
+  <circle cx="54" cy="52" r="25" fill="none" stroke="#2A9D8F" stroke-width="9.5" stroke-linecap="round"
+          stroke-dasharray="28.274 400" transform="rotate(79.92 54 52)"/>
+  <circle cx="54" cy="52" r="25" fill="none" stroke="#3D8FD1" stroke-width="9.5" stroke-linecap="round"
+          stroke-dasharray="25.447 400" transform="rotate(151.92 54 52)"/>
+  <circle cx="54" cy="52" r="25" fill="none" stroke="#4C5C68" stroke-width="9.5" stroke-linecap="round"
+          stroke-dasharray="19.792 400" transform="rotate(217.44 54 52)"/>
+  <circle cx="54" cy="52" r="8.6" fill="#F5B301"/>
+</svg>
