@@ -1,3 +1,10 @@
+## [1.0.1](https://github.com/JhonathanPerez/Mi-Plata-App/compare/v1.0.0...v1.0.1) (2026-09-28)
+
+
+### Bug Fixes
+
+* solo las apps de SMS vienen marcadas por defecto en la captura ([692c24c](https://github.com/JhonathanPerez/Mi-Plata-App/commit/692c24c4cc520c258553ec2400b8edfebf6bf9cc))
+
 # 1.0.0 (2026-09-28)
 
 
