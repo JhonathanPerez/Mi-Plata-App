@@ -1,15 +1,9 @@
 node_modules
 dist
 public/assets/
-android/app/build
-android/build
-android/.gradle
-android/local.properties
+android/
 *.keystore
 *.jks
-android/keystore.properties
-android/app/signing.gradle
 .DS_Store
 .env
 .env.local
-android/
