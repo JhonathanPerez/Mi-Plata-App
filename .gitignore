@@ -12,3 +12,4 @@ android/app/signing.gradle
 .DS_Store
 .env
 .env.local
+android/
