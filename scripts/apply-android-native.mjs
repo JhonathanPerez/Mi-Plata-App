@@ -52,7 +52,7 @@ const originalXml = xml;
 
 if (!xml.includes('CaptureListenerService')) {
   const service = `
-        <!-- Lector de notificaciones de la captura automática de gastos (ver README §13). -->
+        <!-- Lector de notificaciones de la captura automática de gastos (ver README ▸ Captura automática de gastos). -->
         <service
             android:name="${appId}.CaptureListenerService"
             android:exported="true"
