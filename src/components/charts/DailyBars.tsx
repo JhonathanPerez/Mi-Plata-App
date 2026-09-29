@@ -1,4 +1,5 @@
 import { Amount } from '@/components/ui/Money';
+import { cssVars } from '@/lib/cssVars';
 import { formatShortDate } from '@/lib/dates';
 import type { DailyTotal } from '@/types/models';
 
@@ -17,7 +18,7 @@ export function DailyBars({ days }: DailyBarsProps) {
           <span
             key={day.date}
             className={`daily__bar${day.total === 0 ? ' is-empty' : ''}${peak && day.date === peak.date ? ' is-peak' : ''}`}
-            style={{ height: `${max > 0 ? Math.max((day.total / max) * 100, day.total > 0 ? 6 : 0) : 0}%` }}
+            style={cssVars({ '--bar-h': `${max > 0 ? Math.max((day.total / max) * 100, day.total > 0 ? 6 : 0) : 0}%` })}
           />
         ))}
       </div>

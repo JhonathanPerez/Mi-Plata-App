@@ -1,4 +1,5 @@
 import { cx } from '@/lib/cx';
+import { cssVars } from '@/lib/cssVars';
 import { Icon } from './Icon';
 
 interface ColorPickerProps {
@@ -19,7 +20,7 @@ export function ColorPicker({ colors, value, onChange, label }: ColorPickerProps
           aria-checked={color === value}
           aria-label={`Color ${color}`}
           className={cx('picker__color', color === value && 'is-selected')}
-          style={{ background: color }}
+          style={cssVars({ '--swatch': color })}
           onClick={() => onChange(color)}
         >
           {color === value && <Icon name="check" size={18} />}

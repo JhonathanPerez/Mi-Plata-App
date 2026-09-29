@@ -11,6 +11,7 @@ import { Skeleton } from '@/components/ui/Skeleton';
 import { useQuery } from '@/hooks/useQuery';
 import { useAmountFormat } from '@/app/providers/PrivacyProvider';
 import { diffDays, todayIso } from '@/lib/dates';
+import { cssVars } from '@/lib/cssVars';
 import { dueLabel, formatDayMonth, periodMonthName, relativeDays, shadeColor } from '@/lib/statementText';
 import { cardService, type CardOverview, type CardStatement } from '@/services/cardService';
 
@@ -74,7 +75,7 @@ export function CardsPage() {
               <section
                 key={method.id}
                 className="pv-card"
-                style={{ background: `linear-gradient(145deg, ${method.color}, ${shadeColor(method.color, 0.42)})` }}
+                style={cssVars({ '--card-from': method.color, '--card-to': shadeColor(method.color, 0.42) })}
                 aria-label={method.name}
               >
                 <div className="pv-card__top">
