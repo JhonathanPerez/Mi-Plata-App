@@ -1,29 +1,9 @@
 /*
- * Capa de refinamiento visual. Se carga al final: solo pule sombras, degradados, movimiento y detalles.
- * Para volver al aspecto anterior basta con quitar su import en main.tsx.
+ * Capa de refinamiento visual. Se carga después de screens.css y antes de cards.css:
+ * solo pule sombras, degradados, movimiento y detalles.
+ * Todos los valores de color, sombra y movimiento salen de tokens.css (aquí no se declara ninguna variable global).
  * Todo lo que usa `color-mix()` tiene un valor de respaldo anterior (WebView antiguos lo ignoran sin romperse).
  */
-:root {
-  --shadow: 0 1px 1px rgba(16, 38, 42, 0.04), 0 3px 8px rgba(16, 38, 42, 0.04), 0 16px 32px -12px rgba(16, 38, 42, 0.12);
-  --shadow-lift: 0 2px 4px rgba(16, 38, 42, 0.08), 0 20px 40px -14px rgba(11, 58, 51, 0.5);
-  --radius-l: 24px;
-  --hero-grad: linear-gradient(155deg, #17604f 0%, #0e3a33 46%, #092a25 100%);
-  --skeleton-shine: rgba(255, 255, 255, 0.7);
-  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-:root[data-theme='dark'] {
-  --hero-grad: linear-gradient(155deg, #1b5245 0%, #12352f 50%, #0c2521 100%);
-  --skeleton-shine: rgba(255, 255, 255, 0.07);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme='light']) {
-    --hero-grad: linear-gradient(155deg, #1b5245 0%, #12352f 50%, #0c2521 100%);
-    --skeleton-shine: rgba(255, 255, 255, 0.07);
-  }
-}
-
 html {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -31,7 +11,7 @@ html {
 
 /* Un velo de verde muy suave arriba, para que el fondo no sea plano. */
 body {
-  background-image: radial-gradient(120% 46% at 50% -6%, rgba(11, 122, 99, 0.13), transparent 70%);
+  background-image: radial-gradient(120% 46% at 50% -6%, var(--primary-veil), transparent 70%);
   background-repeat: no-repeat;
 }
 
@@ -49,7 +29,7 @@ number-flow-react {
   overflow: hidden;
   border-radius: 30px;
   background: var(--hero-grad);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1), var(--shadow-lift);
+  box-shadow: var(--shadow-hero);
 }
 
 /* Resplandor cálido en la esquina: da profundidad sin añadir ruido. */
@@ -61,7 +41,7 @@ number-flow-react {
   width: 78%;
   aspect-ratio: 1;
   border-radius: 50%;
-  background: radial-gradient(closest-side, rgba(94, 214, 180, 0.22), transparent);
+  background: radial-gradient(closest-side, var(--mint-glow), transparent);
   pointer-events: none;
 }
 
@@ -71,12 +51,12 @@ number-flow-react {
 
 .hero__value {
   font-size: 50px;
-  text-shadow: 0 2px 18px rgba(0, 0, 0, 0.18);
+  text-shadow: var(--shadow-text-hero);
 }
 
 .pending-banner {
-  background: linear-gradient(135deg, #ffcb3d 0%, #f5b301 58%, #e9a400 100%);
-  box-shadow: 0 10px 22px -12px rgba(245, 179, 1, 0.9), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+  background: var(--accent-grad-banner);
+  box-shadow: var(--shadow-banner);
 }
 
 /* ---------- Botones ---------- */
@@ -90,8 +70,8 @@ number-flow-react {
 }
 
 .btn--primary {
-  background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0) 60%);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.24), 0 8px 16px -8px rgba(11, 122, 99, 0.65);
+  background-image: var(--gloss-primary);
+  box-shadow: var(--shadow-cta);
 }
 
 .chip:active,
@@ -100,7 +80,7 @@ number-flow-react {
 }
 
 .choice.is-selected {
-  box-shadow: 0 0 0 1px var(--primary), 0 8px 18px -10px rgba(11, 122, 99, 0.55);
+  box-shadow: var(--shadow-selected);
 }
 
 /* ---------- Selector con píldora deslizante ---------- */
@@ -118,7 +98,7 @@ number-flow-react {
   inset: 0;
   border-radius: 10px;
   background: var(--surface);
-  box-shadow: 0 1px 2px rgba(16, 38, 42, 0.14), 0 4px 10px -4px rgba(16, 38, 42, 0.18);
+  box-shadow: var(--shadow-thumb);
 }
 
 .segmented__label {
@@ -132,7 +112,7 @@ number-flow-react {
   background: color-mix(in srgb, var(--surface) 80%, transparent);
   -webkit-backdrop-filter: blur(22px) saturate(1.6);
   backdrop-filter: blur(22px) saturate(1.6);
-  border-top-color: rgba(16, 38, 42, 0.06);
+  border-top-color: var(--line-nav);
 }
 
 .bottom-nav__item.is-active::before {
@@ -146,17 +126,7 @@ number-flow-react {
   width: 60px;
   height: 34px;
   border-radius: 17px;
-  background: rgba(11, 122, 99, 0.14);
-}
-
-:root[data-theme='dark'] .bottom-nav__indicator {
-  background: rgba(60, 203, 166, 0.18);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme='light']) .bottom-nav__indicator {
-    background: rgba(60, 203, 166, 0.18);
-  }
+  background: var(--nav-indicator);
 }
 
 .bottom-nav__item > svg,
@@ -167,8 +137,8 @@ number-flow-react {
 
 .fab {
   border-radius: 24px;
-  background: linear-gradient(145deg, #ffcf47 0%, #f5b301 55%, #e6a100 100%);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.5), 0 2px 4px rgba(16, 38, 42, 0.18), 0 14px 26px -8px rgba(230, 161, 0, 0.75);
+  background: var(--accent-grad-fab);
+  box-shadow: var(--shadow-fab);
 }
 
 /* ---------- Hoja inferior (Vaul) ---------- */
@@ -176,7 +146,7 @@ number-flow-react {
   position: fixed;
   inset: 0;
   z-index: 60;
-  background: rgba(6, 20, 22, 0.5);
+  background: var(--scrim);
 }
 
 .sheet {
@@ -187,7 +157,7 @@ number-flow-react {
   z-index: 61;
   margin-inline: auto;
   border-radius: 30px 30px 0 0;
-  box-shadow: 0 -18px 50px rgba(6, 20, 22, 0.28);
+  box-shadow: var(--shadow-sheet);
   outline: none;
   animation: none;
 }
@@ -208,7 +178,7 @@ number-flow-react {
 /* ---------- Avisos ---------- */
 .toast {
   animation: none;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2), 0 16px 32px -10px rgba(0, 0, 0, 0.5);
+  box-shadow: var(--shadow-toast);
 }
 
 /* ---------- Estado vacío ---------- */
@@ -222,7 +192,7 @@ number-flow-react {
   font-size: 40px;
   background: var(--surface-2);
   background: radial-gradient(circle at 32% 26%, var(--surface) 0%, var(--surface-2) 100%);
-  box-shadow: 0 0 0 9px rgba(11, 122, 99, 0.07), var(--shadow);
+  box-shadow: 0 0 0 9px var(--primary-halo), var(--shadow);
 }
 
 /* ---------- Gastos por categorizar: deslizar para descartar ---------- */
@@ -342,7 +312,7 @@ number-flow-react {
 }
 
 .option-row.is-selected {
-  box-shadow: 0 0 0 1px var(--primary), 0 8px 18px -12px rgba(11, 122, 99, 0.55);
+  box-shadow: var(--shadow-selected);
 }
 
 /* ---------- Modo privacidad (el ojito) ---------- */

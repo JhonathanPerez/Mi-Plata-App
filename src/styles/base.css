@@ -211,7 +211,7 @@ ul {
   place-items: center;
   background: var(--accent);
   color: var(--on-accent);
-  box-shadow: 0 6px 20px rgba(16, 38, 42, 0.3);
+  box-shadow: var(--shadow-fab-base);
   text-decoration: none;
 }
 
