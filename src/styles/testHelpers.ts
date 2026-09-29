@@ -9,3 +9,12 @@ export function sourceFiles(dir: string): string[] {
     return /\.tsx?$/.test(name) && !/\.test\.tsx?$/.test(name) ? [path] : [];
   });
 }
+
+/** Rutas (relativas a `dir`, con `/`) de todos los .css de una carpeta, incluidas sus subcarpetas. */
+export function cssFilesIn(dir: string, prefix = ''): string[] {
+  return readdirSync(join(dir, prefix)).flatMap((name) => {
+    const relative = prefix ? `${prefix}/${name}` : name;
+    if (statSync(join(dir, relative)).isDirectory()) return cssFilesIn(dir, relative);
+    return name.endsWith('.css') ? [relative] : [];
+  });
+}

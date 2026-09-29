@@ -71,19 +71,19 @@ export function SwipeToPayRow({ expense, onSelect, onTogglePaid, onDelete }: Swi
   );
 
   return (
-    <div className="sw-wrap">
-      <motion.div className={`sw-reveal${isDue ? '' : ' sw-reveal--undo'}`} style={{ opacity: payOpacity }} aria-hidden="true">
+    <div className="swipe-row">
+      <motion.div className={`swipe-row__reveal${isDue ? '' : ' swipe-row__reveal--undo'}`} style={{ opacity: payOpacity }} aria-hidden="true">
         <Icon name={isDue ? 'check' : 'refresh'} size={22} />
         <span>{isDue ? 'Pagado' : 'Por pagar'}</span>
       </motion.div>
       {onDelete && (
-        <motion.div className="sw-reveal sw-reveal--danger" style={{ opacity: deleteOpacity }} aria-hidden="true">
+        <motion.div className="swipe-row__reveal swipe-row__reveal--danger" style={{ opacity: deleteOpacity }} aria-hidden="true">
           <span>Eliminar</span>
           <Icon name="trash" size={22} />
         </motion.div>
       )}
       {/* Los manejadores de useDrag son del DOM; motion.div tipa algunos (onAnimationStart...) distinto. Solo choca el tipo. */}
-      <motion.div className="sw-front" style={{ x }} {...(bind() as unknown as HTMLMotionProps<'div'>)}>
+      <motion.div className="swipe-row__front" style={{ x }} {...(bind() as unknown as HTMLMotionProps<'div'>)}>
         <ExpenseRow
           expense={expense}
           onSelect={(id) => {

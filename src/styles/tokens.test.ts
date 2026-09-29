@@ -1,7 +1,7 @@
-import { readFileSync, readdirSync } from 'node:fs';
+import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
-import { sourceFiles } from './testHelpers';
+import { cssFilesIn, sourceFiles } from './testHelpers';
 
 /**
  * Guardas del sistema de tokens (ver src/styles/tokens.css):
@@ -15,7 +15,7 @@ const STYLES = join(ROOT, 'src/styles');
 const read = (path: string) => readFileSync(path, 'utf8').replace(/\r\n/g, '\n');
 const stripComments = (css: string) => css.replace(/\/\*[\s\S]*?\*\//g, '');
 
-const cssFiles = readdirSync(STYLES).filter((f) => f.endsWith('.css'));
+const cssFiles = cssFilesIn(STYLES);
 const tokens = stripComments(read(join(STYLES, 'tokens.css')));
 
 /** Extrae `--nombre: valor` de un bloque, normalizando espacios. */

@@ -1,0 +1,45 @@
+/* Modo privacidad (el ojito): botón y montos ocultos. */
+
+.privacy-toggle {
+  width: 44px;
+  height: 44px;
+  color: var(--ink-2);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow);
+}
+
+.privacy-toggle[aria-pressed='true'] {
+  color: var(--primary);
+  background: var(--surface-2);
+  border-color: transparent;
+}
+
+.privacy-toggle:active {
+  transform: scale(0.92);
+}
+
+/* Los montos ocultos aparecen "desenfocados" y se aclaran al mostrarlos; en la dona, más compactos. */
+.amount-mask {
+  display: inline-block;
+  letter-spacing: 0.1em;
+  white-space: nowrap;
+  user-select: none;
+  animation: amount-mask-in 0.24s var(--ease-out) both;
+}
+
+.donut__total .amount-mask {
+  font-size: 0.8em;
+  letter-spacing: 0.06em;
+}
+
+@keyframes amount-mask-in {
+  from {
+    opacity: 0;
+    filter: blur(6px);
+  }
+  to {
+    opacity: 1;
+    filter: none;
+  }
+}

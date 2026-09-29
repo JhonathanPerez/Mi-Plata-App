@@ -317,7 +317,7 @@ export function ExpenseFormPage() {
                 { value: 'due', label: 'Por pagar' },
               ]}
             />
-            <p className={cx('st-hint', !paid && 'st-hint--due')}>
+            <p className={cx('payment-hint', !paid && 'payment-hint--due')}>
               <Icon name={paid ? 'check' : 'info'} size={16} />
               <span>{statusHint(paid, methodType, selectedMethod?.name)}</span>
             </p>

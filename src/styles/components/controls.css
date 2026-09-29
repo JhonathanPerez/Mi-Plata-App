@@ -1,0 +1,174 @@
+/* Controles de selección: segmentado, contador, chips, emoji y interruptor. */
+
+.segmented {
+  display: flex;
+  padding: 4px;
+  gap: 4px;
+  background: var(--surface-2);
+  border-radius: var(--radius-m);
+}
+
+.segmented__item {
+  position: relative;
+  flex: 1;
+  min-height: 42px;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  font-weight: 600;
+  color: var(--ink-2);
+  transition: var(--motion-press);
+}
+
+.segmented__item.is-active {
+  color: var(--ink);
+  font-weight: 700;
+}
+
+/* Píldora que se desliza bajo la opción activa (motion la anima; ver Segmented.tsx). */
+.segmented__thumb {
+  position: absolute;
+  inset: 0;
+  border-radius: 10px;
+  background: var(--surface);
+  box-shadow: var(--shadow-thumb);
+}
+
+.segmented__label {
+  position: relative;
+  z-index: 1;
+}
+
+.stepper {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.stepper__label {
+  white-space: nowrap;
+  font-family: var(--font-display);
+  font-weight: 650;
+  font-size: 18px;
+}
+
+.chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+  padding: 0 16px;
+  border-radius: 999px;
+  border: 1.5px solid var(--line);
+  background: var(--surface);
+  font-weight: 600;
+  transition: var(--motion-press);
+}
+
+.chip.is-selected {
+  border-color: var(--primary);
+  background: color-mix(in srgb, var(--primary) 14%, var(--surface));
+  color: var(--ink);
+}
+
+.chip:active {
+  transform: scale(0.96);
+}
+
+.emoji-tile {
+  flex: none;
+  display: grid;
+  place-items: center;
+  border: 1.5px solid;
+  border-color: var(--tile-color, currentColor);
+  background: var(--surface-2);
+  background: color-mix(in srgb, var(--tile-color) 22%, transparent);
+}
+
+.emoji-tile--md {
+  width: 40px;
+  height: 40px;
+  border-radius: 13px;
+  font-size: 21px;
+}
+
+.emoji-tile--sm {
+  width: 30px;
+  height: 30px;
+  border-radius: 10px;
+  font-size: 16px;
+}
+
+.toggle {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  min-height: var(--tap);
+}
+
+.toggle__text {
+  display: flex;
+  flex-direction: column;
+}
+
+.toggle__label {
+  font-weight: 650;
+}
+
+.toggle__hint {
+  font-size: 14px;
+  color: var(--ink-2);
+}
+
+.toggle__input {
+  position: absolute;
+  right: 0;
+  width: 52px;
+  height: 32px;
+  opacity: 0;
+  margin: 0;
+}
+
+.toggle__track {
+  flex: none;
+  width: 52px;
+  height: 32px;
+  border-radius: 999px;
+  background: var(--line);
+  position: relative;
+  transition: var(--motion-press);
+}
+
+.toggle__track::after {
+  content: '';
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--white);
+  box-shadow: var(--shadow-knob);
+  transition: transform 0.15s;
+}
+
+.toggle__input:checked + .toggle__track {
+  background: var(--primary);
+}
+
+.toggle__input:checked + .toggle__track::after {
+  transform: translateX(20px);
+}
+
+.toggle__input:focus-visible + .toggle__track {
+  outline: 3px solid var(--primary);
+  outline-offset: 2px;
+}

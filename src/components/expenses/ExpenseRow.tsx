@@ -47,7 +47,7 @@ export function ExpenseRow({ expense, onSelect, showDate }: ExpenseRowProps) {
           {expense.note && <span className="expense-row__note">{expense.note}</span>}
           <span className="expense-row__meta">
             {meta}
-            {expense.paidAt === null && <span className="st-badge">Por pagar</span>}
+            {expense.paidAt === null && <span className="payment-badge">Por pagar</span>}
           </span>
         </span>
         <span className="expense-row__side">

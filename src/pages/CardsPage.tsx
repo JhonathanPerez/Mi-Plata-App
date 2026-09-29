@@ -56,7 +56,7 @@ export function CardsPage() {
           <ReminderPrompt />
 
           {alerts.map(({ overview, statement, daysLeft }) => (
-            <section className="pv-alert" key={`${overview.method.id}-${statement.period}`} role="status">
+            <section className="statement-alert" key={`${overview.method.id}-${statement.period}`} role="status">
               <Icon name="warning" size={22} />
               <span>
                 <strong>
@@ -74,22 +74,22 @@ export function CardsPage() {
             return (
               <section
                 key={method.id}
-                className="pv-card"
+                className="credit-card"
                 style={cssVars({ '--card-from': method.color, '--card-to': shadeColor(method.color, 0.42) })}
                 aria-label={method.name}
               >
-                <div className="pv-card__top">
-                  <span className="pv-card__name">{method.name}</span>
-                  {method.last4 && <span className="pv-card__num">•••• {method.last4}</span>}
+                <div className="credit-card__top">
+                  <span className="credit-card__name">{method.name}</span>
+                  {method.last4 && <span className="credit-card__num">•••• {method.last4}</span>}
                 </div>
 
                 {!overview.configured ? (
                   <>
-                    <div className="rl-stm">
+                    <div className="credit-card__statement">
                       <span>Falta configurar el corte y el pago</span>
                       <small>Sin esas fechas no se pueden armar los extractos de esta tarjeta.</small>
                     </div>
-                    <button type="button" className="pv-pay" onClick={() => navigate(`/tarjetas/${method.id}/fechas`)}>
+                    <button type="button" className="credit-card__pay" onClick={() => navigate(`/tarjetas/${method.id}/fechas`)}>
                       <Icon name="calendar" size={18} />
                       Configurar fechas
                     </button>
@@ -97,7 +97,7 @@ export function CardsPage() {
                 ) : (
                   <>
                     {overview.payable.map((statement) => (
-                      <div className="rl-stm rl-stm--due" key={statement.period}>
+                      <div className="credit-card__statement credit-card__statement--due" key={statement.period}>
                         <span>
                           Extracto de {periodMonthName(statement.period)} · cerrado el {formatDayMonth(statement.cutDate)}
                         </span>
@@ -111,7 +111,7 @@ export function CardsPage() {
                       </div>
                     ))}
                     {overview.open && (
-                      <div className="rl-stm">
+                      <div className="credit-card__statement">
                         <span>Ciclo de {periodMonthName(overview.open.period)} · abierto</span>
                         <strong>
                           <Amount value={overview.open.unpaidTotal} />
@@ -123,21 +123,21 @@ export function CardsPage() {
                       </div>
                     )}
                     {overview.payable.length > 0 && (
-                      <button type="button" className="pv-pay" onClick={() => navigate(`/tarjetas/${method.id}/pagar`)}>
+                      <button type="button" className="credit-card__pay" onClick={() => navigate(`/tarjetas/${method.id}/pagar`)}>
                         <Icon name="check" size={18} />
                         {overview.payable.length === 1
                           ? `Pagar extracto de ${periodMonthName(overview.payable[0].period)}`
                           : 'Pagar tarjeta'}
                       </button>
                     )}
-                    <div className="cy-links">
+                    <div className="credit-card__links">
                       {target && (
-                        <button type="button" className="cy-link cy-link--button" onClick={() => setEditing({ overview, statement: target })}>
+                        <button type="button" className="credit-card__link credit-card__link--button" onClick={() => setEditing({ overview, statement: target })}>
                           <Icon name="edit" size={16} />
                           Cambiar fechas de este mes
                         </button>
                       )}
-                      <button type="button" className="cy-link cy-link--button" onClick={() => navigate(`/tarjetas/${method.id}/extractos`)}>
+                      <button type="button" className="credit-card__link credit-card__link--button" onClick={() => navigate(`/tarjetas/${method.id}/extractos`)}>
                         Fechas y extractos
                         <Icon name="chevronRight" size={16} />
                       </button>
