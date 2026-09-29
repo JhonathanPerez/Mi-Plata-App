@@ -7,11 +7,16 @@
 html {
   -webkit-text-size-adjust: 100%;
   -webkit-tap-highlight-color: transparent;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 body {
   margin: 0;
   background: var(--bg);
+  /* Un velo de verde muy suave arriba, para que el fondo no sea plano. */
+  background-image: radial-gradient(120% 46% at 50% -6%, var(--primary-veil), transparent 70%);
+  background-repeat: no-repeat;
   color: var(--ink);
   font-family: var(--font-body);
   font-size: 16px;
@@ -166,8 +171,12 @@ ul {
   display: flex;
   height: calc(var(--nav-h) + env(safe-area-inset-bottom));
   padding-bottom: env(safe-area-inset-bottom);
+  /* Cristal esmerilado; el color sólido es el respaldo para WebView sin color-mix(). */
   background: var(--surface);
-  border-top: 1px solid var(--line);
+  background: color-mix(in srgb, var(--surface) 80%, transparent);
+  -webkit-backdrop-filter: blur(22px) saturate(1.6);
+  backdrop-filter: blur(22px) saturate(1.6);
+  border-top: 1px solid var(--line-nav);
 }
 
 .bottom-nav__item {
@@ -189,14 +198,21 @@ ul {
   font-weight: 700;
 }
 
-.bottom-nav__item.is-active::before {
-  content: '';
+/* Indicador que se desliza entre pestañas (motion lo anima; ver BottomNav.tsx). */
+.bottom-nav__indicator {
   position: absolute;
-  top: 0;
-  width: 32px;
-  height: 3px;
-  border-radius: 0 0 3px 3px;
-  background: var(--primary);
+  top: 7px;
+  left: calc(50% - 30px);
+  width: 60px;
+  height: 34px;
+  border-radius: 17px;
+  background: var(--nav-indicator);
+}
+
+.bottom-nav__item > svg,
+.bottom-nav__item > span:not(.bottom-nav__indicator) {
+  position: relative;
+  z-index: 1;
 }
 
 .fab {
@@ -206,12 +222,12 @@ ul {
   z-index: 25;
   width: 64px;
   height: 64px;
-  border-radius: 22px;
+  border-radius: 24px;
   display: grid;
   place-items: center;
-  background: var(--accent);
+  background: var(--accent-grad-fab);
   color: var(--on-accent);
-  box-shadow: var(--shadow-fab-base);
+  box-shadow: var(--shadow-fab);
   text-decoration: none;
 }
 

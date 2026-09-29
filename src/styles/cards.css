@@ -1,6 +1,6 @@
 /*
  * Estados pagado / por pagar, tarjetas de crédito (extractos) y reglas de corte y pago.
- * Se carga después de polish.css.
+ * Se carga al final: sus reglas van después de las de los demás archivos.
  */
 .pv-alert {
   display:flex;
