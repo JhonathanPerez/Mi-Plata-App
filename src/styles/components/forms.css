@@ -1,0 +1,140 @@
+/* Formularios: contenedor, campos, entradas de texto y de monto. */
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.form__footer {
+  position: sticky;
+  bottom: 0;
+  margin: 0 -16px;
+  padding: 14px 16px calc(14px + env(safe-area-inset-bottom));
+  background: linear-gradient(to bottom, transparent, var(--bg) 28%);
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.fieldset {
+  border: 0;
+  padding: 0;
+  margin: 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.field__label {
+  font-size: 14px;
+  font-weight: 650;
+  color: var(--ink-2);
+  padding: 0;
+}
+
+.field__hint {
+  font-size: 14px;
+  color: var(--ink-2);
+}
+
+.field__error {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--danger);
+}
+
+.input {
+  width: 100%;
+  min-height: var(--tap);
+  padding: 0 14px;
+  border-radius: var(--radius-m);
+  border: 1.5px solid var(--line);
+  background: var(--surface);
+  color: var(--ink);
+}
+
+.input:focus {
+  border-color: var(--primary);
+  outline: none;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 25%, transparent);
+}
+
+.input--date {
+  flex: 1;
+  min-width: 150px;
+}
+
+.money {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.money__label {
+  font-size: 14px;
+  font-weight: 650;
+  color: var(--ink-2);
+}
+
+.money__box {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  border-bottom: 2px solid var(--line);
+  padding: 4px 0 6px;
+}
+
+.money__box:focus-within {
+  border-color: var(--primary);
+}
+
+.money--error .money__box {
+  border-color: var(--danger);
+}
+
+.money__symbol {
+  font-family: var(--font-display);
+  font-weight: 600;
+  color: var(--ink-2);
+  font-size: 22px;
+}
+
+.money__input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  background: transparent;
+  outline: none;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 24px;
+  font-variant-numeric: tabular-nums;
+}
+
+.money--hero .money__symbol {
+  font-size: 34px;
+}
+
+.money--hero .money__input {
+  font-size: 52px;
+  letter-spacing: -0.02em;
+}
+
+.money--hero .money__input::placeholder {
+  color: var(--line);
+}
+
+.input--area {
+  padding: 12px 14px;
+  min-height: 120px;
+  resize: vertical;
+  line-height: 1.4;
+}

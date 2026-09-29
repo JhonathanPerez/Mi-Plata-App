@@ -110,7 +110,7 @@ export function ReminderSettingsCard() {
           <Button variant="secondary" block icon="bell" onClick={() => void test()}>
             Enviar aviso de prueba
           </Button>
-          <p className="field__hint rm-note">
+          <p className="field__hint reminder-note">
             <Icon name="info" size={16} />
             <span>
               Si pagas un extracto, sus avisos se cancelan solos. En Xiaomi, Samsung u Oppo, deja Mi Plata «sin restricciones» en Batería para que los avisos no se

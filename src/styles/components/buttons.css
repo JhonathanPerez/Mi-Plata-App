@@ -1,0 +1,75 @@
+/* Botones. */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: var(--tap);
+  padding: 0 20px;
+  border-radius: var(--radius-m);
+  border: 1.5px solid transparent;
+  font-weight: 650;
+  font-size: 16px;
+  text-align: center;
+  transition: var(--motion-press);
+}
+
+.btn--lg {
+  min-height: 58px;
+  font-size: 18px;
+  border-radius: 18px;
+}
+
+.btn--block {
+  width: 100%;
+}
+
+.btn--primary {
+  background: var(--primary);
+  background-image: var(--gloss-primary);
+  color: var(--on-primary);
+  box-shadow: var(--shadow-cta);
+}
+
+.btn--secondary {
+  background: var(--surface);
+  border-color: var(--line);
+  color: var(--ink);
+}
+
+.btn--danger {
+  background: var(--danger);
+  color: var(--on-danger);
+}
+
+.btn--ghost {
+  background: transparent;
+  color: var(--primary);
+}
+
+.btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.btn:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+.icon-btn {
+  width: var(--tap);
+  height: var(--tap);
+  display: grid;
+  place-items: center;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--ink);
+  flex: none;
+  transition: var(--motion-press);
+}
+
+.icon-btn:active {
+  background: var(--surface-2);
+}

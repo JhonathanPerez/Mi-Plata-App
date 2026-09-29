@@ -98,15 +98,15 @@ export function CardRulesPage() {
     <div className="page page--form">
       <PageHeader title={method ? `Fechas de ${method.name}` : 'Fechas del ciclo'} back />
 
-      <section className="cy-block">
-        <h2 className="cy-block__title">
+      <section className="rule-panel">
+        <h2 className="rule-panel__title">
           <Icon name="calendar" size={20} />
           Fechas del ciclo
         </h2>
         <RuleField label="Corte" value={describeCut(rules)} onOpen={() => setSheet('cut')} />
         <RuleField label="Fecha límite de pago" value={describeDue(rules)} onOpen={() => setSheet('due')} />
         {canFallOnWeekend && <RuleField label="Si el pago cae en fin de semana" value={WEEKEND_LABELS[rules.weekend]} onOpen={() => setSheet('due')} />}
-        <p className="cy-note">
+        <p className="rule-note">
           <Icon name="info" size={16} />
           <span>
             Son las reglas de siempre. Si un mes el banco las cambia, ajusta solo ese extracto desde <strong>Tarjetas</strong>. Los extractos ya pagados
@@ -123,13 +123,13 @@ export function CardRulesPage() {
       )}
 
       {!problem && (
-        <section className="rl-up" aria-label="Próximos extractos">
-          <h3 className="rl-up__title">
+        <section className="upcoming-statements" aria-label="Próximos extractos">
+          <h3 className="upcoming-statements__title">
             <Icon name="calendar" size={18} />
             Próximos extractos
           </h3>
           {upcoming.map((item) => (
-            <div className="rl-up__row" key={item.period}>
+            <div className="upcoming-statements__row" key={item.period}>
               <strong>{capitalize(periodMonthName(item.period)).slice(0, 3)}</strong>
               <span>
                 Corte <b>{formatDayMonth(item.cut)}</b>

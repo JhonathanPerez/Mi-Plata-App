@@ -16,8 +16,8 @@ export function DueSummaryCard({ summary, onPay }: DueSummaryCardProps) {
   const hasCards = summary.cards.length > 0;
   const anyClosed = summary.cards.some((card) => card.hasClosedStatement);
   return (
-    <section className="pp-home" aria-label="Por pagar">
-      <div className="pp-home__head">
+    <section className="due-summary" aria-label="Por pagar">
+      <div className="due-summary__head">
         <span>
           <Icon name="card" size={18} />
           Por pagar
@@ -28,11 +28,11 @@ export function DueSummaryCard({ summary, onPay }: DueSummaryCardProps) {
       </div>
 
       {summary.cards.map((card) => (
-        <div className="pp-home__row" key={card.methodId}>
+        <div className="due-summary__row" key={card.methodId}>
           <EmojiTile emoji={card.icon} color={card.color} />
           <div>
             <strong>{card.name}</strong>
-            <span className={card.nextDue?.overdue ? 'pp-home__late' : undefined}>
+            <span className={card.nextDue?.overdue ? 'due-summary__late' : undefined}>
               {card.nextDue
                 ? dueLabel(card.nextDue.date, card.nextDue.daysLeft)
                 : card.configured
@@ -47,7 +47,7 @@ export function DueSummaryCard({ summary, onPay }: DueSummaryCardProps) {
       ))}
 
       {summary.other.count > 0 && (
-        <Link className="pp-home__row pp-home__row--link" to="/gastos?estado=por-pagar">
+        <Link className="due-summary__row due-summary__row--link" to="/gastos?estado=por-pagar">
           <EmojiTile emoji="🧾" color="#7A6F66" />
           <div>
             <strong>Otros métodos</strong>
@@ -66,7 +66,7 @@ export function DueSummaryCard({ summary, onPay }: DueSummaryCardProps) {
           {anyClosed ? 'Pagar tarjeta' : 'Ver tarjetas'}
         </Button>
       )}
-      <p className="pp-home__note">
+      <p className="due-summary__note">
         <Icon name="info" size={15} />
         <span>Ya está incluido en «Gastos del mes»: pagar no cambia tu presupuesto.</span>
       </p>

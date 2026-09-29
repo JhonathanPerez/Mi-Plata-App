@@ -1,0 +1,34 @@
+/*
+ * Punto de entrada de los estilos. Aquí se decide qué gana cuando dos reglas chocan: el orden de las
+ * capas (la última gana), sin depender de la especificidad ni del orden en que se importen los archivos.
+ *
+ *   boot        splash de arranque de index.html (la más débil: cualquier estilo de la app la sustituye)
+ *   tokens      variables de diseño y temas claro/oscuro
+ *   base        reset, tipografía, estructura y navegación
+ *   components  piezas reutilizables (botones, campos, paneles, gráficos…)
+ *   screens     ajustes propios de cada pantalla
+ *   features    dominios de negocio (tarjetas de crédito, pagos)
+ *
+ * Un archivo nuevo se agrega aquí, dentro de su capa. La lista de capas debe ser idéntica a la de index.html.
+ */
+@layer boot, tokens, base, components, screens, features;
+
+@import './tokens.css' layer(tokens);
+@import './base.css' layer(base);
+
+@import './components/buttons.css' layer(components);
+@import './components/forms.css' layer(components);
+@import './components/controls.css' layer(components);
+@import './components/pickers.css' layer(components);
+@import './components/overlays.css' layer(components);
+@import './components/expenses.css' layer(components);
+@import './components/charts.css' layer(components);
+@import './components/rows.css' layer(components);
+@import './components/feedback.css' layer(components);
+@import './components/splash.css' layer(components);
+@import './components/privacy.css' layer(components);
+
+@import './screens.css' layer(screens);
+
+@import './features/credit-cards.css' layer(features);
+@import './features/payments.css' layer(features);

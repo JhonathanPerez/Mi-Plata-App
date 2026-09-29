@@ -1,0 +1,172 @@
+/* Capas sobre la pantalla: panel inferior, diálogo, avisos (toast) y menú de acciones de una fila. */
+
+.dialog-root {
+  position: fixed;
+  inset: 0;
+  z-index: 70;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  /* Si hay un panel Vaul abierto, el body queda con pointer-events:none; el diálogo debe seguir siendo tocable. */
+  pointer-events: auto;
+}
+
+/* Fondo propio del diálogo. No reutiliza .sheet-backdrop: lo posiciona fijo con z-index 60 (para Vaul) y taparía el diálogo. */
+.dialog-backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background: var(--scrim);
+}
+
+.sheet-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  background: var(--scrim);
+}
+
+.sheet {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 61;
+  margin-inline: auto;
+  width: 100%;
+  max-width: var(--content-max);
+  max-height: 90dvh;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg);
+  border-radius: 30px 30px 0 0;
+  box-shadow: var(--shadow-sheet);
+  outline: none;
+}
+
+.sheet__grabber {
+  flex: none;
+  width: 42px;
+  height: 5px;
+  margin: 10px auto 0;
+  border-radius: 3px;
+  background: var(--line);
+}
+
+.sheet__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 8px 4px 20px;
+}
+
+.sheet__title {
+  font-family: var(--font-display);
+  font-size: 21px;
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
+.sheet__body {
+  overflow-y: auto;
+  padding: 12px 20px 20px;
+}
+
+.sheet__footer {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px 20px calc(16px + env(safe-area-inset-bottom));
+  border-top: 1px solid var(--line);
+}
+
+.dialog {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 400px;
+  background: var(--surface);
+  border-radius: var(--radius-l);
+  padding: 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  animation: pop 0.16s ease-out;
+}
+
+.dialog__title {
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
+.dialog__text {
+  color: var(--ink-2);
+}
+
+.dialog__actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.dialog__actions > * {
+  flex: 1;
+}
+
+.toast-region {
+  position: fixed;
+  left: 16px;
+  right: 16px;
+  bottom: calc(var(--nav-h) + 96px + env(safe-area-inset-bottom));
+  z-index: 90;
+  display: flex;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.toast {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  max-width: 480px;
+  padding: 14px 16px;
+  border-radius: var(--radius-m);
+  background: var(--ink);
+  color: var(--bg);
+  font-weight: 600;
+  box-shadow: var(--shadow-toast);
+}
+
+.toast--error {
+  background: var(--danger);
+  color: var(--on-danger);
+}
+
+.row-action {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  min-height: var(--tap);
+  padding: 12px 4px;
+  border: none;
+  background: none;
+  color: var(--ink);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.row-action small {
+  display: block;
+  color: var(--ink-2);
+  font-size: 0.8em;
+  font-weight: 400;
+}
+
+.row-action--danger {
+  color: var(--danger);
+}

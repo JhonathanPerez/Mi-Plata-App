@@ -146,8 +146,8 @@ export function StatementDatesSheet({ open, methodId, rules, statement, onClose,
         ) : (
           preview &&
           changed && (
-            <section className={preview.moved.length > 0 ? 'cy-impact' : 'cy-impact cy-impact--ok'} aria-live="polite">
-              <p className="cy-impact__head">
+            <section className={preview.moved.length > 0 ? 'date-impact' : 'date-impact date-impact--ok'} aria-live="polite">
+              <p className="date-impact__head">
                 <Icon name={preview.moved.length > 0 ? 'warning' : 'check'} size={18} />
                 <span>
                   {preview.moved.length > 0
@@ -155,7 +155,7 @@ export function StatementDatesSheet({ open, methodId, rules, statement, onClose,
                     : 'Ningún gasto cambia de extracto con este corte'}
                 </span>
               </p>
-              <div className="cy-impact__tot">
+              <div className="date-impact__total">
                 <span>El extracto de {monthName} quedaría en</span>
                 <strong>
                   <Amount value={preview.totalAfter} />

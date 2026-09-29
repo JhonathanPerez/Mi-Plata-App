@@ -23,8 +23,8 @@ export function ReminderPrompt() {
   };
 
   return (
-    <section className="rm-prompt" aria-label="Avisos de pago">
-      <span className="rm-prompt__icon" aria-hidden="true">
+    <section className="reminder-prompt" aria-label="Avisos de pago">
+      <span className="reminder-prompt__icon" aria-hidden="true">
         <Icon name="bell" size={22} />
       </span>
       <div>

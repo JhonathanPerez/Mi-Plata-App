@@ -92,14 +92,14 @@ export function PayCardPage() {
 
       {payable.length === 0 ? (
         <div className="card">
-          <p className="muted pc-empty">
+          <p className="muted empty-note">
             No hay extractos cerrados por pagar en esta tarjeta.
             {open ? ` El ciclo de ${periodMonthName(open.period)} corta el ${formatDayMonth(open.cutDate)}.` : ''}
           </p>
         </div>
       ) : (
         <>
-          <section className="pc-sum">
+          <section className="pay-summary">
             <span>
               {payable.length === 1
                 ? `Extracto de ${periodMonthName(payable[0].period)} · corte ${formatDayMonth(payable[0].cutDate)}`
@@ -129,13 +129,13 @@ export function PayCardPage() {
 
           {payable.map((statement) => (
             <section key={statement.period}>
-              <div className="pc-head">
+              <div className="pay-list-head">
                 <h2 className="section__title">
                   {payable.length > 1 ? `Extracto de ${periodMonthName(statement.period)}` : 'Incluidos'}
                 </h2>
                 <button
                   type="button"
-                  className="link link--button pc-link"
+                  className="link link--button pay-link"
                   onClick={() => {
                     const ids = unpaidOf(statement).map((e) => e.id);
                     const everySelected = ids.every((x) => selected.has(x));
@@ -154,19 +154,19 @@ export function PayCardPage() {
                   const category = categories.get(expense.categoryId);
                   const on = selected.has(expense.id);
                   return (
-                    <label className={cx('pc-row', !on && 'is-off')} key={expense.id}>
+                    <label className={cx('pay-item', !on && 'is-off')} key={expense.id}>
                       <input className="sr-only" type="checkbox" checked={on} onChange={() => toggle(expense.id)} />
-                      <span className={cx('pp-check', on && 'is-on')} aria-hidden="true">
+                      <span className={cx('pay-item__check', on && 'is-on')} aria-hidden="true">
                         {on && <Icon name="check" size={16} />}
                       </span>
                       <EmojiTile emoji={category?.icon ?? '🧾'} color={category?.color ?? '#7A6F66'} />
-                      <span className="pc-row__body">
+                      <span className="pay-item__body">
                         <strong>{expense.note ?? category?.name ?? 'Gasto'}</strong>
                         <small>
                           {category?.name ?? 'Sin categoría'} · {formatShortDate(expense.date)}
                         </small>
                       </span>
-                      <strong className="pc-row__amt">
+                      <strong className="pay-item__amount">
                         <Amount value={expense.amount} />
                       </strong>
                     </label>
@@ -175,7 +175,7 @@ export function PayCardPage() {
               </div>
             </section>
           ))}
-          <p className="muted pc-tip">
+          <p className="muted pay-tip">
             <Icon name="info" size={16} />
             <span>Desmarca lo que no pagaste con este extracto (por ejemplo, algo que pagaste aparte): seguirá como «Por pagar».</span>
           </p>
@@ -185,29 +185,29 @@ export function PayCardPage() {
       {open && openUnpaid.length > 0 && (
         <section>
           <h2 className="section__title">Después del corte · próximo ciclo</h2>
-          <div className="card card--flush pc-locked">
+          <div className="card card--flush pay-locked">
             {openUnpaid.map((expense) => {
               const category = categories.get(expense.categoryId);
               return (
-                <div className="pc-row" key={expense.id}>
-                  <span className="pp-lock" aria-hidden="true">
+                <div className="pay-item" key={expense.id}>
+                  <span className="pay-item__lock" aria-hidden="true">
                     <Icon name="lock" size={16} />
                   </span>
                   <EmojiTile emoji={category?.icon ?? '🧾'} color={category?.color ?? '#7A6F66'} />
-                  <span className="pc-row__body">
+                  <span className="pay-item__body">
                     <strong>{expense.note ?? category?.name ?? 'Gasto'}</strong>
                     <small>
                       {category?.name ?? 'Sin categoría'} · {formatShortDate(expense.date)}
                     </small>
                   </span>
-                  <strong className="pc-row__amt">
+                  <strong className="pay-item__amount">
                         <Amount value={expense.amount} />
                       </strong>
                 </div>
               );
             })}
           </div>
-          <p className="muted pc-tip">
+          <p className="muted pay-tip">
             <Icon name="info" size={16} />
             <span>Entran al extracto que corta el {formatDayMonth(open.cutDate)} y se pagarán entonces.</span>
           </p>

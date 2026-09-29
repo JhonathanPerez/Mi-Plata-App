@@ -90,7 +90,7 @@ export function RuleSheet({ open, which, rules, onChange, onClose, fromPeriod }:
         {rule.kind === 'day' && (
           <div className="field">
             <span className="field__label">Día del mes</span>
-            <div className="rl-stepper">
+            <div className="rule-stepper">
               <button type="button" aria-label="Un día menos" onClick={() => setRule({ kind: 'day', day: Math.max(1, rule.day - 1) })}>
                 −
               </button>
@@ -123,7 +123,7 @@ export function RuleSheet({ open, which, rules, onChange, onClose, fromPeriod }:
             </div>
             <div className="field">
               <span className="field__label">Día de la semana</span>
-              <div className="rl-week" role="radiogroup" aria-label="Día de la semana">
+              <div className="weekday-picker" role="radiogroup" aria-label="Día de la semana">
                 {WEEK_ORDER.map((weekday, i) => (
                   <button
                     key={weekday}
@@ -131,7 +131,7 @@ export function RuleSheet({ open, which, rules, onChange, onClose, fromPeriod }:
                     role="radio"
                     aria-checked={rule.weekday === weekday}
                     aria-label={WEEKDAY_NAMES[weekday]}
-                    className={cx('rl-wd', rule.weekday === weekday && 'is-selected')}
+                    className={cx('weekday-picker__day', rule.weekday === weekday && 'is-selected')}
                     onClick={() => setRule({ ...rule, weekday })}
                   >
                     {WEEK_LETTERS[i]}
@@ -142,7 +142,7 @@ export function RuleSheet({ open, which, rules, onChange, onClose, fromPeriod }:
           </>
         )}
 
-        <p className="rl-sentence">
+        <p className="rule-sentence">
           <strong>{describeRule(rule)}</strong>
           {isDue ? (rules.dueNextMonth ? ' del mes siguiente' : ' del mismo mes') : ' de cada mes'}
         </p>
@@ -177,10 +177,10 @@ export function RuleSheet({ open, which, rules, onChange, onClose, fromPeriod }:
           </>
         )}
 
-        <section className="rl-up rl-up--sheet" aria-label="Así quedaría">
-          <h3 className="rl-up__title">Así quedaría</h3>
+        <section className="upcoming-statements upcoming-statements--sheet" aria-label="Así quedaría">
+          <h3 className="upcoming-statements__title">Así quedaría</h3>
           {examples.map((example) => (
-            <div className="rl-up__row rl-up__row--2" key={example.period}>
+            <div className="upcoming-statements__row upcoming-statements__row--pair" key={example.period}>
               <strong>{capitalize(periodMonthName(example.period))}</strong>
               <span>
                 {isDue ? 'Pago' : 'Corte'} <b>{formatDayMonth(example.date)}</b>

@@ -61,7 +61,7 @@ export function StatementsPage() {
           <Skeleton height={260} radius={24} />
         </div>
       ) : !rules ? (
-        <section className="cy-open">
+        <section className="statement-open">
           <span className="muted">Falta configurar el corte y el pago de esta tarjeta.</span>
           <button type="button" className="link link--button" onClick={() => navigate(`/tarjetas/${id}/fechas`)}>
             Configurar fechas
@@ -70,7 +70,7 @@ export function StatementsPage() {
       ) : (
         <>
           {open && (
-            <section className="cy-open">
+            <section className="statement-open">
               <span className="muted">
                 Ciclo abierto · corta el {formatDayMonth(open.cutDate)} ({relativeDays(diffDays(today, open.cutDate))})
               </span>
@@ -89,24 +89,24 @@ export function StatementsPage() {
               const normal = statementDates(rules, statement.period);
               const adjusted = statement.fixed && (normal.cut !== statement.cutDate || normal.due !== statement.dueDate);
               return (
-                <button type="button" className="cy-st cy-st--button" key={statement.period} onClick={() => setEditing(statement)}>
+                <button type="button" className="statement-row statement-row--button" key={statement.period} onClick={() => setEditing(statement)}>
                   <EmojiTile emoji={state.tone === 'paid' ? '✅' : '🧾'} color={state.tone === 'paid' ? '#2A9D8F' : '#F5B301'} />
-                  <span className="cy-st__body">
+                  <span className="statement-row__body">
                     <strong>
                       {capitalize(periodMonthName(statement.period))} {statement.period.slice(0, 4) !== today.slice(0, 4) ? statement.period.slice(0, 4) : ''}
-                      {adjusted && <span className="cy-tag">Ajustado</span>}
+                      {adjusted && <span className="statement-tag">Ajustado</span>}
                     </strong>
-                    <span className="muted rl-nowrap">Corte {formatDayMonth(statement.cutDate)}</span>
-                    <span className="muted rl-nowrap">Pago máx. {formatDayMonth(statement.dueDate)}</span>
-                    <span className={cx('cy-st__state', state.tone === 'due' && 'is-due', state.tone === 'late' && 'is-late')}>{state.text}</span>
+                    <span className="muted nowrap">Corte {formatDayMonth(statement.cutDate)}</span>
+                    <span className="muted nowrap">Pago máx. {formatDayMonth(statement.dueDate)}</span>
+                    <span className={cx('statement-row__state', state.tone === 'due' && 'is-due', state.tone === 'late' && 'is-late')}>{state.text}</span>
                   </span>
-                  <strong className="cy-st__amt">
+                  <strong className="statement-row__amount">
                     <Amount value={statement.total} />
                   </strong>
                 </button>
               );
             })}
-            {shown.filter((s) => s.closed).length === 0 && <p className="muted pc-empty">Aún no hay extractos cerrados.</p>}
+            {shown.filter((s) => s.closed).length === 0 && <p className="muted empty-note">Aún no hay extractos cerrados.</p>}
           </div>
 
           {!showAll && closed.length > VISIBLE && (
@@ -115,7 +115,7 @@ export function StatementsPage() {
             </button>
           )}
 
-          <p className="muted cy-foot">
+          <p className="muted statement-footnote">
             <Icon name="info" size={16} />
             <span>Toca un extracto para ajustar sus fechas. Cada uno guarda las suyas: cambiar un mes no altera los demás.</span>
           </p>

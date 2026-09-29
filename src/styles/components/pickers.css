@@ -1,0 +1,194 @@
+/* Selectores: iconos y colores, campo tipo enlace y lista de opciones (categoría, método de pago). */
+
+.picker {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.picker-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.picker-custom {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.picker-custom__input {
+  flex: none;
+  width: 64px;
+  height: 56px;
+  text-align: center;
+  font-size: 28px;
+  border-radius: 14px;
+  border: 1.5px dashed var(--ink-2);
+  background: var(--surface);
+}
+
+.picker-custom__input.is-selected {
+  border: 3px solid var(--primary);
+  background: color-mix(in srgb, var(--primary) 14%, var(--surface));
+}
+
+.picker-custom__input:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 25%, transparent);
+}
+
+.picker__icon {
+  width: 46px;
+  height: 46px;
+  border-radius: 14px;
+  border: 1.5px solid var(--line);
+  background: var(--surface);
+  font-size: 22px;
+  display: grid;
+  place-items: center;
+}
+
+.picker__color {
+  width: 46px;
+  height: 46px;
+  border-radius: 14px;
+  border: 1.5px solid transparent;
+  background: var(--swatch, var(--surface));
+  color: var(--white);
+  font-size: 22px;
+  display: grid;
+  place-items: center;
+}
+
+.picker__icon.is-selected {
+  border-color: var(--primary);
+  border-width: 3px;
+  background: color-mix(in srgb, var(--primary) 14%, var(--surface));
+}
+
+.picker__color svg {
+  filter: drop-shadow(0 0 1.5px var(--black-a70));
+}
+
+.picker__color.is-selected {
+  outline: 3px solid var(--ink);
+  outline-offset: 2px;
+}
+
+.picker-link {
+  width: 100%;
+  min-height: 62px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  border: 1.5px solid var(--line);
+  border-radius: var(--radius-m);
+  background: var(--surface);
+  color: var(--primary);
+  text-align: left;
+  transition: var(--motion-row);
+}
+
+.picker-link:active {
+  background: var(--surface-2);
+  transform: scale(0.985);
+}
+
+.picker-link__text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Lo elegido se ve como un vínculo: color de enlace y subrayado. */
+.picker-link__name {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--primary);
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 4px;
+  text-decoration-color: var(--primary-underline);
+  text-decoration-color: color-mix(in srgb, currentColor 45%, transparent);
+}
+
+.picker-link__name--empty {
+  text-decoration-style: dashed;
+}
+
+.picker-link__desc {
+  margin-top: 2px;
+  font-size: 14px;
+  color: var(--ink-2);
+}
+
+.picker-link__action {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--primary);
+}
+
+.picker-link__chevron {
+  flex: none;
+  color: var(--primary);
+}
+
+.option-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.option-row:active {
+  transform: scale(0.985);
+}
+
+.option-row {
+  width: 100%;
+  min-height: 64px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  border: 1.5px solid var(--line);
+  border-radius: var(--radius-m);
+  background: var(--surface);
+  text-align: left;
+  transition: var(--motion-row);
+}
+
+.option-row.is-selected {
+  border-color: var(--primary);
+  background: color-mix(in srgb, var(--primary) 10%, var(--surface));
+  box-shadow: var(--shadow-selected);
+}
+
+.option-row__text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.option-row__name {
+  font-weight: 700;
+}
+
+.option-row__desc {
+  font-size: 14px;
+  color: var(--ink-2);
+}
+
+.option-row__check {
+  flex: none;
+  color: var(--primary);
+}
