@@ -1,5 +1,6 @@
 import { EmojiTile } from '@/components/ui/EmojiTile';
 import { Amount } from '@/components/ui/Money';
+import { cssVars } from '@/lib/cssVars';
 import { formatPercent } from '@/lib/money';
 import type { CategoryTotal } from '@/types/models';
 
@@ -25,7 +26,7 @@ export function CategoryBars({ items, limit }: CategoryBarsProps) {
               </span>
             </div>
             <div className="bars__track" aria-hidden="true">
-              <span className="bars__fill" style={{ width: `${(item.total / max) * 100}%`, background: item.color }} />
+              <span className="bars__fill" style={cssVars({ '--fill': `${(item.total / max) * 100}%`, '--swatch': item.color })} />
             </div>
             <span className="bars__percent">{formatPercent(item.percent)} del mes</span>
           </div>

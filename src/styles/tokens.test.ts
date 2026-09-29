@@ -1,6 +1,7 @@
 import { readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
+import { sourceFiles } from './testHelpers';
 
 /**
  * Guardas del sistema de tokens (ver src/styles/tokens.css):
@@ -52,6 +53,10 @@ describe('tokens.css', () => {
 
   it('todo token usado en el CSS está definido', () => {
     const defined = new Set(Object.keys(declarations(tokens)));
+    // Variables que los componentes pasan con cssVars({ '--x': valor }): el valor solo se conoce en ejecución.
+    for (const file of sourceFiles(join(ROOT, 'src'))) {
+      for (const m of read(file).matchAll(/'(--[\w-]+)'\s*:/g)) defined.add(m[1]);
+    }
     const missing: string[] = [];
     for (const file of cssFiles) {
       const css = stripComments(read(join(STYLES, file)));

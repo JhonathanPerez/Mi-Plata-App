@@ -284,56 +284,8 @@
   color: var(--ink);
 }
 
-.chip:active,
-.choice:active {
+.chip:active {
   transform: scale(0.96);
-}
-
-.choice-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-  gap: 8px;
-}
-
-.choice {
-  position: relative;
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  min-height: 88px;
-  padding: 10px 4px;
-  border-radius: var(--radius-m);
-  border: 1.5px solid var(--line);
-  background: var(--surface);
-  text-align: center;
-  font-weight: 600;
-  transition: var(--motion-press);
-}
-
-.choice.is-selected {
-  border-color: var(--primary);
-  border-width: 2px;
-  background: color-mix(in srgb, var(--primary) 12%, var(--surface));
-  box-shadow: var(--shadow-selected);
-}
-
-.choice__name {
-  max-width: 100%;
-  font-size: 13px;
-  line-height: 1.15;
-  overflow-wrap: anywhere;
-  hyphens: auto;
-  -webkit-hyphens: auto;
-}
-
-.choice__check {
-  position: absolute;
-  top: 6px;
-  right: 6px;
-  color: var(--primary);
 }
 
 .emoji-tile {
@@ -341,7 +293,9 @@
   display: grid;
   place-items: center;
   border: 1.5px solid;
+  border-color: var(--tile-color, currentColor);
   background: var(--surface-2);
+  background: color-mix(in srgb, var(--tile-color) 22%, transparent);
 }
 
 .emoji-tile--md {
@@ -414,7 +368,7 @@
   height: 46px;
   border-radius: 14px;
   border: 1.5px solid transparent;
-  background: var(--surface);
+  background: var(--swatch, var(--surface));
   color: var(--white);
   font-size: 22px;
   display: grid;
@@ -884,8 +838,10 @@
 }
 
 .strip__segment {
+  width: var(--seg-w, 0%);
   height: 100%;
   min-width: 3px;
+  background: var(--swatch);
   flex: none;
 }
 
@@ -897,10 +853,23 @@
   background: var(--white-a28);
 }
 
+.strip__tick--25 {
+  left: 25%;
+}
+
+.strip__tick--50 {
+  left: 50%;
+}
+
+.strip__tick--75 {
+  left: 75%;
+}
+
 .strip__limit {
   position: absolute;
   top: -2px;
   bottom: -2px;
+  left: var(--limit-left, 0%);
   width: 3px;
   background: var(--accent);
 }
@@ -946,8 +915,10 @@
 
 .bars__fill {
   display: block;
+  width: var(--fill, 0%);
   height: 100%;
   border-radius: 4px;
+  background: var(--swatch);
 }
 
 .bars__percent {
@@ -1003,6 +974,7 @@
   width: 14px;
   height: 14px;
   border-radius: 5px;
+  background: var(--swatch);
   flex: none;
 }
 
@@ -1036,6 +1008,7 @@
 
 .daily__bar {
   flex: 1;
+  height: var(--bar-h, 0%);
   background: color-mix(in srgb, var(--primary) 55%, var(--surface));
   border-radius: 3px 3px 0 0;
   min-height: 2px;
@@ -1431,6 +1404,9 @@
 /* ---------- Esqueletos de carga ---------- */
 .skeleton {
   display: block;
+  width: var(--sk-w, 100%);
+  height: var(--sk-h, 16px);
+  border-radius: var(--sk-r, 10px);
   background: linear-gradient(100deg, transparent 30%, var(--skeleton-shine) 50%, transparent 70%) 0 0 / 220% 100%, var(--line);
   animation: shimmer 1.4s linear infinite;
 }

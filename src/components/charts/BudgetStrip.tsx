@@ -1,4 +1,5 @@
 import type { CategoryTotal } from '@/types/models';
+import { cssVars } from '@/lib/cssVars';
 import { formatPercent } from '@/lib/money';
 
 interface BudgetStripProps {
@@ -27,13 +28,13 @@ export function BudgetStrip({ segments, budget, spent }: BudgetStripProps) {
           <span
             key={segment.categoryId}
             className="strip__segment"
-            style={{ width: `${(segment.total / scale) * 100}%`, background: segment.color }}
+            style={cssVars({ '--seg-w': `${(segment.total / scale) * 100}%`, '--swatch': segment.color })}
           />
         ))}
-        <span className="strip__tick" style={{ left: '25%' }} />
-        <span className="strip__tick" style={{ left: '50%' }} />
-        <span className="strip__tick" style={{ left: '75%' }} />
-        {budgetMark !== null && <span className="strip__limit" style={{ left: `${budgetMark}%` }} />}
+        <span className="strip__tick strip__tick--25" />
+        <span className="strip__tick strip__tick--50" />
+        <span className="strip__tick strip__tick--75" />
+        {budgetMark !== null && <span className="strip__limit" style={cssVars({ '--limit-left': `${budgetMark}%` })} />}
       </div>
     </div>
   );

@@ -1,3 +1,5 @@
+import { cssVars } from '@/lib/cssVars';
+
 interface EmojiTileProps {
   emoji: string;
   color: string;
@@ -9,7 +11,7 @@ export function EmojiTile({ emoji, color, size = 'md' }: EmojiTileProps) {
   return (
     <span
       className={`emoji-tile emoji-tile--${size}`}
-      style={{ background: `color-mix(in srgb, ${color} 22%, transparent)`, borderColor: color }}
+      style={cssVars({ '--tile-color': color })}
       aria-hidden="true"
     >
       {emoji}

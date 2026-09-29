@@ -25,10 +25,6 @@ body {
   overscroll-behavior-y: none;
 }
 
-body.no-scroll {
-  overflow: hidden;
-}
-
 h1, h2, h3, p {
   margin: 0;
 }
@@ -76,6 +72,11 @@ ul {
 
 .shell__main {
   padding-bottom: calc(var(--nav-h) + 104px + env(safe-area-inset-bottom));
+}
+
+/* Oculto sin display:none para conservar el alto real hasta reubicar el scroll. */
+.shell__main--pending {
+  visibility: hidden;
 }
 
 .page {

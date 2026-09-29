@@ -493,12 +493,6 @@ number-flow-react {
   font-variant-numeric: tabular-nums;
 }
 
-.pending-row__dismiss {
-  align-self: center;
-  margin-right: 6px;
-  color: var(--ink-2);
-}
-
 .capture-status {
   display: flex;
   align-items: flex-start;

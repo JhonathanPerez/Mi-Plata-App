@@ -1,4 +1,5 @@
 import { Amount } from '@/components/ui/Money';
+import { cssVars } from '@/lib/cssVars';
 import { formatPercent } from '@/lib/money';
 import type { MethodTotal } from '@/types/models';
 
@@ -43,7 +44,7 @@ export function DonutChart({ items, total }: DonutChartProps) {
       <ul className="donut__legend">
         {items.map((item) => (
           <li key={item.paymentMethodId}>
-            <span className="donut__swatch" style={{ background: item.color }} aria-hidden="true" />
+            <span className="donut__swatch" style={cssVars({ '--swatch': item.color })} aria-hidden="true" />
             <span className="donut__name">
               {item.icon} {item.name}
             </span>
