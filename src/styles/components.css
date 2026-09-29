@@ -225,7 +225,7 @@
   background: var(--surface);
   color: var(--ink);
   font-weight: 700;
-  box-shadow: 0 1px 3px rgba(16, 38, 42, 0.18);
+  box-shadow: var(--shadow-xs);
 }
 
 .stepper {
@@ -386,7 +386,7 @@
 
 .picker__color {
   border-color: transparent;
-  color: #fff;
+  color: var(--white);
 }
 
 .picker__icon.is-selected {
@@ -396,7 +396,7 @@
 }
 
 .picker__color svg {
-  filter: drop-shadow(0 0 1.5px rgba(0, 0, 0, 0.7));
+  filter: drop-shadow(0 0 1.5px var(--black-a70));
 }
 
 .picker__color.is-selected {
@@ -454,8 +454,8 @@
   width: 26px;
   height: 26px;
   border-radius: 50%;
-  background: #fff;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  background: var(--white);
+  box-shadow: var(--shadow-knob);
   transition: transform 0.15s;
 }
 
@@ -496,13 +496,13 @@
   position: absolute;
   inset: 0;
   z-index: 0;
-  background: rgba(6, 20, 22, 0.5);
+  background: var(--scrim);
 }
 
 .sheet-backdrop {
   position: absolute;
   inset: 0;
-  background: rgba(6, 20, 22, 0.5);
+  background: var(--scrim);
 }
 
 .sheet {
@@ -597,7 +597,7 @@
 .preview-backdrop {
   position: absolute;
   inset: 0;
-  background: rgba(6, 20, 22, 0.45);
+  background: var(--scrim-soft);
   animation: fade-in 0.14s ease-out;
 }
 
@@ -612,7 +612,7 @@
   display: flex;
   flex-direction: column;
   gap: 14px;
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.22);
+  box-shadow: var(--shadow-menu);
   animation: pop 0.14s ease-out;
   user-select: none;
   -webkit-user-select: none;
@@ -694,7 +694,7 @@
   background: var(--ink);
   color: var(--bg);
   font-weight: 600;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+  box-shadow: var(--shadow-float);
   animation: pop 0.18s ease-out;
 }
 
@@ -844,7 +844,7 @@
   top: 0;
   bottom: 0;
   width: 1px;
-  background: rgba(255, 255, 255, 0.28);
+  background: var(--white-a28);
 }
 
 .strip__limit {
@@ -1079,8 +1079,8 @@
   z-index: 80;
   display: grid;
   place-items: center;
-  background: rgba(6, 20, 22, 0.55);
-  color: #fff;
+  background: var(--scrim-strong);
+  color: var(--white);
   font-weight: 700;
   font-size: 18px;
 }
@@ -1273,7 +1273,7 @@
   text-decoration: underline;
   text-decoration-thickness: 2px;
   text-underline-offset: 4px;
-  text-decoration-color: rgba(11, 122, 99, 0.4);
+  text-decoration-color: var(--primary-underline);
   text-decoration-color: color-mix(in srgb, currentColor 45%, transparent);
 }
 

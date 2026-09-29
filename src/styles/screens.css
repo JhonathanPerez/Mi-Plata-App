@@ -80,7 +80,7 @@
 
 .hero__cta {
   background: var(--hero-ink);
-  color: #0e3a33;
+  color: var(--hero-cta-ink);
   border-color: transparent;
 }
 
