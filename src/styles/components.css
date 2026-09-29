@@ -25,7 +25,9 @@
 
 .btn--primary {
   background: var(--primary);
+  background-image: var(--gloss-primary);
   color: var(--on-primary);
+  box-shadow: var(--shadow-cta);
 }
 
 .btn--secondary {
@@ -67,6 +69,15 @@
 
 .icon-btn:active {
   background: var(--surface-2);
+}
+
+.btn,
+.chip,
+.choice,
+.segmented__item,
+.toggle__track,
+.icon-btn {
+  transition: background-color 0.18s, color 0.18s, border-color 0.18s, box-shadow 0.18s, transform 0.14s var(--ease-out);
 }
 
 /* ---------- Campos ---------- */
@@ -212,6 +223,7 @@
 }
 
 .segmented__item {
+  position: relative;
   flex: 1;
   min-height: 42px;
   border: 0;
@@ -222,10 +234,22 @@
 }
 
 .segmented__item.is-active {
-  background: var(--surface);
   color: var(--ink);
   font-weight: 700;
-  box-shadow: var(--shadow-xs);
+}
+
+/* Píldora que se desliza bajo la opción activa (motion la anima; ver Segmented.tsx). */
+.segmented__thumb {
+  position: absolute;
+  inset: 0;
+  border-radius: 10px;
+  background: var(--surface);
+  box-shadow: var(--shadow-thumb);
+}
+
+.segmented__label {
+  position: relative;
+  z-index: 1;
 }
 
 .stepper {
@@ -265,6 +289,11 @@
   color: var(--ink);
 }
 
+.chip:active,
+.choice:active {
+  transform: scale(0.96);
+}
+
 .choice-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
@@ -292,6 +321,7 @@
   border-color: var(--primary);
   border-width: 2px;
   background: color-mix(in srgb, var(--primary) 12%, var(--surface));
+  box-shadow: var(--shadow-selected);
 }
 
 .choice__name {
@@ -443,7 +473,6 @@
   border-radius: 999px;
   background: var(--line);
   position: relative;
-  transition: background 0.15s;
 }
 
 .toggle__track::after {
@@ -491,7 +520,7 @@
   pointer-events: auto;
 }
 
-/* Fondo propio del diálogo. No reutiliza .sheet-backdrop: polish.css lo pone en z-index 60 (para Vaul) y taparía el diálogo. */
+/* Fondo propio del diálogo. No reutiliza .sheet-backdrop: lo posiciona fijo con z-index 60 (para Vaul) y taparía el diálogo. */
 .dialog-backdrop {
   position: absolute;
   inset: 0;
@@ -500,28 +529,44 @@
 }
 
 .sheet-backdrop {
-  position: absolute;
+  position: fixed;
   inset: 0;
+  z-index: 60;
   background: var(--scrim);
 }
 
 .sheet {
-  position: relative;
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 61;
+  margin-inline: auto;
   width: 100%;
   max-width: var(--content-max);
   max-height: 90dvh;
   display: flex;
   flex-direction: column;
   background: var(--bg);
-  border-radius: 26px 26px 0 0;
-  animation: sheet-up 0.22s ease-out;
+  border-radius: 30px 30px 0 0;
+  box-shadow: var(--shadow-sheet);
+  outline: none;
+}
+
+.sheet__grabber {
+  flex: none;
+  width: 42px;
+  height: 5px;
+  margin: 10px auto 0;
+  border-radius: 3px;
+  background: var(--line);
 }
 
 .sheet__header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 14px 8px 4px 20px;
+  padding: 8px 8px 4px 20px;
 }
 
 .sheet__title {
@@ -694,8 +739,7 @@
   background: var(--ink);
   color: var(--bg);
   font-weight: 600;
-  box-shadow: var(--shadow-float);
-  animation: pop 0.18s ease-out;
+  box-shadow: var(--shadow-toast);
 }
 
 .toast--error {
@@ -713,7 +757,16 @@
 }
 
 .empty__emoji {
+  display: grid;
+  place-items: center;
+  width: 88px;
+  height: 88px;
+  margin-bottom: 4px;
+  border-radius: 50%;
   font-size: 40px;
+  background: var(--surface-2);
+  background: radial-gradient(circle at 32% 26%, var(--surface) 0%, var(--surface-2) 100%);
+  box-shadow: 0 0 0 9px var(--primary-halo), var(--shadow);
 }
 
 .empty__title {
@@ -1208,11 +1261,6 @@
   word-break: break-word;
 }
 
-@keyframes sheet-up {
-  from { transform: translateY(40px); opacity: 0; }
-  to { transform: none; opacity: 1; }
-}
-
 @keyframes pop {
   from { transform: scale(0.92); opacity: 0; }
   to { transform: none; opacity: 1; }
@@ -1228,6 +1276,7 @@
   *::before,
   *::after {
     animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
 }
@@ -1308,6 +1357,16 @@
   gap: 8px;
 }
 
+.picker-link,
+.option-row {
+  transition: background-color 0.18s, border-color 0.18s, box-shadow 0.18s, transform 0.14s var(--ease-out);
+}
+
+.option-row:active,
+.picker-link:active {
+  transform: scale(0.985);
+}
+
 .option-row {
   width: 100%;
   min-height: 64px;
@@ -1324,6 +1383,7 @@
 .option-row.is-selected {
   border-color: var(--primary);
   background: color-mix(in srgb, var(--primary) 10%, var(--surface));
+  box-shadow: var(--shadow-selected);
 }
 
 .option-row__text {
@@ -1372,4 +1432,102 @@
 
 .row-action--danger {
   color: var(--danger);
+}
+
+/* ---------- Esqueletos de carga ---------- */
+.skeleton {
+  display: block;
+  background: linear-gradient(100deg, transparent 30%, var(--skeleton-shine) 50%, transparent 70%) 0 0 / 220% 100%, var(--line);
+  animation: shimmer 1.4s linear infinite;
+}
+
+@keyframes shimmer {
+  from {
+    background-position: 120% 0, 0 0;
+  }
+  to {
+    background-position: -120% 0, 0 0;
+  }
+}
+
+.page-skeleton {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.skeleton-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 18px 16px;
+}
+
+.skeleton-row + .skeleton-row {
+  border-top: 1px solid var(--line);
+}
+
+.skeleton-row__body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ---------- Modo privacidad (el ojito) ---------- */
+.privacy-toggle {
+  width: 44px;
+  height: 44px;
+  color: var(--ink-2);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow);
+}
+
+.privacy-toggle[aria-pressed='true'] {
+  color: var(--primary);
+  background: var(--surface-2);
+  border-color: transparent;
+}
+
+.privacy-toggle:active {
+  transform: scale(0.92);
+}
+
+/* Los montos ocultos aparecen "desenfocados" y se aclaran al mostrarlos; en la dona, más compactos. */
+.amount-mask {
+  display: inline-block;
+  letter-spacing: 0.1em;
+  white-space: nowrap;
+  user-select: none;
+  animation: amount-mask-in 0.24s var(--ease-out) both;
+}
+
+.donut__total .amount-mask {
+  font-size: 0.8em;
+  letter-spacing: 0.06em;
+}
+
+@keyframes amount-mask-in {
+  from {
+    opacity: 0;
+    filter: blur(6px);
+  }
+  to {
+    opacity: 1;
+    filter: none;
+  }
 }

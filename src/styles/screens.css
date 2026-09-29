@@ -23,13 +23,33 @@
 }
 
 .hero {
+  position: relative;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
   gap: 12px;
   padding: 20px 18px 16px;
-  border-radius: 26px;
-  background: var(--hero-bg);
+  border-radius: 30px;
+  background: var(--hero-grad);
   color: var(--hero-ink);
+  box-shadow: var(--shadow-hero);
+}
+
+/* Resplandor cálido en la esquina: da profundidad sin añadir ruido. */
+.hero::before {
+  content: '';
+  position: absolute;
+  top: -35%;
+  right: -22%;
+  width: 78%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, var(--mint-glow), transparent);
+  pointer-events: none;
+}
+
+.hero > * {
+  position: relative;
 }
 
 .hero__label {
@@ -40,10 +60,15 @@
 
 .hero__value {
   font-family: var(--font-display);
-  font-size: 46px;
+  font-size: 50px;
   line-height: 1;
   font-weight: 750;
   letter-spacing: -0.03em;
+  font-variant-numeric: tabular-nums;
+  text-shadow: var(--shadow-text-hero);
+}
+
+number-flow-react {
   font-variant-numeric: tabular-nums;
 }
 
@@ -115,6 +140,7 @@
   border-radius: var(--radius-l);
   background: var(--surface);
   border: 1px solid var(--line);
+  box-shadow: var(--shadow);
   min-width: 0;
 }
 
@@ -339,8 +365,9 @@
   gap: 12px;
   padding: 12px 14px;
   border-radius: var(--radius-l);
-  background: var(--accent);
+  background: var(--accent-grad-banner);
   color: var(--on-accent);
+  box-shadow: var(--shadow-banner);
   text-decoration: none;
 }
 
@@ -370,9 +397,42 @@
   opacity: 0.85;
 }
 
+/* Gastos por categorizar: deslizar para descartar. */
 .pending-row {
+  position: relative;
+  display: block;
+  overflow: hidden;
+  background: var(--danger);
+}
+
+.pending-row__front {
+  position: relative;
   display: flex;
   align-items: stretch;
+  background: var(--surface);
+  touch-action: pan-y;
+  will-change: transform;
+}
+
+/* La franja visible al deslizar mide unos 96 px: el ícono va sobre el texto para que quepa. */
+.pending-row__reveal {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding-right: 16px;
+  color: var(--on-danger);
+  font-weight: 700;
+}
+
+.pending-row__reveal-inner {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  font-size: 12px;
+  transform-origin: right center;
 }
 
 .pending-row + .pending-row {
@@ -385,7 +445,7 @@
   display: flex;
   align-items: flex-start;
   gap: 12px;
-  padding: 14px 8px 14px 16px;
+  padding: 14px 16px;
   border: 0;
   background: transparent;
   color: inherit;

@@ -6,7 +6,6 @@ import '@/styles/tokens.css';
 import '@/styles/base.css';
 import '@/styles/components.css';
 import '@/styles/screens.css';
-import '@/styles/polish.css';
 import '@/styles/cards.css';
 import { App } from '@/app/App';
 
