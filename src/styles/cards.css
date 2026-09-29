@@ -400,11 +400,12 @@
   font-variant-numeric:tabular-nums;
 }
 
-.pc-row.is-off .pc-row__body, .pc-row.is-off .pc-row__amt {
+.pc-row.is-off .pc-row__body {
   opacity:.55;
 }
 
 .pc-row.is-off .pc-row__amt {
+  opacity:.55;
   text-decoration:line-through;
 }
 
@@ -532,13 +533,16 @@
   margin-top:2px;
 }
 
-.cy-impact__row, .cy-impact__tot {
+.cy-impact__row {
   display:flex;
   justify-content:space-between;
   font-size:14.5px;
 }
 
 .cy-impact__tot {
+  display:flex;
+  justify-content:space-between;
+  font-size:14.5px;
   padding-top:8px;
   border-top:1px solid var(--warning-line);
   font-weight:700;
@@ -583,8 +587,8 @@
 }
 
 .cy-st__body .muted {
-  white-space:nowrap;
   font-size:13.5px;
+  white-space:nowrap;
 }
 
 .cy-st__state {
@@ -644,8 +648,8 @@
   gap:10px;
   align-items:baseline;
   font-size:13.5px;
-  padding:8px 0;
   white-space:nowrap;
+  padding:8px 0;
 }
 
 .rl-up__row+.rl-up__row {
@@ -662,10 +666,6 @@
 
 .rl-up__row>strong {
   min-width:34px;
-}
-
-.rl-up__row--2>strong {
-  min-width:88px;
 }
 
 .rl-week {
