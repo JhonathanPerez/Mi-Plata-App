@@ -33,7 +33,6 @@ h1, h2, h3, p {
   margin: 0;
 }
 
-button,
 input,
 select,
 textarea {
@@ -42,6 +41,8 @@ textarea {
 }
 
 button {
+  font: inherit;
+  color: inherit;
   cursor: pointer;
 }
 
