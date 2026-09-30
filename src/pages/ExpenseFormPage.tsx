@@ -9,6 +9,7 @@ import { OptionSheet, type PickerOption } from '@/components/expenses/OptionShee
 import { Field } from '@/components/ui/Field';
 import { Icon } from '@/components/ui/Icon';
 import { MoneyInput } from '@/components/ui/MoneyInput';
+import { PageHeader } from '@/components/ui/PageHeader';
 import { PickerField } from '@/components/ui/PickerField';
 import { Segmented } from '@/components/ui/Segmented';
 import { NOTE_MAX_LENGTH } from '@/config/constants';
@@ -143,10 +144,7 @@ export function ExpenseFormPage() {
   if (pendingId && !isEdit && data && !data.pending && !saved && !saving) {
     return (
       <div className="page page--form">
-        <header className="page-header">
-          <IconButton icon="back" label="Volver" onClick={() => navigate(-1)} />
-          <h1 className="page-header__title">Gasto no disponible</h1>
-        </header>
+        <PageHeader title="Gasto no disponible" back />
         <p className="muted">Este gasto detectado ya se categorizó o se descartó.</p>
       </div>
     );
@@ -155,10 +153,7 @@ export function ExpenseFormPage() {
   if (isEdit && data && !data.existing && !saved) {
     return (
       <div className="page page--form">
-        <header className="page-header">
-          <IconButton icon="back" label="Volver" onClick={() => navigate(-1)} />
-          <h1 className="page-header__title">Gasto no encontrado</h1>
-        </header>
+        <PageHeader title="Gasto no encontrado" back />
         <p className="muted">Este gasto ya no existe. Es posible que lo hayas eliminado.</p>
       </div>
     );
@@ -222,15 +217,12 @@ export function ExpenseFormPage() {
 
   return (
     <div className="page page--form">
-      <header className="page-header">
-        <IconButton icon="close" label="Cerrar sin guardar" onClick={() => navigate(-1)} />
-        <h1 className="page-header__title">{isEdit ? 'Editar gasto' : pendingId ? 'Categorizar gasto' : 'Agregar gasto'}</h1>
-        {isEdit && (
-          <div className="page-header__actions">
-            <IconButton icon="trash" label="Eliminar gasto" onClick={remove} />
-          </div>
-        )}
-      </header>
+      <PageHeader
+        title={isEdit ? 'Editar gasto' : pendingId ? 'Categorizar gasto' : 'Agregar gasto'}
+        close
+        closeLabel="Cerrar sin guardar"
+        actions={isEdit ? <IconButton icon="trash" label="Eliminar gasto" onClick={remove} /> : undefined}
+      />
 
       {loading && !data ? (
         <p className="muted" role="status">

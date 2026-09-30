@@ -11,6 +11,7 @@ import { EmojiTile } from '@/components/ui/EmojiTile';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { Icon } from '@/components/ui/Icon';
 import { Money } from '@/components/ui/Money';
+import { PageHeader } from '@/components/ui/PageHeader';
 import { PrivacyToggle } from '@/components/ui/PrivacyToggle';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { useQuery } from '@/hooks/useQuery';
@@ -58,13 +59,11 @@ export function HomePage() {
 
   return (
     <div className="page">
-      <header className="home-head">
-        <div className="home-head__text">
-          <h1 className="home-head__month">{formatMonthTitle(data.yearMonth)}</h1>
-          <p className="home-head__date">Hoy es {formatLongDate(data.today)}</p>
-        </div>
-        <PrivacyToggle />
-      </header>
+      <PageHeader
+        title={formatMonthTitle(data.yearMonth)}
+        subtitle={`Hoy es ${formatLongDate(data.today)}`}
+        actions={<PrivacyToggle />}
+      />
 
       {pendingCount ? (
         <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} transition={{ type: 'spring', stiffness: 420, damping: 32 }}>
