@@ -9,6 +9,7 @@ import { Amount } from '@/components/ui/Money';
 import { Notice } from '@/components/ui/Notice';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { PrivacyToggle } from '@/components/ui/PrivacyToggle';
+import { Stat } from '@/components/ui/Stat';
 import { useQuery } from '@/hooks/useQuery';
 import { addDays, formatShortDate, todayIso } from '@/lib/dates';
 import { cx } from '@/lib/cx';
@@ -101,20 +102,18 @@ export function PayCardPage() {
         </div>
       ) : (
         <>
-          <section className="pay-summary">
-            <span>
-              {payable.length === 1
+          <Stat
+            as="section"
+            tone="hero"
+            className="pay-summary"
+            label={
+              payable.length === 1
                 ? `Extracto de ${periodMonthName(payable[0].period)} · corte ${formatDayMonth(payable[0].cutDate)}`
-                : `${payable.length} extractos cerrados`}
-            </span>
-            <strong>
-              <Amount value={total} />
-            </strong>
-            <small>
-              {chosen.length} de {allIds.length} gastos seleccionados
-              {total !== grandTotal ? ` · total del extracto ${cop(grandTotal)}` : ''}
-            </small>
-          </section>
+                : `${payable.length} extractos cerrados`
+            }
+            value={<Amount value={total} />}
+            foot={`${chosen.length} de ${allIds.length} gastos seleccionados${total !== grandTotal ? ` · total del extracto ${cop(grandTotal)}` : ''}`}
+          />
 
           <div className="field">
             <span className="field__label">Fecha del pago</span>

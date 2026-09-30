@@ -15,6 +15,7 @@ import { Notice } from '@/components/ui/Notice';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { PrivacyToggle } from '@/components/ui/PrivacyToggle';
 import { Skeleton } from '@/components/ui/Skeleton';
+import { Stat } from '@/components/ui/Stat';
 import { useQuery } from '@/hooks/useQuery';
 import { formatLongDate, formatMonthTitle } from '@/lib/dates';
 import { formatPercent } from '@/lib/money';
@@ -76,20 +77,15 @@ export function HomePage() {
 
       <section className="hero" aria-label="Resumen del presupuesto">
         {budget.hasBudget ? (
-          <>
-            <p className="hero__label">{budget.level === 'over' ? 'Presupuesto superado' : 'Disponible este mes'}</p>
-            <p className="hero__value">
-              <Money value={budget.level === 'over' ? budget.overBy : budget.available} />
-            </p>
-            {budget.level === 'over' && <p className="hero__sub">por encima de tu presupuesto</p>}
-          </>
+          <Stat
+            tone="hero"
+            size="lg"
+            label={budget.level === 'over' ? 'Presupuesto superado' : 'Disponible este mes'}
+            value={<Money value={budget.level === 'over' ? budget.overBy : budget.available} />}
+            foot={budget.level === 'over' ? 'por encima de tu presupuesto' : undefined}
+          />
         ) : (
-          <>
-            <p className="hero__label">Gastado este mes</p>
-            <p className="hero__value">
-              <Money value={data.monthTotal} />
-            </p>
-          </>
+          <Stat tone="hero" size="lg" label="Gastado este mes" value={<Money value={data.monthTotal} />} />
         )}
 
         <BudgetStrip segments={data.byCategory} budget={budget.budget} spent={budget.spent} />
@@ -121,18 +117,8 @@ export function HomePage() {
       </section>
 
       <div className="tiles">
-        <div className="tile">
-          <span className="tile__label">Gastos de hoy</span>
-          <span className="tile__value">
-            <Money value={data.todayTotal} />
-          </span>
-        </div>
-        <div className="tile">
-          <span className="tile__label">Gastos del mes</span>
-          <span className="tile__value">
-            <Money value={data.monthTotal} />
-          </span>
-        </div>
+        <Stat size="sm" label="Gastos de hoy" value={<Money value={data.todayTotal} />} />
+        <Stat size="sm" label="Gastos del mes" value={<Money value={data.monthTotal} />} />
       </div>
 
       {dueSummary && dueSummary.total + dueSummary.other.total > 0 && (

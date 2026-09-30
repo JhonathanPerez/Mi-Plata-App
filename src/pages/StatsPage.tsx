@@ -9,6 +9,7 @@ import { MonthNavigator } from '@/components/ui/MonthNavigator';
 import { Amount } from '@/components/ui/Money';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { PrivacyToggle } from '@/components/ui/PrivacyToggle';
+import { Stat } from '@/components/ui/Stat';
 import { useQuery } from '@/hooks/useQuery';
 import { addMonths, currentYearMonth, formatMonthTitle } from '@/lib/dates';
 import { useAmountFormat } from '@/app/providers/PrivacyProvider';
@@ -56,39 +57,25 @@ export function StatsPage() {
         </div>
       ) : (
         <>
-          <section className="card total-card" aria-label="Total del mes">
-            <p className="total-card__label">Total gastado</p>
-            <p className="total-card__value">
-              <Amount value={data.total} />
-            </p>
+          <Stat as="section" aria-label="Total del mes" label="Total gastado" value={<Amount value={data.total} />}>
             <ComparisonLine summary={data} />
-          </section>
+          </Stat>
 
           <div className="tiles tiles--2x2">
-            <div className="tile">
-              <span className="tile__label">Promedio diario</span>
-              <span className="tile__value">
-                <Amount value={Math.round(data.dailyAverage)} />
-              </span>
-            </div>
-            <div className="tile">
-              <span className="tile__label">Transacciones</span>
-              <span className="tile__value">{data.transactions}</span>
-            </div>
-            <div className="tile">
-              <span className="tile__label">Más gasto en</span>
-              <span className="tile__value tile__value--with-icon">
-                {data.topCategory && <EmojiTile emoji={data.topCategory.icon} color={data.topCategory.color} size="sm" />}
-                <span>{data.topCategory?.name}</span>
-              </span>
-            </div>
-            <div className="tile">
-              <span className="tile__label">Método más usado</span>
-              <span className="tile__value tile__value--with-icon">
-                {data.topMethod && <EmojiTile emoji={data.topMethod.icon} color={data.topMethod.color} size="sm" />}
-                <span>{data.topMethod?.name}</span>
-              </span>
-            </div>
+            <Stat size="sm" label="Promedio diario" value={<Amount value={Math.round(data.dailyAverage)} />} />
+            <Stat size="sm" label="Transacciones" value={data.transactions} />
+            <Stat
+              size="sm"
+              label="Más gasto en"
+              leading={data.topCategory && <EmojiTile emoji={data.topCategory.icon} color={data.topCategory.color} size="sm" />}
+              value={data.topCategory?.name}
+            />
+            <Stat
+              size="sm"
+              label="Método más usado"
+              leading={data.topMethod && <EmojiTile emoji={data.topMethod.icon} color={data.topMethod.color} size="sm" />}
+              value={data.topMethod?.name}
+            />
           </div>
 
           <section className="section">
