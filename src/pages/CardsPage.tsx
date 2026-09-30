@@ -6,6 +6,7 @@ import { Button, LinkButton } from '@/components/ui/Button';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { Icon } from '@/components/ui/Icon';
 import { Amount } from '@/components/ui/Money';
+import { Notice } from '@/components/ui/Notice';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { PrivacyToggle } from '@/components/ui/PrivacyToggle';
 import { Skeleton } from '@/components/ui/Skeleton';
@@ -57,16 +58,16 @@ export function CardsPage() {
           <ReminderPrompt />
 
           {alerts.map(({ overview, statement, daysLeft }) => (
-            <section className="statement-alert" key={`${overview.method.id}-${statement.period}`} role="status">
-              <Icon name="warning" size={22} />
-              <span>
-                <strong>
-                  Tu extracto de {periodMonthName(statement.period)} de {overview.method.name}{' '}
-                  {daysLeft < 0 ? `venció ${relativeDays(daysLeft)}` : daysLeft === 0 ? 'vence hoy' : `vence ${relativeDays(daysLeft)}`}
-                </strong>
-                . Son {cop(statement.unpaidTotal)}.
-              </span>
-            </section>
+            <Notice
+              key={`${overview.method.id}-${statement.period}`}
+              tone={daysLeft < 0 ? 'danger' : 'warning'}
+              role="status"
+              title={`Tu extracto de ${periodMonthName(statement.period)} de ${overview.method.name} ${
+                daysLeft < 0 ? `venció ${relativeDays(daysLeft)}` : daysLeft === 0 ? 'vence hoy' : `vence ${relativeDays(daysLeft)}`
+              }`}
+            >
+              Son {cop(statement.unpaidTotal)}.
+            </Notice>
           ))}
 
           {(data ?? []).map((overview) => {

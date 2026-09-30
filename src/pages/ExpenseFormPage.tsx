@@ -9,13 +9,13 @@ import { OptionSheet, type PickerOption } from '@/components/expenses/OptionShee
 import { Field } from '@/components/ui/Field';
 import { Icon } from '@/components/ui/Icon';
 import { MoneyInput } from '@/components/ui/MoneyInput';
+import { Notice } from '@/components/ui/Notice';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { PickerField } from '@/components/ui/PickerField';
 import { Segmented } from '@/components/ui/Segmented';
 import { NOTE_MAX_LENGTH } from '@/config/constants';
 import { useQuery } from '@/hooks/useQuery';
 import { addDays, formatLongDate, todayIso } from '@/lib/dates';
-import { cx } from '@/lib/cx';
 import { errorMessage } from '@/lib/errors';
 import { describePaymentMethod } from '@/lib/payment';
 import { captureService, suggestPaymentMethodId } from '@/services/captureService';
@@ -310,10 +310,9 @@ export function ExpenseFormPage() {
                 { value: 'due', label: 'Por pagar' },
               ]}
             />
-            <p className={cx('payment-hint', !paid && 'payment-hint--due')}>
-              <Icon name={paid ? 'check' : 'info'} size={16} />
-              <span>{statusHint(paid, methodType, selectedMethod?.name)}</span>
-            </p>
+            <Notice tone={paid ? 'info' : 'warning'} icon={paid ? 'check' : 'info'}>
+              {statusHint(paid, methodType, selectedMethod?.name)}
+            </Notice>
           </div>
 
           <div className="form__footer">

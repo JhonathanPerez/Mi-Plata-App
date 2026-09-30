@@ -1,21 +1,5 @@
 /* Tarjetas de crédito: tarjeta, extractos, cambio de fechas y reglas de corte y pago. */
 
-.statement-alert {
-  display:flex;
-  gap:var(--space-3);
-  align-items:flex-start;
-  padding:var(--space-4);
-  border-radius:var(--radius-m);
-  background:var(--accent-grad);
-  color:var(--on-accent);
-  font-size:var(--fs-sm);
-}
-
-.statement-alert svg {
-  flex:none;
-  margin-top:var(--space-0);
-}
-
 .credit-card {
   position:relative;
   overflow:hidden;

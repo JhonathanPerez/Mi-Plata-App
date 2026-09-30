@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/Button';
 import { EmojiTile } from '@/components/ui/EmojiTile';
 import { Icon } from '@/components/ui/Icon';
 import { Amount } from '@/components/ui/Money';
+import { Notice } from '@/components/ui/Notice';
 import { dueLabel } from '@/lib/statementText';
 import type { DueSummary } from '@/services/cardService';
 
@@ -66,10 +67,7 @@ export function DueSummaryCard({ summary, onPay }: DueSummaryCardProps) {
           {anyClosed ? 'Pagar tarjeta' : 'Ver tarjetas'}
         </Button>
       )}
-      <p className="due-summary__note">
-        <Icon name="info" size={15} />
-        <span>Ya está incluido en «Gastos del mes»: pagar no cambia tu presupuesto.</span>
-      </p>
+      <Notice>Ya está incluido en «Gastos del mes»: pagar no cambia tu presupuesto.</Notice>
     </section>
   );
 }
