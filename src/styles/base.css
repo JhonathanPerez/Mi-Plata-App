@@ -148,7 +148,7 @@ ul {
   border: 1px solid var(--line);
   border-radius: var(--radius-l);
   padding: var(--space-4);
-  box-shadow: var(--shadow);
+  box-shadow: var(--shadow-card);
 }
 
 .card--flush {
@@ -259,7 +259,7 @@ ul {
   place-items: center;
   background: var(--accent-grad-fab);
   color: var(--on-accent);
-  box-shadow: var(--shadow-fab);
+  box-shadow: var(--shadow-accent);
   text-decoration: none;
 }
 

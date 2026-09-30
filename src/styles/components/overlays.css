@@ -41,7 +41,7 @@
   flex-direction: column;
   background: var(--bg);
   border-radius: var(--radius-l) var(--radius-l) 0 0;
-  box-shadow: var(--shadow-sheet);
+  box-shadow: var(--shadow-overlay);
   outline: none;
 }
 
@@ -137,7 +137,7 @@
   background: var(--ink);
   color: var(--bg);
   font-weight: 600;
-  box-shadow: var(--shadow-toast);
+  box-shadow: var(--shadow-overlay);
 }
 
 .toast--error {

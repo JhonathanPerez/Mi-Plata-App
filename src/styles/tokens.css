@@ -31,9 +31,12 @@
   --fs-3xl: 32px;
   --fs-hero: 44px;
 
-  /* Elevación */
-  --shadow: 0 1px 1px rgba(16, 38, 42, 0.04), 0 3px 8px rgba(16, 38, 42, 0.04), 0 16px 32px -12px rgba(16, 38, 42, 0.12);
-  --shadow-lift: 0 2px 4px rgba(16, 38, 42, 0.08), 0 20px 40px -14px rgba(11, 58, 51, 0.5);
+  /* Elevación: 5 sombras, una por rol */
+  --shadow-card: 0 1px 1px rgba(16, 38, 42, 0.04), 0 3px 8px rgba(16, 38, 42, 0.04), 0 16px 32px -12px rgba(16, 38, 42, 0.12);
+  --shadow-raised: 0 2px 4px rgba(16, 38, 42, 0.1), 0 12px 28px -10px rgba(11, 58, 51, 0.4);
+  --shadow-overlay: 0 2px 6px rgba(6, 20, 22, 0.2), 0 0 48px rgba(6, 20, 22, 0.3);
+  --shadow-glow: 0 8px 16px -8px rgba(11, 122, 99, 0.65);
+  --shadow-accent: inset 0 1px 0 var(--white-a50), 0 2px 4px rgba(16, 38, 42, 0.18), 0 14px 26px -8px rgba(230, 161, 0, 0.75);
 
   /* Superficies con degradado y brillos */
   --hero-grad: linear-gradient(155deg, #17604f 0%, #0e3a33 46%, #092a25 100%);
@@ -87,20 +90,6 @@
   --accent-grad-fab: linear-gradient(145deg, #ffcf47 0%, #f5b301 55%, #e6a100 100%);
   --gloss-primary: linear-gradient(180deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0) 60%);
 
-  /* Sombras con nombre (una por rol; ver la etapa 2 para fusionar las parecidas) */
-  --shadow-thumb: 0 1px 2px rgba(16, 38, 42, 0.14), 0 4px 10px -4px rgba(16, 38, 42, 0.18);
-  --shadow-knob: 0 1px 3px rgba(0, 0, 0, 0.3);
-  --shadow-menu: 0 12px 32px rgba(0, 0, 0, 0.22);
-  --shadow-toast: 0 2px 4px rgba(0, 0, 0, 0.2), 0 16px 32px -10px rgba(0, 0, 0, 0.5);
-  --shadow-sheet: 0 -18px 50px rgba(6, 20, 22, 0.28);
-  --shadow-hero: inset 0 1px 0 var(--white-a10), var(--shadow-lift);
-  --shadow-primary-glow: 0 8px 16px -8px rgba(11, 122, 99, 0.65);
-  --shadow-cta: inset 0 1px 0 var(--white-a24), var(--shadow-primary-glow);
-  --shadow-selected: 0 0 0 1px var(--primary), 0 8px 18px -10px rgba(11, 122, 99, 0.55);
-  --shadow-banner: 0 10px 22px -12px rgba(245, 179, 1, 0.9), inset 0 1px 0 var(--white-a40);
-  --shadow-fab: inset 0 1px 0 var(--white-a50), 0 2px 4px rgba(16, 38, 42, 0.18), 0 14px 26px -8px rgba(230, 161, 0, 0.75);
-  --shadow-text-hero: 0 2px 18px rgba(0, 0, 0, 0.18);
-
   --font-display: 'Bricolage Grotesque Variable', 'Figtree Variable', system-ui, sans-serif;
   --font-body: 'Figtree Variable', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
 
@@ -148,7 +137,7 @@
   --hero-grad: linear-gradient(155deg, #1b5245 0%, #12352f 50%, #0c2521 100%);
   --skeleton-shine: rgba(255, 255, 255, 0.07);
   --nav-indicator: rgba(60, 203, 166, 0.18);
-  --shadow: none;
+  --shadow-card: none;
   color-scheme: dark;
 }
 
@@ -168,7 +157,7 @@
     --hero-grad: linear-gradient(155deg, #1b5245 0%, #12352f 50%, #0c2521 100%);
     --skeleton-shine: rgba(255, 255, 255, 0.07);
     --nav-indicator: rgba(60, 203, 166, 0.18);
-    --shadow: none;
+    --shadow-card: none;
     color-scheme: dark;
   }
 }

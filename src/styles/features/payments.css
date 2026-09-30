@@ -52,7 +52,7 @@
   border-radius:var(--radius-l);
   background:var(--surface);
   border:1px solid var(--line);
-  box-shadow:var(--shadow);
+  box-shadow:var(--shadow-card);
 }
 
 .due-summary__head {
@@ -119,7 +119,7 @@
   border-radius:var(--radius-l);
   background:var(--hero-grad);
   color:var(--hero-ink);
-  box-shadow:var(--shadow-lift);
+  box-shadow:var(--shadow-raised);
 }
 
 .pay-summary>span {
@@ -260,7 +260,7 @@
   border-radius: var(--radius-l);
   background: var(--surface);
   border: 1px solid var(--line);
-  box-shadow: var(--shadow);
+  box-shadow: var(--shadow-card);
 }
 
 .reminder-prompt__icon {

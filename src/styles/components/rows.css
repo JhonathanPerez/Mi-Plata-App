@@ -50,7 +50,7 @@
 .row--card.is-selected {
   border-color: var(--primary);
   background: color-mix(in srgb, var(--primary) 10%, var(--surface));
-  box-shadow: var(--shadow-selected);
+  box-shadow: 0 0 0 1px var(--primary), var(--shadow-glow);
 }
 
 .row--danger {
