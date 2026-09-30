@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/Button';
 import { Icon } from '@/components/ui/Icon';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { PickerField } from '@/components/ui/PickerField';
+import { Row } from '@/components/ui/Row';
 import { useQuery } from '@/hooks/useQuery';
 import {
   WEEKEND_LABELS,
@@ -117,15 +118,16 @@ export function CardRulesPage() {
             Próximos extractos
           </h3>
           {upcoming.map((item) => (
-            <div className="upcoming-statements__row" key={item.period}>
-              <strong>{capitalize(periodMonthName(item.period)).slice(0, 3)}</strong>
-              <span>
-                Corte <b>{formatDayMonth(item.cut)}</b>
-              </span>
-              <span>
-                Pago <b>{formatDayMonth(item.due)}</b>
-              </span>
-            </div>
+            <Row
+              as="div"
+              key={item.period}
+              title={capitalize(periodMonthName(item.period))}
+              detail={
+                <>
+                  Corte <b>{formatDayMonth(item.cut)}</b> · Pago <b>{formatDayMonth(item.due)}</b>
+                </>
+              }
+            />
           ))}
         </section>
       )}
