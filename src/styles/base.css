@@ -66,12 +66,12 @@ ul {
   font-weight: 600;
   text-decoration: none;
   display: inline-block;
-  padding: 10px 0;
+  padding: var(--space-3) 0;
 }
 
 .link--button {
   display: inline-block;
-  padding: 8px 0;
+  padding: var(--space-2) 0;
   border: 0;
   background: none;
   text-align: left;
@@ -87,8 +87,8 @@ ul {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 4px;
-  padding: 8px 4px;
+  gap: var(--space-1);
+  padding: var(--space-2) var(--space-1);
   color: var(--white);
   font-weight: 700;
   text-decoration: underline;
@@ -101,7 +101,7 @@ ul {
 }
 
 .shell__main {
-  padding-bottom: calc(var(--nav-h) + 104px + env(safe-area-inset-bottom));
+  padding-bottom: calc(var(--nav-h) + var(--fab-clearance) + env(safe-area-inset-bottom));
 }
 
 /* Oculto sin display:none para conservar el alto real hasta reubicar el scroll. */
@@ -113,10 +113,10 @@ ul {
   width: 100%;
   max-width: var(--content-max);
   margin: 0 auto;
-  padding: calc(12px + env(safe-area-inset-top)) 16px 24px;
+  padding: calc(var(--space-3) + env(safe-area-inset-top)) var(--space-4) var(--space-5);
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: var(--space-4);
 }
 
 .page--form {
@@ -127,7 +127,7 @@ ul {
 .section {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: var(--space-3);
 }
 
 .section__head {
@@ -147,7 +147,7 @@ ul {
   background: var(--surface);
   border: 1px solid var(--line);
   border-radius: var(--radius-l);
-  padding: 16px;
+  padding: var(--space-4);
   box-shadow: var(--shadow);
 }
 
@@ -162,7 +162,7 @@ ul {
 
 .inline {
   display: flex;
-  gap: 12px;
+  gap: var(--space-3);
   align-items: flex-end;
 }
 
@@ -174,7 +174,7 @@ ul {
 .page-header {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--space-2);
   min-height: 48px;
 }
 
@@ -190,7 +190,7 @@ ul {
 
 .page-header__actions {
   display: flex;
-  gap: 4px;
+  gap: var(--space-1);
 }
 
 /* ---------- Navegación ---------- */
@@ -217,7 +217,7 @@ ul {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 2px;
+  gap: var(--space-0);
   font-size: var(--fs-xs);
   font-weight: 500;
   color: var(--ink-2);
