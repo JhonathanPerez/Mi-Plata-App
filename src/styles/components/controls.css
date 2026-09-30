@@ -12,7 +12,7 @@
 .segmented__item {
   position: relative;
   flex: 1;
-  min-height: 42px;
+  min-height: var(--tap);
   border: 0;
   border-radius: var(--radius-s);
   background: transparent;
