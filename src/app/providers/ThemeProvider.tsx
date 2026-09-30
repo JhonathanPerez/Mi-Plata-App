@@ -18,12 +18,18 @@ function isDark(mode: ThemeMode): boolean {
   return mode === 'dark' || (mode === 'system' && window.matchMedia(DARK_QUERY).matches);
 }
 
+/** Color de fondo del tema activo, leído del token `--bg` (así la barra de estado no duplica la paleta). */
+function readBackgroundToken(): string {
+  return getComputedStyle(document.documentElement).getPropertyValue('--bg').trim();
+}
+
 async function syncStatusBar(mode: ThemeMode): Promise<void> {
   if (!Capacitor.isNativePlatform()) return;
   const dark = isDark(mode);
   try {
     await StatusBar.setStyle({ style: dark ? Style.Dark : Style.Light });
-    await StatusBar.setBackgroundColor({ color: dark ? '#0B1719' : '#F3F6F2' });
+    const color = readBackgroundToken();
+    if (color) await StatusBar.setBackgroundColor({ color });
   } catch {
     // La barra de estado es solo cosmética: si falla, la app sigue funcionando.
   }

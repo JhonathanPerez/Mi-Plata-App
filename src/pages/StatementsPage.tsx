@@ -92,7 +92,7 @@ export function StatementsPage() {
                 <Row
                   key={statement.period}
                   onClick={() => setEditing(statement)}
-                  leading={<EmojiTile emoji={state.tone === 'paid' ? '✅' : '🧾'} color={state.tone === 'paid' ? '#2A9D8F' : '#F5B301'} />}
+                  leading={<EmojiTile emoji={state.tone === 'paid' ? '✅' : '🧾'} color={state.tone === 'paid' ? 'var(--status-paid)' : 'var(--status-pending)'} />}
                   title={
                     <>
                       {capitalize(periodMonthName(statement.period))} {statement.period.slice(0, 4) !== today.slice(0, 4) ? statement.period.slice(0, 4) : ''}

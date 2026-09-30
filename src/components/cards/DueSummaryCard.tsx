@@ -48,7 +48,7 @@ export function DueSummaryCard({ summary, onPay }: DueSummaryCardProps) {
 
       {summary.other.count > 0 && (
         <Link className="due-summary__row due-summary__row--link" to="/gastos?estado=por-pagar">
-          <EmojiTile emoji="🧾" color="#7A6F66" />
+          <EmojiTile emoji="🧾" color="var(--neutral-tile)" />
           <div>
             <strong>Otros métodos</strong>
             <span>
