@@ -47,6 +47,15 @@ export const CATEGORY_COLORS = [
   '#4C5C68',
 ];
 
+/** Los cinco tramos del anillo del logo, tomados de la paleta de categorías. */
+export const LOGO_RING_COLORS = [
+  CATEGORY_COLORS[0],
+  CATEGORY_COLORS[7],
+  CATEGORY_COLORS[4],
+  CATEGORY_COLORS[5],
+  CATEGORY_COLORS[11],
+];
+
 export const CATEGORY_ICONS = [
   '🍔', '🛒', '☕', '🍽️', '🍺', '🚌', '🚗', '⛽', '🏠', '💡',
   '🔧', '🧹', '🎬', '🎮', '🎵', '🛍️', '👕', '💇', '🧴', '💊',
