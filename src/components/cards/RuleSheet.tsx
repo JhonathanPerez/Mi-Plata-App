@@ -1,4 +1,4 @@
-import { Button } from '@/components/ui/Button';
+import { Chip } from '@/components/ui/Chip';
 import { Segmented } from '@/components/ui/Segmented';
 import { Sheet } from '@/components/ui/Sheet';
 import { cx } from '@/lib/cx';
@@ -69,11 +69,7 @@ export function RuleSheet({ open, which, rules, onChange, onClose, fromPeriod }:
       open={open}
       title={isDue ? 'Fecha límite de pago' : 'Día de corte'}
       onClose={onClose}
-      footer={
-        <Button block size="lg" icon="check" onClick={onClose}>
-          Listo
-        </Button>
-      }
+      actions={{ primary: { label: 'Listo', icon: 'check', onClick: onClose } }}
     >
       <div className="stack">
         <Segmented<Kind>
@@ -109,15 +105,9 @@ export function RuleSheet({ open, which, rules, onChange, onClose, fromPeriod }:
               <span className="field__label">¿Cuál?</span>
               <div className="chip-row">
                 {ORDINALS.map((o) => (
-                  <button
-                    key={String(o.value)}
-                    type="button"
-                    aria-pressed={rule.nth === o.value}
-                    className={cx('chip', rule.nth === o.value && 'is-selected')}
-                    onClick={() => setRule({ ...rule, nth: o.value })}
-                  >
+                  <Chip key={String(o.value)} selected={rule.nth === o.value} onClick={() => setRule({ ...rule, nth: o.value })}>
                     {o.label}
-                  </button>
+                  </Chip>
                 ))}
               </div>
             </div>

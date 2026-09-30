@@ -1,23 +1,73 @@
-/* Fila genérica de listas (icono, título, detalle, flecha). */
+/* Fila genérica de listas (ícono o pieza propia, título, detalle y algo al final). Ver components/ui/Row.tsx. */
 
 .row {
   width: 100%;
   display: flex;
   align-items: center;
-  gap: 14px;
-  min-height: 64px;
-  padding: 10px 16px;
   border: 0;
   background: transparent;
   text-align: left;
 }
 
-.row + .row {
+/* Dentro de una tarjeta: con divisores entre filas. */
+.row--list {
+  gap: 14px;
+  min-height: 64px;
+  padding: 12px 16px;
+}
+
+.row--list + .row--list {
   border-top: 1px solid var(--line);
 }
 
-.row:active:not(:disabled) {
+/* Sin margen lateral: listas dentro de una hoja. */
+.row--flush {
+  gap: 12px;
+  min-height: var(--tap);
+  padding: 10px 4px;
+}
+
+.row--list:active:not(:disabled),
+.row--flush:active:not(:disabled) {
   background: var(--surface-2);
+}
+
+/* Con borde propio: escoger una opción. */
+.row--card {
+  gap: 12px;
+  min-height: 64px;
+  padding: 10px 14px;
+  border: 1.5px solid var(--line);
+  border-radius: var(--radius-m);
+  background: var(--surface);
+  transition: var(--motion-row);
+}
+
+.row--card:active {
+  transform: scale(0.985);
+}
+
+.row--card.is-selected {
+  border-color: var(--primary);
+  background: color-mix(in srgb, var(--primary) 10%, var(--surface));
+  box-shadow: var(--shadow-selected);
+}
+
+.row--danger {
+  color: var(--danger);
+}
+
+/* Contenido arriba: para filas con líneas de texto que pueden ocupar varios renglones. */
+.row--start {
+  align-items: flex-start;
+}
+
+/* La fila abre algo al mantenerla presionada: sin selección de texto ni menú del sistema. */
+.row--holdable {
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+  touch-action: manipulation;
 }
 
 .row:disabled {
@@ -53,7 +103,124 @@
   overflow-wrap: anywhere;
 }
 
+.row__note {
+  color: var(--ink);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Como mucho dos renglones: para textos largos que llegan de fuera (el mensaje original de un gasto). */
+.row__detail--clamp {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.row__status {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--primary);
+}
+
+.row__status--due {
+  color: var(--warning-text);
+}
+
+.row__status--late {
+  color: var(--danger);
+}
+
+.row__side {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  text-align: right;
+}
+
+.row__amount {
+  font-family: var(--font-display);
+  font-size: 17px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
 .row__chevron {
   color: var(--ink-2);
   flex: none;
+}
+
+.row__check {
+  flex: none;
+  color: var(--primary);
+}
+
+/* Fila deslizable: al arrastrarla se descubre un aviso de color en cada lado que tenga acción. Ver components/ui/SwipeRow.tsx. */
+
+.swipe-row {
+  position: relative;
+  overflow: hidden;
+}
+
+.swipe-row + .swipe-row {
+  border-top: 1px solid var(--line);
+}
+
+.swipe-row__front {
+  position: relative;
+  display: flex;
+  align-items: stretch;
+  background: var(--surface);
+  touch-action: pan-y;
+  will-change: transform;
+}
+
+/* La franja visible al deslizar mide unos 96 px: el ícono va sobre el texto para que quepa. */
+.swipe-row__reveal {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  padding-inline: 16px;
+  color: var(--white);
+  font-weight: 700;
+}
+
+.swipe-row__reveal--left {
+  justify-content: flex-start;
+}
+
+.swipe-row__reveal--right {
+  justify-content: flex-end;
+}
+
+.swipe-row__reveal--primary {
+  background: var(--primary);
+}
+
+.swipe-row__reveal--neutral {
+  background: var(--ink-2);
+}
+
+.swipe-row__reveal--danger {
+  background: var(--danger);
+  color: var(--on-danger);
+}
+
+.swipe-row__reveal-inner {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  font-size: 12px;
+}
+
+.swipe-row__reveal--left .swipe-row__reveal-inner {
+  transform-origin: left center;
+}
+
+.swipe-row__reveal--right .swipe-row__reveal-inner {
+  transform-origin: right center;
 }

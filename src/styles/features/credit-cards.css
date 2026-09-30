@@ -68,20 +68,6 @@
   font-size:14px;
 }
 
-.credit-card__pay {
-  display:inline-flex;
-  justify-content:center;
-  align-items:center;
-  gap:8px;
-  min-height:50px;
-  border:0;
-  border-radius:16px;
-  background:var(--white);
-  color:var(--plum-ink);
-  font-weight:800;
-  font-size:16px;
-}
-
 .rule-panel {
   display:flex;
   flex-direction:column;
@@ -112,17 +98,6 @@
   flex:none;
   margin-top:2px;
   color:var(--primary);
-}
-
-.credit-card__link {
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  gap:4px;
-  color:var(--white);
-  font-weight:700;
-  text-decoration:underline;
-  text-underline-offset:4px;
 }
 
 .statement-footnote {
@@ -185,45 +160,6 @@
 
 .statement-open small {
   color:var(--ink-2);
-}
-
-.statement-row {
-  display:flex;
-  align-items:center;
-  gap:12px;
-  padding:14px 16px;
-}
-
-.statement-row+.statement-row {
-  border-top:1px solid var(--line);
-}
-
-.statement-row__body {
-  flex:1;
-  min-width:0;
-  display:flex;
-  flex-direction:column;
-  gap:2px;
-}
-
-.statement-row__body .muted {
-  font-size:13.5px;
-  white-space:nowrap;
-}
-
-.statement-row__state {
-  font-size:13px;
-  font-weight:700;
-  color:var(--primary);
-}
-
-.statement-row__state.is-due {
-  color:var(--warning-text);
-}
-
-.statement-row__amount {
-  font-family:var(--font-display);
-  font-variant-numeric:tabular-nums;
 }
 
 .statement-tag {
@@ -397,30 +333,6 @@
   flex-direction: column;
   align-items: center;
   gap: 4px;
-}
-
-.credit-card__link--button {
-  border: 0;
-  background: none;
-  color: var(--white);
-  cursor: pointer;
-  padding: 8px 4px;
-}
-
-.statement-row--button {
-  width: 100%;
-  border: 0;
-  background: transparent;
-  color: inherit;
-  text-align: left;
-}
-
-.statement-row--button:active {
-  background: var(--surface-2);
-}
-
-.statement-row__state.is-late {
-  color: var(--danger);
 }
 
 .empty-note {

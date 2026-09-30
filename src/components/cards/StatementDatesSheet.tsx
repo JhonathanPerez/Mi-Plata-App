@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useConfirm } from '@/app/providers/ConfirmProvider';
 import { useToast } from '@/app/providers/ToastProvider';
-import { Button } from '@/components/ui/Button';
+import { LinkButton } from '@/components/ui/Button';
 import { Icon } from '@/components/ui/Icon';
 import { Sheet } from '@/components/ui/Sheet';
 import { errorMessage } from '@/lib/errors';
@@ -116,11 +116,15 @@ export function StatementDatesSheet({ open, methodId, rules, statement, onClose,
       open={open}
       title={`Fechas de ${monthName}`}
       onClose={onClose}
-      footer={
-        <Button block size="lg" icon="check" loading={busy} disabled={!changed || Boolean(preview?.error)} onClick={() => void save()}>
-          Guardar fechas
-        </Button>
-      }
+      actions={{
+        primary: {
+          label: 'Guardar fechas',
+          icon: 'check',
+          loading: busy,
+          disabled: !changed || Boolean(preview?.error),
+          onClick: () => void save(),
+        },
+      }}
     >
       <div className="stack">
         <div className="field">
@@ -166,13 +170,11 @@ export function StatementDatesSheet({ open, methodId, rules, statement, onClose,
         )}
 
         <div className="stack">
-          <button type="button" className="link link--button" onClick={onEditRules}>
-            Cambiar la regla de siempre
-          </button>
+          <LinkButton onClick={onEditRules}>Cambiar la regla de siempre</LinkButton>
           {statement.fixed && (
-            <button type="button" className="link link--button" onClick={() => void reset()} disabled={busy}>
+            <LinkButton onClick={() => void reset()} disabled={busy}>
               Volver a las fechas de la regla
-            </button>
+            </LinkButton>
           )}
         </div>
       </div>

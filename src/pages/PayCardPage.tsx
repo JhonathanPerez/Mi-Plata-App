@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useToast } from '@/app/providers/ToastProvider';
-import { Button } from '@/components/ui/Button';
+import { Button, LinkButton } from '@/components/ui/Button';
+import { Chip } from '@/components/ui/Chip';
 import { EmojiTile } from '@/components/ui/EmojiTile';
 import { Icon } from '@/components/ui/Icon';
 import { Amount } from '@/components/ui/Money';
@@ -117,12 +118,12 @@ export function PayCardPage() {
           <div className="field">
             <span className="field__label">Fecha del pago</span>
             <div className="chip-row">
-              <button type="button" className={cx('chip', paidOn === today && 'is-selected')} aria-pressed={paidOn === today} onClick={() => setPaidOn(today)}>
+              <Chip selected={paidOn === today} onClick={() => setPaidOn(today)}>
                 Hoy
-              </button>
-              <button type="button" className={cx('chip', paidOn === addDays(today, -1) && 'is-selected')} aria-pressed={paidOn === addDays(today, -1)} onClick={() => setPaidOn(addDays(today, -1))}>
+              </Chip>
+              <Chip selected={paidOn === addDays(today, -1)} onClick={() => setPaidOn(addDays(today, -1))}>
                 Ayer
-              </button>
+              </Chip>
               <input className="input input--date" type="date" aria-label="Otra fecha de pago" max={today} value={paidOn} onChange={(event) => event.target.value && setPaidOn(event.target.value)} />
             </div>
           </div>
@@ -133,9 +134,8 @@ export function PayCardPage() {
                 <h2 className="section__title">
                   {payable.length > 1 ? `Extracto de ${periodMonthName(statement.period)}` : 'Incluidos'}
                 </h2>
-                <button
-                  type="button"
-                  className="link link--button pay-link"
+                <LinkButton
+                  className="pay-link"
                   onClick={() => {
                     const ids = unpaidOf(statement).map((e) => e.id);
                     const everySelected = ids.every((x) => selected.has(x));
@@ -147,7 +147,7 @@ export function PayCardPage() {
                   }}
                 >
                   {unpaidOf(statement).every((e) => selected.has(e.id)) ? 'Quitar todos' : 'Marcar todos'}
-                </button>
+                </LinkButton>
               </div>
               <div className="card card--flush">
                 {unpaidOf(statement).map((expense) => {

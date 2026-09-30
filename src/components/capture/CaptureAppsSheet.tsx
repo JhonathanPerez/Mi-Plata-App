@@ -1,9 +1,10 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Button } from '@/components/ui/Button';
 import { Icon } from '@/components/ui/Icon';
+import { Row } from '@/components/ui/Row';
 import { Sheet } from '@/components/ui/Sheet';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { CAPTURE_SOURCES, type CaptureAppChoice } from '@/config/capture';
+import { cx } from '@/lib/cx';
 import { haptics } from '@/lib/haptics';
 import type { InstalledApp } from '@/lib/notificationCapture';
 import { normalizeText } from '@/lib/text';
@@ -78,16 +79,11 @@ export function CaptureAppsSheet({ open, onClose, selected, onSaved }: CaptureAp
       open={open}
       onClose={onClose}
       title="Elegir apps"
-      footer={
-        <div className="dialog__actions">
-          <Button variant="secondary" onClick={onClose}>
-            Cancelar
-          </Button>
-          <Button onClick={save}>
-            Guardar{checked.size > 0 ? ` (${checked.size})` : ''}
-          </Button>
-        </div>
-      }
+      actions={{
+        layout: 'split',
+        secondary: { label: 'Cancelar', onClick: onClose },
+        primary: { label: `Guardar${checked.size > 0 ? ` (${checked.size})` : ''}`, onClick: save },
+      }}
     >
       <div className="stack">
         <div className="search">
@@ -116,21 +112,23 @@ export function CaptureAppsSheet({ open, onClose, selected, onSaved }: CaptureAp
               const isChecked = checked.has(app.pkg);
               return (
                 <li key={app.pkg}>
-                  <button
-                    type="button"
-                    className="app-picker__row"
+                  <Row
+                    variant="flush"
                     role="checkbox"
                     aria-checked={isChecked}
                     onClick={() => toggle(app.pkg)}
-                  >
-                    <span className="app-picker__icon" aria-hidden="true">
-                      <Icon name="phone" size={20} />
-                    </span>
-                    <span className="app-picker__label">{app.label}</span>
-                    <span className={`app-picker__check${isChecked ? ' is-on' : ''}`} aria-hidden="true">
-                      {isChecked && <Icon name="check" size={14} weight="bold" />}
-                    </span>
-                  </button>
+                    leading={
+                      <span className="app-picker__icon" aria-hidden="true">
+                        <Icon name="phone" size={20} />
+                      </span>
+                    }
+                    title={app.label}
+                    trailing={
+                      <span className={cx('app-picker__check', isChecked && 'is-on')} aria-hidden="true">
+                        {isChecked && <Icon name="check" size={14} weight="bold" />}
+                      </span>
+                    }
+                  />
                 </li>
               );
             })}

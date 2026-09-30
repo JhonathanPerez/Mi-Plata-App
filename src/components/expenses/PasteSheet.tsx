@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 import { useToast } from '@/app/providers/ToastProvider';
-import { Button } from '@/components/ui/Button';
 import { Field } from '@/components/ui/Field';
 import { Sheet } from '@/components/ui/Sheet';
 import { describeFailure } from '@/lib/parseNotification';
@@ -57,11 +56,7 @@ export function PasteSheet({ open, onClose }: PasteSheetProps) {
       open={open}
       title="Pegar un mensaje"
       onClose={onClose}
-      footer={
-        <Button block size="lg" loading={busy} icon="check" onClick={() => void submit()}>
-          Detectar gasto
-        </Button>
-      }
+      actions={{ primary: { label: 'Detectar gasto', icon: 'check', loading: busy, onClick: () => void submit() } }}
     >
       <Field
         label="Texto del SMS o de la notificación"

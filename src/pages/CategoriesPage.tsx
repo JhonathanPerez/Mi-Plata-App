@@ -6,9 +6,9 @@ import { ColorPicker } from '@/components/ui/ColorPicker';
 import { EmojiTile } from '@/components/ui/EmojiTile';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { Field } from '@/components/ui/Field';
-import { Icon } from '@/components/ui/Icon';
 import { IconPicker } from '@/components/ui/IconPicker';
 import { PageHeader } from '@/components/ui/PageHeader';
+import { Row } from '@/components/ui/Row';
 import { Sheet } from '@/components/ui/Sheet';
 import { Toggle } from '@/components/ui/Toggle';
 import { CATEGORY_COLORS, CATEGORY_ICONS, NAME_MAX_LENGTH } from '@/config/constants';
@@ -101,17 +101,19 @@ export function CategoriesPage() {
       ) : (
         <div className="card card--flush list-gap">
           {(categories ?? []).map((category) => (
-            <button key={category.id} type="button" className="row" onClick={() => setEditing(category)}>
-              <EmojiTile emoji={category.icon} color={category.color} />
-              <span className="row__body">
-                <span className="row__title">{category.name}</span>
-                <span className="row__detail">
+            <Row
+              key={category.id}
+              leading={<EmojiTile emoji={category.icon} color={category.color} />}
+              title={category.name}
+              detail={
+                <>
                   {category.expenseCount} {pluralize(category.expenseCount, 'gasto', 'gastos')}
                   {!category.isActive && ' · Oculta al registrar'}
-                </span>
-              </span>
-              <Icon name="edit" size={20} className="row__chevron" />
-            </button>
+                </>
+              }
+              chevron="edit"
+              onClick={() => setEditing(category)}
+            />
           ))}
         </div>
       )}
@@ -120,18 +122,12 @@ export function CategoriesPage() {
         open={editing !== null}
         onClose={close}
         title={editing === 'new' ? 'Nueva categoría' : 'Editar categoría'}
-        footer={
-          <>
-            <Button size="lg" block loading={saving} onClick={save}>
-              Guardar categoría
-            </Button>
-            {current && (
-              <Button variant="danger" block icon="trash" onClick={remove} disabled={current.expenseCount > 0}>
-                Eliminar categoría
-              </Button>
-            )}
-          </>
-        }
+        actions={{
+          primary: { label: 'Guardar categoría', loading: saving, onClick: save },
+          secondary: current
+            ? { label: 'Eliminar categoría', variant: 'danger', icon: 'trash', onClick: remove, disabled: current.expenseCount > 0 }
+            : undefined,
+        }}
       >
         <div className="form">
           <Field label="Nombre" htmlFor="category-name" error={nameError}>
