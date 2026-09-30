@@ -5,7 +5,7 @@
   padding: 4px;
   gap: 4px;
   background: var(--surface-2);
-  border-radius: var(--radius-m);
+  border-radius: var(--radius-s);
 }
 
 .segmented__item {
@@ -13,7 +13,7 @@
   flex: 1;
   min-height: 42px;
   border: 0;
-  border-radius: 10px;
+  border-radius: var(--radius-s);
   background: transparent;
   font-weight: 600;
   color: var(--ink-2);
@@ -29,7 +29,7 @@
 .segmented__thumb {
   position: absolute;
   inset: 0;
-  border-radius: 10px;
+  border-radius: var(--radius-s);
   background: var(--surface);
   box-shadow: var(--shadow-thumb);
 }
@@ -64,7 +64,7 @@
   gap: 6px;
   min-height: 44px;
   padding: 0 16px;
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   border: 1.5px solid var(--line);
   background: var(--surface);
   font-weight: 600;
@@ -94,14 +94,14 @@
 .emoji-tile--md {
   width: 40px;
   height: 40px;
-  border-radius: 13px;
+  border-radius: var(--radius-s);
   font-size: var(--fs-xl);
 }
 
 .emoji-tile--sm {
   width: 30px;
   height: 30px;
-  border-radius: 10px;
+  border-radius: var(--radius-s);
   font-size: var(--fs-md);
 }
 
@@ -141,7 +141,7 @@
   flex: none;
   width: 52px;
   height: 32px;
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   background: var(--line);
   position: relative;
   transition: var(--motion-press);

@@ -90,7 +90,7 @@
   display: block;
   width: var(--sk-w, 100%);
   height: var(--sk-h, 16px);
-  border-radius: var(--sk-r, 10px);
+  border-radius: var(--sk-r, var(--radius-s));
   background: linear-gradient(100deg, transparent 30%, var(--skeleton-shine) 50%, transparent 70%) 0 0 / 220% 100%, var(--line);
   animation: shimmer 1.4s linear infinite;
 }

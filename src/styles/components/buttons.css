@@ -7,7 +7,7 @@
   gap: 8px;
   min-height: var(--tap);
   padding: 0 20px;
-  border-radius: var(--radius-m);
+  border-radius: var(--radius-s);
   border: 1.5px solid transparent;
   font-weight: 650;
   font-size: var(--fs-md);
@@ -18,7 +18,7 @@
 .btn--lg {
   min-height: 58px;
   font-size: var(--fs-lg);
-  border-radius: 18px;
+  border-radius: var(--radius-m);
 }
 
 .btn--block {

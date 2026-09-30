@@ -41,8 +41,8 @@ export function CardsPage() {
 
       {loading && !data ? (
         <div className="page-skeleton" role="status" aria-label="Cargando tarjetas">
-          <Skeleton height={64} radius={20} />
-          <Skeleton height={300} radius={26} />
+          <Skeleton height={64} radius="m" />
+          <Skeleton height={300} radius="l" />
         </div>
       ) : (data ?? []).length === 0 ? (
         <div className="card">
