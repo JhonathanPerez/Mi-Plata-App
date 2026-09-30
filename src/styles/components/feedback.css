@@ -16,7 +16,7 @@
   height: 88px;
   margin-bottom: 4px;
   border-radius: 50%;
-  font-size: 40px;
+  font-size: var(--fs-hero);
   background: var(--surface-2);
   background: radial-gradient(circle at 32% 26%, var(--surface) 0%, var(--surface-2) 100%);
   box-shadow: 0 0 0 9px var(--primary-halo), var(--shadow);
@@ -24,7 +24,7 @@
 
 .empty__title {
   font-family: var(--font-display);
-  font-size: 19px;
+  font-size: var(--fs-lg);
   font-weight: 650;
 }
 
@@ -43,7 +43,7 @@
   background: var(--scrim-strong);
   color: var(--white);
   font-weight: 700;
-  font-size: 18px;
+  font-size: var(--fs-lg);
 }
 
 .saved {
@@ -72,7 +72,7 @@
 
 .saved__text {
   font-family: var(--font-display);
-  font-size: 24px;
+  font-size: var(--fs-2xl);
   font-weight: 700;
 }
 

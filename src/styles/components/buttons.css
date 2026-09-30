@@ -10,14 +10,14 @@
   border-radius: var(--radius-m);
   border: 1.5px solid transparent;
   font-weight: 650;
-  font-size: 16px;
+  font-size: var(--fs-md);
   text-align: center;
   transition: var(--motion-press);
 }
 
 .btn--lg {
   min-height: 58px;
-  font-size: 18px;
+  font-size: var(--fs-lg);
   border-radius: 18px;
 }
 

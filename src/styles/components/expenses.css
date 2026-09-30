@@ -56,7 +56,7 @@
 .preview-card__amount {
   font-family: var(--font-display);
   font-weight: 700;
-  font-size: 26px;
+  font-size: var(--fs-2xl);
   font-variant-numeric: tabular-nums;
 }
 
@@ -81,7 +81,7 @@
 }
 
 .preview-card__row dt {
-  font-size: 13px;
+  font-size: var(--fs-xs);
   color: var(--ink-2);
   flex-shrink: 0;
 }
@@ -109,11 +109,11 @@
 }
 
 .expense-group__head h3 {
-  font-size: 15px;
+  font-size: var(--fs-sm);
   font-weight: 700;
 }
 
 .expense-group__head span {
   font-variant-numeric: tabular-nums;
-  font-size: 14px;
+  font-size: var(--fs-sm);
 }

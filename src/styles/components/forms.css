@@ -31,14 +31,14 @@
 }
 
 .field__label {
-  font-size: 14px;
+  font-size: var(--fs-sm);
   font-weight: 650;
   color: var(--ink-2);
   padding: 0;
 }
 
 .field__hint {
-  font-size: 14px;
+  font-size: var(--fs-sm);
   color: var(--ink-2);
 }
 
@@ -46,7 +46,7 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  font-size: 14px;
+  font-size: var(--fs-sm);
   font-weight: 600;
   color: var(--danger);
 }
@@ -79,7 +79,7 @@
 }
 
 .money__label {
-  font-size: 14px;
+  font-size: var(--fs-sm);
   font-weight: 650;
   color: var(--ink-2);
 }
@@ -104,7 +104,7 @@
   font-family: var(--font-display);
   font-weight: 600;
   color: var(--ink-2);
-  font-size: 22px;
+  font-size: var(--fs-xl);
 }
 
 .money__input {
@@ -115,16 +115,16 @@
   outline: none;
   font-family: var(--font-display);
   font-weight: 700;
-  font-size: 24px;
+  font-size: var(--fs-2xl);
   font-variant-numeric: tabular-nums;
 }
 
 .money--hero .money__symbol {
-  font-size: 34px;
+  font-size: var(--fs-3xl);
 }
 
 .money--hero .money__input {
-  font-size: 52px;
+  font-size: var(--fs-hero);
   letter-spacing: -0.02em;
 }
 

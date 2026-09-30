@@ -12,14 +12,14 @@
 
 .home-head__month {
   font-family: var(--font-display);
-  font-size: 30px;
+  font-size: var(--fs-3xl);
   font-weight: 750;
   letter-spacing: -0.03em;
 }
 
 .home-head__date {
   color: var(--ink-2);
-  font-size: 15px;
+  font-size: var(--fs-sm);
 }
 
 .hero {
@@ -53,14 +53,14 @@
 }
 
 .hero__label {
-  font-size: 15px;
+  font-size: var(--fs-sm);
   font-weight: 600;
   color: var(--hero-ink-2);
 }
 
 .hero__value {
   font-family: var(--font-display);
-  font-size: 50px;
+  font-size: var(--fs-hero);
   line-height: 1;
   font-weight: 750;
   letter-spacing: -0.03em;
@@ -75,7 +75,7 @@ number-flow-react {
 .hero__sub {
   margin-top: -6px;
   color: var(--hero-ink-2);
-  font-size: 14px;
+  font-size: var(--fs-sm);
 }
 
 .hero__foot span {
@@ -93,7 +93,7 @@ number-flow-react {
   background: transparent;
   color: var(--hero-ink);
   font-weight: 600;
-  font-size: 15px;
+  font-size: var(--fs-sm);
 }
 
 .hero__budget {
@@ -117,7 +117,7 @@ number-flow-react {
   border-radius: var(--radius-m);
   background: var(--accent);
   color: var(--on-accent);
-  font-size: 14px;
+  font-size: var(--fs-sm);
   font-weight: 600;
 }
 
@@ -145,14 +145,14 @@ number-flow-react {
 }
 
 .tile__label {
-  font-size: 14px;
+  font-size: var(--fs-sm);
   color: var(--ink-2);
   font-weight: 600;
 }
 
 .tile__value {
   font-family: var(--font-display);
-  font-size: 22px;
+  font-size: var(--fs-xl);
   font-weight: 700;
   letter-spacing: -0.01em;
   font-variant-numeric: tabular-nums;
@@ -163,7 +163,7 @@ number-flow-react {
   display: flex;
   align-items: center;
   gap: 8px;
-  font-size: 17px;
+  font-size: var(--fs-md);
 }
 
 .top-category {
@@ -178,14 +178,14 @@ number-flow-react {
 }
 
 .top-category__label {
-  font-size: 14px;
+  font-size: var(--fs-sm);
   color: var(--ink-2);
 }
 
 .top-category__name {
   font-family: var(--font-display);
   font-weight: 700;
-  font-size: 18px;
+  font-size: var(--fs-lg);
 }
 
 .top-category__amount {
@@ -208,7 +208,7 @@ number-flow-react {
 
 .total-card__value {
   font-family: var(--font-display);
-  font-size: 40px;
+  font-size: var(--fs-hero);
   font-weight: 750;
   letter-spacing: -0.03em;
   line-height: 1.05;
@@ -219,7 +219,7 @@ number-flow-react {
   display: flex;
   align-items: center;
   gap: 6px;
-  font-size: 15px;
+  font-size: var(--fs-sm);
   font-weight: 600;
   color: var(--ink-2);
 }
@@ -297,7 +297,7 @@ number-flow-react {
 
 .about__name {
   font-family: var(--font-display);
-  font-size: 20px;
+  font-size: var(--fs-xl);
   font-weight: 700;
 }
 
@@ -305,7 +305,7 @@ number-flow-react {
   display: flex;
   gap: 10px;
   align-items: flex-start;
-  font-size: 15px;
+  font-size: var(--fs-sm);
   color: var(--ink-2);
 }
 
@@ -329,7 +329,7 @@ number-flow-react {
 
 .export-preview__value {
   font-family: var(--font-display);
-  font-size: 30px;
+  font-size: var(--fs-3xl);
   font-weight: 750;
 }
 
@@ -393,7 +393,7 @@ number-flow-react {
 }
 
 .pending-banner__text small {
-  font-size: 13px;
+  font-size: var(--fs-xs);
   opacity: 0.85;
 }
 
@@ -405,7 +405,7 @@ number-flow-react {
 
 .capture-status__title {
   font-family: var(--font-display);
-  font-size: 20px;
+  font-size: var(--fs-xl);
   font-weight: 700;
 }
 

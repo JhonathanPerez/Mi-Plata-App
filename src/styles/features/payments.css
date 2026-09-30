@@ -9,7 +9,7 @@
   border-radius:12px;
   background:var(--primary-wash);
   color:var(--ink-2);
-  font-size:14px;
+  font-size:var(--fs-sm);
 }
 
 .payment-hint svg {
@@ -33,7 +33,7 @@
   border-radius:999px;
   background:var(--accent-soft-strong);
   color:var(--warning-text-strong);
-  font-size:11.5px;
+  font-size:var(--fs-xs);
   font-weight:800;
   letter-spacing:.02em;
   text-transform:uppercase;
@@ -70,7 +70,7 @@
 
 .due-summary__head strong {
   font-family:var(--font-display);
-  font-size:24px;
+  font-size:var(--fs-2xl);
   color:var(--warning-text);
 }
 
@@ -90,7 +90,7 @@
 }
 
 .due-summary__row span {
-  font-size:13px;
+  font-size:var(--fs-xs);
   color:var(--ink-2);
 }
 
@@ -102,7 +102,7 @@
   display:flex;
   gap:8px;
   align-items:flex-start;
-  font-size:13px;
+  font-size:var(--fs-xs);
   color:var(--ink-2);
 }
 
@@ -129,14 +129,14 @@
 
 .pay-summary strong {
   font-family:var(--font-display);
-  font-size:40px;
+  font-size:var(--fs-hero);
   font-weight:800;
   letter-spacing:-.03em;
 }
 
 .pay-summary small {
   color:var(--hero-ink-2);
-  font-size:13.5px;
+  font-size:var(--fs-xs);
 }
 
 .pay-list-head {
@@ -165,7 +165,7 @@
 
 .pay-item__body small {
   color:var(--ink-2);
-  font-size:13px;
+  font-size:var(--fs-xs);
 }
 
 .pay-item__amount {
@@ -216,7 +216,7 @@
   display:flex;
   gap:8px;
   align-items:flex-start;
-  font-size:14px;
+  font-size:var(--fs-sm);
   margin-top:8px;
 }
 
@@ -275,7 +275,7 @@
 
 .reminder-prompt p {
   margin-top: 2px;
-  font-size: 14px;
+  font-size: var(--fs-sm);
   color: var(--ink-2);
 }
 

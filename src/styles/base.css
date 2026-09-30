@@ -19,7 +19,7 @@ body {
   background-repeat: no-repeat;
   color: var(--ink);
   font-family: var(--font-body);
-  font-size: 16px;
+  font-size: var(--fs-md);
   line-height: 1.45;
   touch-action: manipulation;
   overscroll-behavior-y: none;
@@ -138,7 +138,7 @@ ul {
 
 .section__title {
   font-family: var(--font-display);
-  font-size: 19px;
+  font-size: var(--fs-lg);
   font-weight: 650;
   letter-spacing: -0.01em;
 }
@@ -180,7 +180,7 @@ ul {
 
 .page-header__title {
   font-family: var(--font-display);
-  font-size: 26px;
+  font-size: var(--fs-2xl);
   font-weight: 700;
   letter-spacing: -0.02em;
   flex: 1;
@@ -218,7 +218,7 @@ ul {
   align-items: center;
   justify-content: center;
   gap: 2px;
-  font-size: 12px;
+  font-size: var(--fs-xs);
   font-weight: 500;
   color: var(--ink-2);
   text-decoration: none;
