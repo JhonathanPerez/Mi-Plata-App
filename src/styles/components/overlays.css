@@ -63,7 +63,7 @@
 
 .sheet__title {
   font-family: var(--font-display);
-  font-size: 21px;
+  font-size: var(--fs-xl);
   font-weight: 700;
   overflow-wrap: anywhere;
 }
@@ -97,7 +97,7 @@
 
 .dialog__title {
   font-family: var(--font-display);
-  font-size: 20px;
+  font-size: var(--fs-xl);
   font-weight: 700;
   overflow-wrap: anywhere;
 }

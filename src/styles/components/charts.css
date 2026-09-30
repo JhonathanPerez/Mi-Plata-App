@@ -95,7 +95,7 @@
 }
 
 .bars__percent {
-  font-size: 13px;
+  font-size: var(--fs-xs);
   color: var(--ink-2);
 }
 
@@ -127,7 +127,7 @@
 .donut__total {
   font-family: var(--font-display);
   font-weight: 700;
-  font-size: 22px;
+  font-size: var(--fs-xl);
 }
 
 .donut__legend {
@@ -159,7 +159,7 @@
 
 .donut__pct {
   color: var(--ink-2);
-  font-size: 14px;
+  font-size: var(--fs-sm);
   min-width: 40px;
   text-align: right;
 }
@@ -199,13 +199,13 @@
 .daily__axis {
   display: flex;
   justify-content: space-between;
-  font-size: 12px;
+  font-size: var(--fs-xs);
   color: var(--ink-2);
   margin-top: 4px;
 }
 
 .daily__peak {
   margin-top: 10px;
-  font-size: 14px;
+  font-size: var(--fs-sm);
   color: var(--ink-2);
 }

@@ -98,7 +98,7 @@
 }
 
 .row__detail {
-  font-size: 14px;
+  font-size: var(--fs-sm);
   color: var(--ink-2);
   overflow-wrap: anywhere;
 }
@@ -119,7 +119,7 @@
 }
 
 .row__status {
-  font-size: 14px;
+  font-size: var(--fs-sm);
   font-weight: 700;
   color: var(--primary);
 }
@@ -142,7 +142,7 @@
 
 .row__amount {
   font-family: var(--font-display);
-  font-size: 17px;
+  font-size: var(--fs-md);
   font-weight: 700;
   font-variant-numeric: tabular-nums;
 }
@@ -214,7 +214,7 @@
   flex-direction: column;
   align-items: center;
   gap: 2px;
-  font-size: 12px;
+  font-size: var(--fs-xs);
 }
 
 .swipe-row__reveal--left .swipe-row__reveal-inner {

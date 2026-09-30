@@ -8,7 +8,7 @@
   border-radius:18px;
   background:var(--accent-grad-flat);
   color:var(--on-accent);
-  font-size:15px;
+  font-size:var(--fs-sm);
 }
 
 .statement-alert svg {
@@ -54,7 +54,7 @@
 
 .credit-card__name {
   font-family:var(--font-display);
-  font-size:24px;
+  font-size:var(--fs-2xl);
   font-weight:750;
   flex:1;
   min-width:0;
@@ -65,7 +65,7 @@
   flex:none;
   letter-spacing:.14em;
   opacity:.9;
-  font-size:14px;
+  font-size:var(--fs-sm);
 }
 
 .rule-panel {
@@ -83,14 +83,14 @@
   display:flex;
   align-items:center;
   gap:8px;
-  font-size:18px;
+  font-size:var(--fs-lg);
 }
 
 .rule-note {
   display:flex;
   gap:8px;
   align-items:flex-start;
-  font-size:14px;
+  font-size:var(--fs-sm);
   color:var(--ink-2);
 }
 
@@ -104,7 +104,7 @@
   display:flex;
   gap:8px;
   align-items:flex-start;
-  font-size:14px;
+  font-size:var(--fs-sm);
 }
 
 .statement-footnote svg {
@@ -137,7 +137,7 @@
 .date-impact__total {
   display:flex;
   justify-content:space-between;
-  font-size:14.5px;
+  font-size:var(--fs-sm);
   padding-top:8px;
   border-top:1px solid var(--warning-line);
   font-weight:700;
@@ -155,7 +155,7 @@
 
 .statement-open strong {
   font-family:var(--font-display);
-  font-size:26px;
+  font-size:var(--fs-2xl);
 }
 
 .statement-open small {
@@ -168,7 +168,7 @@
   border-radius:999px;
   background:var(--surface-2);
   color:var(--ink-2);
-  font-size:11.5px;
+  font-size:var(--fs-xs);
   font-weight:800;
   vertical-align:1px;
 }
@@ -194,7 +194,7 @@
   display:flex;
   align-items:center;
   gap:8px;
-  font-size:15px;
+  font-size:var(--fs-sm);
   margin-bottom:2px;
 }
 
@@ -203,7 +203,7 @@
   grid-template-columns:auto 1fr 1fr;
   gap:10px;
   align-items:baseline;
-  font-size:13.5px;
+  font-size:var(--fs-xs);
   white-space:nowrap;
   padding:8px 0;
 }
@@ -265,14 +265,14 @@
   border-radius:16px;
   border:1.5px solid var(--line);
   background:var(--surface);
-  font-size:28px;
+  font-size:var(--fs-3xl);
   font-weight:700;
   color:var(--primary);
 }
 
 .rule-stepper strong {
   font-family:var(--font-display);
-  font-size:44px;
+  font-size:var(--fs-hero);
   min-width:70px;
   text-align:center;
 }
@@ -287,19 +287,19 @@
 }
 
 .credit-card__statement>span {
-  font-size:14px;
+  font-size:var(--fs-sm);
   opacity:.92;
 }
 
 .credit-card__statement>strong {
   font-family:var(--font-display);
-  font-size:28px;
+  font-size:var(--fs-3xl);
   font-weight:800;
   letter-spacing:-.02em;
 }
 
 .credit-card__statement>small {
-  font-size:13.5px;
+  font-size:var(--fs-xs);
   opacity:.9;
 }
 
@@ -313,7 +313,7 @@
   gap:6px;
   font-style:normal;
   font-weight:800;
-  font-size:14px;
+  font-size:var(--fs-sm);
 }
 
 .date-impact--ok {
@@ -325,7 +325,7 @@
 }
 
 .rule-panel .picker-link__name {
-  font-size:16px;
+  font-size:var(--fs-md);
 }
 
 .credit-card__links {
