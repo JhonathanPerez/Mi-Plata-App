@@ -159,7 +159,7 @@ export function PayCardPage() {
                       <span className={cx('pay-item__check', on && 'is-on')} aria-hidden="true">
                         {on && <Icon name="check" size={16} />}
                       </span>
-                      <EmojiTile emoji={category?.icon ?? '🧾'} color={category?.color ?? '#7A6F66'} />
+                      <EmojiTile emoji={category?.icon ?? '🧾'} color={category?.color ?? 'var(--neutral-tile)'} />
                       <span className="pay-item__body">
                         <strong>{expense.note ?? category?.name ?? 'Gasto'}</strong>
                         <small>
@@ -193,7 +193,7 @@ export function PayCardPage() {
                   <span className="pay-item__lock" aria-hidden="true">
                     <Icon name="lock" size={16} />
                   </span>
-                  <EmojiTile emoji={category?.icon ?? '🧾'} color={category?.color ?? '#7A6F66'} />
+                  <EmojiTile emoji={category?.icon ?? '🧾'} color={category?.color ?? 'var(--neutral-tile)'} />
                   <span className="pay-item__body">
                     <strong>{expense.note ?? category?.name ?? 'Gasto'}</strong>
                     <small>
