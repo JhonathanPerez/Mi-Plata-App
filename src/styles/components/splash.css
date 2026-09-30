@@ -6,15 +6,15 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 12px;
-  padding: 24px;
+  gap: var(--space-3);
+  padding: var(--space-5);
   text-align: center;
 }
 
 .splash__mark {
   width: 72px;
   height: 72px;
-  padding: 11px;
+  padding: var(--space-3);
   border-radius: var(--radius-l);
   display: grid;
   place-items: center;
@@ -82,7 +82,7 @@
 .splash__spinner {
   width: 28px;
   height: 28px;
-  margin-top: 4px;
+  margin-top: var(--space-1);
   border-radius: 50%;
   border: 3px solid var(--surface-2);
   border-top-color: var(--primary);

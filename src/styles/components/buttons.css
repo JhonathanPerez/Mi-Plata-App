@@ -4,9 +4,9 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
+  gap: var(--space-2);
   min-height: var(--tap);
-  padding: 0 20px;
+  padding: 0 var(--space-4);
   border-radius: var(--radius-s);
   border: 1.5px solid transparent;
   font-weight: 650;

@@ -7,7 +7,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 24px;
+  padding: var(--space-5);
   /* El gesto que la abre es "mantener presionado": nunca debe dejar seleccionar su texto. */
   user-select: none;
   -webkit-user-select: none;
@@ -28,10 +28,10 @@
   max-width: 340px;
   background: var(--surface);
   border-radius: var(--radius-l);
-  padding: 22px;
+  padding: var(--space-5);
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: var(--space-4);
   box-shadow: var(--shadow-menu);
   animation: pop 0.14s ease-out;
   user-select: none;
@@ -49,7 +49,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 10px;
+  gap: var(--space-3);
   text-align: center;
 }
 
@@ -63,15 +63,15 @@
 .preview-card__list {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: var(--space-3);
 }
 
 .preview-card__row {
   display: flex;
   align-items: baseline;
   justify-content: space-between;
-  gap: 16px;
-  padding-top: 10px;
+  gap: var(--space-4);
+  padding-top: var(--space-3);
   border-top: 1px solid var(--line);
 }
 
@@ -96,14 +96,14 @@
 .expense-list {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: var(--space-4);
 }
 
 .expense-group__head {
   display: flex;
   justify-content: space-between;
   align-items: baseline;
-  padding: 0 4px 6px;
+  padding: 0 var(--space-1) var(--space-2);
   color: var(--ink-2);
   font-weight: 600;
 }

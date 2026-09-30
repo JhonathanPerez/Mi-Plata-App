@@ -3,19 +3,19 @@
 .picker {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: var(--space-2);
 }
 
 .picker-wrap {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: var(--space-3);
 }
 
 .picker-custom {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: var(--space-3);
 }
 
 .picker-custom__input {
@@ -83,8 +83,8 @@
   min-height: 62px;
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 10px 14px;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
   border: 1.5px solid var(--line);
   border-radius: var(--radius-s);
   background: var(--surface);
@@ -122,7 +122,7 @@
 }
 
 .picker-link__desc {
-  margin-top: 2px;
+  margin-top: var(--space-0);
   font-size: var(--fs-sm);
   color: var(--ink-2);
 }
@@ -131,7 +131,7 @@
   flex: none;
   display: inline-flex;
   align-items: center;
-  gap: 2px;
+  gap: var(--space-0);
   font-size: var(--fs-sm);
   font-weight: 700;
   color: var(--primary);
@@ -145,5 +145,5 @@
 .option-list {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: var(--space-2);
 }

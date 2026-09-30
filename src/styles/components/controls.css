@@ -2,8 +2,8 @@
 
 .segmented {
   display: flex;
-  padding: 4px;
-  gap: 4px;
+  padding: var(--space-1);
+  gap: var(--space-1);
   background: var(--surface-2);
   border-radius: var(--radius-s);
 }
@@ -55,15 +55,15 @@
 .chip-row {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: var(--space-2);
 }
 
 .chip {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: var(--space-2);
   min-height: 44px;
-  padding: 0 16px;
+  padding: 0 var(--space-4);
   border-radius: var(--radius-pill);
   border: 1.5px solid var(--line);
   background: var(--surface);
@@ -110,7 +110,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 16px;
+  gap: var(--space-4);
   min-height: var(--tap);
 }
 
