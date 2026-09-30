@@ -233,7 +233,7 @@
 .weekday-picker__day {
   aspect-ratio:1;
   border-radius:var(--radius-s);
-  border:1.5px solid var(--line);
+  border:1.5px solid var(--line-strong);
   background:var(--surface);
   font-weight:800;
 }
@@ -263,7 +263,7 @@
   width:52px;
   height:52px;
   border-radius:var(--radius-m);
-  border:1.5px solid var(--line);
+  border:1.5px solid var(--line-strong);
   background:var(--surface);
   font-size:var(--fs-3xl);
   font-weight:700;
