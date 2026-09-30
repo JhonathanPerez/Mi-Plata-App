@@ -6,7 +6,7 @@
   align-items:flex-start;
   padding:var(--space-4);
   border-radius:var(--radius-m);
-  background:var(--accent-grad-flat);
+  background:var(--accent-grad);
   color:var(--on-accent);
   font-size:var(--fs-sm);
 }
@@ -37,7 +37,7 @@
   width:70%;
   aspect-ratio:1;
   border-radius:50%;
-  background:radial-gradient(closest-side,var(--white-a22),transparent);
+  background:radial-gradient(closest-side,var(--white-a24),transparent);
 }
 
 .credit-card>* {
@@ -248,7 +248,7 @@
 .rule-sentence {
   padding:var(--space-3) var(--space-3);
   border-radius:var(--radius-s);
-  background:var(--primary-wash);
+  background:var(--primary-tint);
 }
 
 .rule-stepper {
@@ -283,7 +283,7 @@
   gap:var(--space-0);
   padding:var(--space-3) var(--space-4);
   border-radius:var(--radius-m);
-  background:var(--white-a14);
+  background:var(--white-a12);
 }
 
 .credit-card__statement>span {

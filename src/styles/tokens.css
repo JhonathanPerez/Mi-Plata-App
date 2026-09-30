@@ -49,15 +49,8 @@
 
   /* Colores de apoyo (no cambian con el tema) */
   --white: #ffffff;
-  --white-a10: rgba(255, 255, 255, 0.1);
   --white-a12: rgba(255, 255, 255, 0.12);
-  --white-a14: rgba(255, 255, 255, 0.14);
-  --white-a20: rgba(255, 255, 255, 0.2);
-  --white-a22: rgba(255, 255, 255, 0.22);
   --white-a24: rgba(255, 255, 255, 0.24);
-  --white-a25: rgba(255, 255, 255, 0.25);
-  --white-a28: rgba(255, 255, 255, 0.28);
-  --white-a40: rgba(255, 255, 255, 0.4);
   --white-a50: rgba(255, 255, 255, 0.5);
   --black-a70: rgba(0, 0, 0, 0.7);
   --mint-glow: rgba(94, 214, 180, 0.22);
@@ -67,10 +60,7 @@
   --hero-cta-ink: #0e3a33;
 
   /* Tintes de la marca y del acento */
-  --primary-veil: rgba(11, 122, 99, 0.13);
-  --primary-wash: rgba(11, 122, 99, 0.09);
   --primary-tint: rgba(11, 122, 99, 0.12);
-  --primary-halo: rgba(11, 122, 99, 0.07);
   --primary-underline: rgba(11, 122, 99, 0.4);
   --nav-indicator: rgba(11, 122, 99, 0.14);
   --line-nav: rgba(16, 38, 42, 0.06);
@@ -81,13 +71,9 @@
   --warning-text-deep: #7a4f00;
   --warning-line: rgba(122, 79, 0, 0.25);
   --scrim: rgba(6, 20, 22, 0.5);
-  --scrim-soft: rgba(6, 20, 22, 0.45);
-  --scrim-strong: rgba(6, 20, 22, 0.55);
 
-  /* Degradados del acento */
-  --accent-grad-flat: linear-gradient(135deg, #ffcb3d, #f5b301);
-  --accent-grad-banner: linear-gradient(135deg, #ffcb3d 0%, #f5b301 58%, #e9a400 100%);
-  --accent-grad-fab: linear-gradient(145deg, #ffcf47 0%, #f5b301 55%, #e6a100 100%);
+  /* Degradado del acento */
+  --accent-grad: linear-gradient(135deg, #ffcb3d, #f5b301);
   --gloss-primary: linear-gradient(180deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0) 60%);
 
   --font-display: 'Bricolage Grotesque Variable', 'Figtree Variable', system-ui, sans-serif;
