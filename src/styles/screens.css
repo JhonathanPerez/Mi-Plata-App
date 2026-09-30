@@ -231,7 +231,7 @@ number-flow-react {
   min-height: var(--tap);
   padding: 0 var(--space-4);
   border-radius: var(--radius-s);
-  border: 1.5px solid var(--line);
+  border: 1.5px solid var(--line-strong);
   background: var(--surface);
   color: var(--ink-2);
 }
@@ -467,7 +467,7 @@ number-flow-react {
   width: 22px;
   height: 22px;
   border-radius: var(--radius-xs);
-  border: 1.5px solid var(--line);
+  border: 1.5px solid var(--line-strong);
   color: var(--on-primary);
 }
 

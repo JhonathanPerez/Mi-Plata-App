@@ -187,7 +187,7 @@
   width:26px;
   height:26px;
   border-radius:var(--radius-xs);
-  border:2px solid var(--line);
+  border:2px solid var(--line-strong);
   display:grid;
   place-items:center;
   color:var(--white);
