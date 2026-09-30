@@ -69,31 +69,10 @@
 }
 
 .pay-summary {
-  display:flex;
-  flex-direction:column;
-  gap:var(--space-1);
   padding:var(--space-4);
   border-radius:var(--radius-l);
   background:var(--hero-grad);
-  color:var(--hero-ink);
   box-shadow:var(--shadow-raised);
-}
-
-.pay-summary>span {
-  color:var(--hero-ink-2);
-  font-weight:600;
-}
-
-.pay-summary strong {
-  font-family:var(--font-display);
-  font-size:var(--fs-hero);
-  font-weight:800;
-  letter-spacing:-.03em;
-}
-
-.pay-summary small {
-  color:var(--hero-ink-2);
-  font-size:var(--fs-xs);
 }
 
 .pay-list-head {

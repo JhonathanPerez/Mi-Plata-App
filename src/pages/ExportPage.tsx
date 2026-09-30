@@ -5,6 +5,7 @@ import { Field } from '@/components/ui/Field';
 import { MonthNavigator } from '@/components/ui/MonthNavigator';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { Segmented } from '@/components/ui/Segmented';
+import { Stat } from '@/components/ui/Stat';
 import { Stepper } from '@/components/ui/Stepper';
 import { useQuery } from '@/hooks/useQuery';
 import { currentYearMonth, todayIso } from '@/lib/dates';
@@ -101,16 +102,17 @@ export function ExportPage() {
         </p>
       )}
 
-      <section className="card export-preview" aria-live="polite">
-        <p className="export-preview__label">El archivo incluirá</p>
-        <p className="export-preview__value">
-          {count} {pluralize(count, 'gasto', 'gastos')}
-        </p>
-        <p className="export-preview__sub">Total: {formatCOP(preview?.total ?? 0)}</p>
+      <Stat
+        as="section"
+        aria-live="polite"
+        label="El archivo incluirá"
+        value={`${count} ${pluralize(count, 'gasto', 'gastos')}`}
+        foot={`Total: ${formatCOP(preview?.total ?? 0)}`}
+      >
         <p className="field__hint">
           Hojas: <strong>Gastos</strong> (Fecha, Categoría, Descripción, Método de pago, Valor, Estado) y <strong>Resumen</strong> (totales por categoría y método).
         </p>
-      </section>
+      </Stat>
 
       <Button size="lg" block icon="download" loading={exporting} disabled={!range || count === 0} onClick={doExport}>
         Exportar a Excel
