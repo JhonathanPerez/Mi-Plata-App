@@ -72,6 +72,21 @@
   min-width: 150px;
 }
 
+.date-field__hint {
+  font-size: var(--fs-xs);
+  color: var(--ink-2);
+}
+
+/* Los atajos miden lo mismo que el campo (48 px). */
+.date-field .chip {
+  min-height: var(--tap);
+}
+
+/* Sin atajos el campo comparte fila con otro (Desde / Hasta): puede encogerse. */
+.date-field--solo .input--date {
+  min-width: 0;
+}
+
 .money {
   display: flex;
   flex-direction: column;

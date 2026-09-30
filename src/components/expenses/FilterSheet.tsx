@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Chip } from '@/components/ui/Chip';
+import { DateField } from '@/components/ui/DateField';
 import { Field } from '@/components/ui/Field';
 import { MoneyInput } from '@/components/ui/MoneyInput';
 import { Segmented } from '@/components/ui/Segmented';
@@ -88,13 +89,9 @@ export function FilterSheet({ open, onClose, value, onApply, categories, methods
         </Field>
 
         {draft.mode === 'range' && (
-          <div className="inline">
-            <Field label="Desde" htmlFor="filter-from">
-              <input id="filter-from" className="input" type="date" value={draft.from} onChange={(e) => setDraft({ ...draft, from: e.target.value })} />
-            </Field>
-            <Field label="Hasta" htmlFor="filter-to">
-              <input id="filter-to" className="input" type="date" value={draft.to} onChange={(e) => setDraft({ ...draft, to: e.target.value })} />
-            </Field>
+          <div className="inline inline--start">
+            <DateField label="Desde" value={draft.from} onChange={(from) => setDraft({ ...draft, from })} />
+            <DateField label="Hasta" value={draft.to} onChange={(to) => setDraft({ ...draft, to })} />
           </div>
         )}
 

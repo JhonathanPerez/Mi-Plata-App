@@ -168,6 +168,10 @@ ul {
   align-items: flex-end;
 }
 
+.inline--start {
+  align-items: flex-start;
+}
+
 .inline > * {
   flex: 1;
   min-width: 0;

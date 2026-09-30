@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useToast } from '@/app/providers/ToastProvider';
 import { Button, LinkButton } from '@/components/ui/Button';
-import { Chip } from '@/components/ui/Chip';
+import { DateField } from '@/components/ui/DateField';
 import { EmojiTile } from '@/components/ui/EmojiTile';
 import { Icon } from '@/components/ui/Icon';
 import { Amount } from '@/components/ui/Money';
@@ -12,7 +12,7 @@ import { PrivacyToggle } from '@/components/ui/PrivacyToggle';
 import { Row } from '@/components/ui/Row';
 import { Stat } from '@/components/ui/Stat';
 import { useQuery } from '@/hooks/useQuery';
-import { addDays, formatShortDate, todayIso } from '@/lib/dates';
+import { formatShortDate, todayIso } from '@/lib/dates';
 import { cx } from '@/lib/cx';
 import { errorMessage } from '@/lib/errors';
 import { haptics } from '@/lib/haptics';
@@ -116,18 +116,7 @@ export function PayCardPage() {
             foot={`${chosen.length} de ${allIds.length} gastos seleccionados${total !== grandTotal ? ` · total del extracto ${cop(grandTotal)}` : ''}`}
           />
 
-          <div className="field">
-            <span className="field__label">Fecha del pago</span>
-            <div className="chip-row">
-              <Chip selected={paidOn === today} onClick={() => setPaidOn(today)}>
-                Hoy
-              </Chip>
-              <Chip selected={paidOn === addDays(today, -1)} onClick={() => setPaidOn(addDays(today, -1))}>
-                Ayer
-              </Chip>
-              <input className="input input--date" type="date" aria-label="Otra fecha de pago" max={today} value={paidOn} onChange={(event) => event.target.value && setPaidOn(event.target.value)} />
-            </div>
-          </div>
+          <DateField label="Fecha del pago" quick max={today} value={paidOn} onChange={(value) => value && setPaidOn(value)} />
 
           {payable.map((statement) => (
             <section key={statement.period}>
