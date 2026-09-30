@@ -96,7 +96,7 @@ export function CategoriesPage() {
         <p className="muted">Cargando…</p>
       ) : (categories ?? []).length === 0 ? (
         <div className="card">
-          <EmptyState emoji="🏷️" title="No hay categorías" description="Crea la primera para empezar a registrar gastos." />
+          <EmptyState icon="tag" title="No hay categorías" description="Crea la primera para empezar a registrar gastos." />
         </div>
       ) : (
         <div className="card card--flush list-gap">

@@ -49,7 +49,7 @@ export function StatsPage() {
       ) : data.transactions === 0 ? (
         <div className="card">
           <EmptyState
-            emoji="📊"
+            icon="chart"
             title="Sin gastos en este mes"
             description={`No hay movimientos en ${formatMonthTitle(yearMonth)}. Usa las flechas para ver otros meses.`}
           />

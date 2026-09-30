@@ -155,7 +155,7 @@ export function HomePage() {
       {!hasSpending ? (
         <div className="card">
           <EmptyState
-            emoji="🧾"
+            icon="list"
             title="Aún no hay gastos este mes"
             description="Toca el botón + para registrar el primero. Toma menos de diez segundos."
             action={

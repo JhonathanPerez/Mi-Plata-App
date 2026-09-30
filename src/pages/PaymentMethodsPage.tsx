@@ -113,7 +113,7 @@ export function PaymentMethodsPage() {
         <p className="muted">Cargando…</p>
       ) : (methods ?? []).length === 0 ? (
         <div className="card">
-          <EmptyState emoji="💳" title="No hay métodos de pago" description="Agrega efectivo o una tarjeta para registrar gastos." />
+          <EmptyState icon="card" title="No hay métodos de pago" description="Agrega efectivo o una tarjeta para registrar gastos." />
         </div>
       ) : (
         <div className="card card--flush list-gap">
