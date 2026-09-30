@@ -104,9 +104,12 @@
   --font-display: 'Bricolage Grotesque Variable', 'Figtree Variable', system-ui, sans-serif;
   --font-body: 'Figtree Variable', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
 
-  --radius-s: 10px;
-  --radius-m: 14px;
+  /* Esquinas: 4 radios + píldora (los círculos usan 50 %) */
+  --radius-xs: 8px;
+  --radius-s: 12px;
+  --radius-m: 16px;
   --radius-l: 24px;
+  --radius-pill: 999px;
   --nav-h: 64px;
   --tap: 48px;
   --content-max: 560px;

@@ -237,7 +237,7 @@ ul {
   left: calc(50% - 30px);
   width: 60px;
   height: 34px;
-  border-radius: 17px;
+  border-radius: var(--radius-m);
   background: var(--nav-indicator);
 }
 
@@ -254,7 +254,7 @@ ul {
   z-index: 25;
   width: 64px;
   height: 64px;
-  border-radius: 24px;
+  border-radius: var(--radius-l);
   display: grid;
   place-items: center;
   background: var(--accent-grad-fab);

@@ -55,7 +55,7 @@
   width: 100%;
   min-height: var(--tap);
   padding: 0 14px;
-  border-radius: var(--radius-m);
+  border-radius: var(--radius-s);
   border: 1.5px solid var(--line);
   background: var(--surface);
   color: var(--ink);

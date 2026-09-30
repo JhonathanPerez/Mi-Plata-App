@@ -29,7 +29,7 @@
   flex-direction: column;
   gap: 12px;
   padding: 20px 18px 16px;
-  border-radius: 30px;
+  border-radius: var(--radius-l);
   background: var(--hero-grad);
   color: var(--hero-ink);
   box-shadow: var(--shadow-hero);
@@ -114,7 +114,7 @@ number-flow-react {
   gap: 10px;
   align-items: flex-start;
   padding: 12px 14px;
-  border-radius: var(--radius-m);
+  border-radius: var(--radius-s);
   background: var(--accent);
   color: var(--on-accent);
   font-size: var(--fs-sm);
@@ -231,7 +231,7 @@ number-flow-react {
   gap: 10px;
   min-height: var(--tap);
   padding: 0 14px;
-  border-radius: var(--radius-m);
+  border-radius: var(--radius-s);
   border: 1.5px solid var(--line);
   background: var(--surface);
   color: var(--ink-2);
@@ -378,7 +378,7 @@ number-flow-react {
   padding: 0 8px;
   display: grid;
   place-items: center;
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   background: var(--on-accent);
   color: var(--accent);
   font-family: var(--font-display);
@@ -456,7 +456,7 @@ number-flow-react {
   place-items: center;
   width: 36px;
   height: 36px;
-  border-radius: var(--radius-m);
+  border-radius: var(--radius-s);
   background: var(--surface-2);
   color: var(--ink-2);
 }
@@ -467,7 +467,7 @@ number-flow-react {
   place-items: center;
   width: 22px;
   height: 22px;
-  border-radius: 7px;
+  border-radius: var(--radius-xs);
   border: 1.5px solid var(--line);
   color: var(--on-primary);
 }

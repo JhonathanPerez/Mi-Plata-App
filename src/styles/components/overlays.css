@@ -40,7 +40,7 @@
   display: flex;
   flex-direction: column;
   background: var(--bg);
-  border-radius: 30px 30px 0 0;
+  border-radius: var(--radius-l) var(--radius-l) 0 0;
   box-shadow: var(--shadow-sheet);
   outline: none;
 }
@@ -50,7 +50,7 @@
   width: 42px;
   height: 5px;
   margin: 10px auto 0;
-  border-radius: 3px;
+  border-radius: var(--radius-xs);
   background: var(--line);
 }
 
@@ -133,7 +133,7 @@
   gap: 10px;
   max-width: 480px;
   padding: 14px 16px;
-  border-radius: var(--radius-m);
+  border-radius: var(--radius-s);
   background: var(--ink);
   color: var(--bg);
   font-weight: 600;

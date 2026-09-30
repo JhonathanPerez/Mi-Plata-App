@@ -59,8 +59,8 @@ export function StatementsPage() {
 
       {loading && !overview ? (
         <div className="page-skeleton" role="status" aria-label="Cargando extractos">
-          <Skeleton height={90} radius={20} />
-          <Skeleton height={260} radius={24} />
+          <Skeleton height={90} radius="m" />
+          <Skeleton height={260} radius="l" />
         </div>
       ) : !rules ? (
         <section className="statement-open">

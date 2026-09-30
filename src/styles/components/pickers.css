@@ -24,7 +24,7 @@
   height: 56px;
   text-align: center;
   font-size: var(--fs-3xl);
-  border-radius: 14px;
+  border-radius: var(--radius-s);
   border: 1.5px dashed var(--ink-2);
   background: var(--surface);
 }
@@ -43,7 +43,7 @@
 .picker__icon {
   width: 46px;
   height: 46px;
-  border-radius: 14px;
+  border-radius: var(--radius-s);
   border: 1.5px solid var(--line);
   background: var(--surface);
   font-size: var(--fs-xl);
@@ -54,7 +54,7 @@
 .picker__color {
   width: 46px;
   height: 46px;
-  border-radius: 14px;
+  border-radius: var(--radius-s);
   border: 1.5px solid transparent;
   background: var(--swatch, var(--surface));
   color: var(--white);
@@ -86,7 +86,7 @@
   gap: 12px;
   padding: 10px 14px;
   border: 1.5px solid var(--line);
-  border-radius: var(--radius-m);
+  border-radius: var(--radius-s);
   background: var(--surface);
   color: var(--primary);
   text-align: left;

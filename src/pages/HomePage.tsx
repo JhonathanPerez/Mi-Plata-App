@@ -40,13 +40,13 @@ export function HomePage() {
           </p>
         ) : (
           <div className="page-skeleton" role="status" aria-label="Cargando tus gastos">
-            <Skeleton height={34} width="62%" radius={12} />
-            <Skeleton height={150} radius={28} />
+            <Skeleton height={34} width="62%" radius="s" />
+            <Skeleton height={150} radius="l" />
             <div className="tiles">
-              <Skeleton height={76} radius={22} />
-              <Skeleton height={76} radius={22} />
+              <Skeleton height={76} radius="l" />
+              <Skeleton height={76} radius="l" />
             </div>
-            <Skeleton height={72} radius={22} />
+            <Skeleton height={72} radius="l" />
           </div>
         )}
       </div>
