@@ -59,9 +59,9 @@
   --plum-ink: #2b1a55;
   --hero-cta-ink: #0e3a33;
 
-  /* Tintes de la marca y del acento */
-  --primary-tint: rgba(11, 122, 99, 0.12);
-  --primary-underline: rgba(11, 122, 99, 0.4);
+  /* Tintes de la marca y del acento (los de la marca se derivan de --primary, así siguen al tema) */
+  --primary-tint: color-mix(in srgb, var(--primary) 12%, transparent);
+  --primary-underline: color-mix(in srgb, var(--primary) 40%, transparent);
   --nav-indicator: rgba(11, 122, 99, 0.14);
   --line-nav: rgba(16, 38, 42, 0.06);
   --accent-soft: rgba(245, 179, 1, 0.16);
@@ -123,6 +123,7 @@
   --hero-grad: linear-gradient(155deg, #1b5245 0%, #12352f 50%, #0c2521 100%);
   --skeleton-shine: rgba(255, 255, 255, 0.07);
   --nav-indicator: rgba(60, 203, 166, 0.18);
+  --line-nav: rgba(255, 255, 255, 0.08);
   --shadow-card: none;
   color-scheme: dark;
 }
@@ -143,6 +144,7 @@
     --hero-grad: linear-gradient(155deg, #1b5245 0%, #12352f 50%, #0c2521 100%);
     --skeleton-shine: rgba(255, 255, 255, 0.07);
     --nav-indicator: rgba(60, 203, 166, 0.18);
+    --line-nav: rgba(255, 255, 255, 0.08);
     --shadow-card: none;
     color-scheme: dark;
   }
