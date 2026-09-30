@@ -83,7 +83,7 @@ export function PendingPage() {
       ) : items.length === 0 ? (
         <div className="card">
           <EmptyState
-            emoji="✅"
+            icon="check"
             title="Todo al día"
             description="Cuando llegue una notificación o un SMS de tu banco con una compra, aparecerá aquí para que le pongas categoría."
             action={

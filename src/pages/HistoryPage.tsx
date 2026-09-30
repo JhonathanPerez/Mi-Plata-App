@@ -171,7 +171,7 @@ export function HistoryPage() {
       ) : count === 0 ? (
         <div className="card">
           <EmptyState
-            emoji="🔎"
+            icon={status === 'due' ? 'check' : 'search'}
             title={status === 'due' ? 'Nada por pagar' : activeCount > 0 || search ? 'Sin resultados' : 'No hay gastos en este periodo'}
             description={
               status === 'due'

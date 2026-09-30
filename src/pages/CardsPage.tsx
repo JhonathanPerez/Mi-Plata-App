@@ -47,7 +47,7 @@ export function CardsPage() {
       ) : (data ?? []).length === 0 ? (
         <div className="card">
           <EmptyState
-            emoji="💳"
+            icon="card"
             title="No tienes tarjetas de crédito"
             description="Crea una en Ajustes ▸ Métodos de pago (tipo «Tarjeta de crédito») y configura sus fechas de corte y pago."
           />

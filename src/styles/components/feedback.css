@@ -9,27 +9,26 @@
   text-align: center;
 }
 
-.empty__emoji {
+.empty__icon {
   display: grid;
   place-items: center;
   width: 88px;
   height: 88px;
   margin-bottom: var(--space-1);
   border-radius: 50%;
-  font-size: var(--fs-hero);
-  background: var(--surface-2);
-  background: radial-gradient(circle at 32% 26%, var(--surface) 0%, var(--surface-2) 100%);
-  box-shadow: 0 0 0 9px var(--primary-tint), var(--shadow-card);
+  background: var(--primary-tint);
+  color: var(--primary);
 }
 
 .empty__title {
   font-family: var(--font-display);
   font-size: var(--fs-lg);
-  font-weight: 650;
+  font-weight: 700;
 }
 
 .empty__text {
   color: var(--ink-2);
+  font-size: var(--fs-sm);
   max-width: 300px;
   margin-bottom: var(--space-2);
 }
