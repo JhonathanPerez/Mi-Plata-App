@@ -4,6 +4,7 @@ import { useConfirm } from '@/app/providers/ConfirmProvider';
 import { useToast } from '@/app/providers/ToastProvider';
 import { haptics } from '@/lib/haptics';
 import { Button, IconButton } from '@/components/ui/Button';
+import { Chip } from '@/components/ui/Chip';
 import { OptionSheet, type PickerOption } from '@/components/expenses/OptionSheet';
 import { Field } from '@/components/ui/Field';
 import { Icon } from '@/components/ui/Icon';
@@ -268,12 +269,12 @@ export function ExpenseFormPage() {
           <fieldset className="fieldset">
             <legend className="field__label">Fecha</legend>
             <div className="chip-row">
-              <button type="button" className={cx('chip', date === today && 'is-selected')} aria-pressed={date === today} onClick={() => setDate(today)}>
+              <Chip selected={date === today} onClick={() => setDate(today)}>
                 Hoy
-              </button>
-              <button type="button" className={cx('chip', date === yesterday && 'is-selected')} aria-pressed={date === yesterday} onClick={() => setDate(yesterday)}>
+              </Chip>
+              <Chip selected={date === yesterday} onClick={() => setDate(yesterday)}>
                 Ayer
-              </button>
+              </Chip>
               <input
                 className="input input--date"
                 type="date"

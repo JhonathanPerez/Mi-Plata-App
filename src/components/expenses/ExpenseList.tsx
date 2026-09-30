@@ -1,8 +1,8 @@
 import { formatDayHeading } from '@/lib/dates';
 import { Amount } from '@/components/ui/Money';
+import { SwipeRow } from '@/components/ui/SwipeRow';
 import type { ExpenseWithRefs } from '@/types/models';
 import { ExpenseRow } from './ExpenseRow';
-import { SwipeToPayRow } from './SwipeToPayRow';
 
 interface ExpenseListProps {
   expenses: ExpenseWithRefs[];
@@ -11,6 +11,44 @@ interface ExpenseListProps {
   onTogglePaid?: (expense: ExpenseWithRefs) => void;
   /** Si se pasa (junto con onTogglePaid), deslizar a la izquierda pide eliminar el gasto. */
   onDelete?: (expense: ExpenseWithRefs) => void;
+}
+
+interface PayableRowProps {
+  expense: ExpenseWithRefs;
+  onSelect: (id: string) => void;
+  onTogglePaid: (expense: ExpenseWithRefs) => void;
+  onDelete?: (expense: ExpenseWithRefs) => void;
+}
+
+/**
+ * Una fila del historial que se desliza a la derecha para marcarla como pagada (si estaba por pagar) o de nuevo
+ * como por pagar, y a la izquierda para eliminarla (si hay `onDelete`; la confirmación queda a cargo de quien lo reciba).
+ */
+function PayableExpenseRow({ expense, onSelect, onTogglePaid, onDelete }: PayableRowProps) {
+  const isDue = expense.paidAt === null;
+  const subject = `${expense.categoryName} ${expense.note ?? ''}`;
+  return (
+    <SwipeRow
+      swipeRight={{
+        label: isDue ? 'Pagado' : 'Por pagar',
+        icon: isDue ? 'check' : 'refresh',
+        tone: isDue ? 'primary' : 'neutral',
+        srLabel: `${isDue ? 'Marcar como pagado' : 'Marcar como por pagar'}: ${subject}`,
+        onCommit: () => onTogglePaid(expense),
+      }}
+      swipeLeft={
+        onDelete && {
+          label: 'Eliminar',
+          icon: 'trash',
+          tone: 'danger',
+          srLabel: `Eliminar gasto: ${subject}`,
+          onCommit: () => onDelete(expense),
+        }
+      }
+    >
+      <ExpenseRow expense={expense} onSelect={onSelect} />
+    </SwipeRow>
+  );
 }
 
 /** Lista agrupada por día, con el total de cada día. */
@@ -39,7 +77,7 @@ export function ExpenseList({ expenses, onSelect, onTogglePaid, onDelete }: Expe
           <div className="card card--flush">
             {group.items.map((expense) =>
               onTogglePaid ? (
-                <SwipeToPayRow
+                <PayableExpenseRow
                   key={expense.id}
                   expense={expense}
                   onSelect={onSelect}

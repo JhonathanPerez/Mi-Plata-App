@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { EmojiTile } from '@/components/ui/EmojiTile';
+import { Row } from '@/components/ui/Row';
 import { formatShortDate, formatTime } from '@/lib/dates';
 import { formatCOP } from '@/lib/money';
 import { usePrivacy } from '@/app/providers/PrivacyProvider';
@@ -34,29 +35,22 @@ export function ExpenseRow({ expense, onSelect, showDate }: ExpenseRowProps) {
 
   return (
     <>
-      <button
-        type="button"
-        className="expense-row"
+      <Row
+        holdable
         onClick={() => onSelect(expense.id)}
         aria-label={`${expense.categoryName}${hidden ? '' : `, ${formatCOP(expense.amount)}`}${expense.paidAt === null ? ', por pagar' : ''}. Editar gasto`}
         {...longPress}
+        leading={<EmojiTile emoji={expense.categoryIcon} color={expense.categoryColor} />}
+        title={expense.categoryName}
+        amount={<Amount value={expense.amount} />}
+        aside={showDate ? formatShortDate(expense.date) : undefined}
       >
-        <EmojiTile emoji={expense.categoryIcon} color={expense.categoryColor} />
-        <span className="expense-row__body">
-          <span className="expense-row__title">{expense.categoryName}</span>
-          {expense.note && <span className="expense-row__note">{expense.note}</span>}
-          <span className="expense-row__meta">
-            {meta}
-            {expense.paidAt === null && <span className="payment-badge">Por pagar</span>}
-          </span>
+        {expense.note && <span className="row__note">{expense.note}</span>}
+        <span className="row__detail">
+          {meta}
+          {expense.paidAt === null && <span className="payment-badge">Por pagar</span>}
         </span>
-        <span className="expense-row__side">
-          <span className="expense-row__amount">
-            <Amount value={expense.amount} />
-          </span>
-          {showDate && <span className="expense-row__date">{formatShortDate(expense.date)}</span>}
-        </span>
-      </button>
+      </Row>
       {/* Fuera del <button>: un portal renderiza su contenido en otro punto del DOM, pero en React
           los clics dentro de él siguen "burbujeando" por el árbol de componentes. Si quedara dentro
           del botón, un clic en la X o en el fondo también dispararía el onClick de la fila (editar). */}

@@ -82,6 +82,19 @@ ul {
   opacity: 0.5;
 }
 
+/* Enlace blanco subrayado, para ponerlo sobre un fondo de color. */
+.link--inverse {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 8px 4px;
+  color: var(--white);
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
 /* ---------- Estructura ---------- */
 .shell {
   min-height: 100dvh;

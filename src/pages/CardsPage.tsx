@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ReminderPrompt } from '@/components/cards/ReminderPrompt';
 import { StatementDatesSheet } from '@/components/cards/StatementDatesSheet';
+import { Button, LinkButton } from '@/components/ui/Button';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { Icon } from '@/components/ui/Icon';
 import { Amount } from '@/components/ui/Money';
@@ -89,10 +90,9 @@ export function CardsPage() {
                       <span>Falta configurar el corte y el pago</span>
                       <small>Sin esas fechas no se pueden armar los extractos de esta tarjeta.</small>
                     </div>
-                    <button type="button" className="credit-card__pay" onClick={() => navigate(`/tarjetas/${method.id}/fechas`)}>
-                      <Icon name="calendar" size={18} />
+                    <Button variant="inverse" block icon="calendar" onClick={() => navigate(`/tarjetas/${method.id}/fechas`)}>
                       Configurar fechas
-                    </button>
+                    </Button>
                   </>
                 ) : (
                   <>
@@ -123,24 +123,23 @@ export function CardsPage() {
                       </div>
                     )}
                     {overview.payable.length > 0 && (
-                      <button type="button" className="credit-card__pay" onClick={() => navigate(`/tarjetas/${method.id}/pagar`)}>
-                        <Icon name="check" size={18} />
+                      <Button variant="inverse" block icon="check" onClick={() => navigate(`/tarjetas/${method.id}/pagar`)}>
                         {overview.payable.length === 1
                           ? `Pagar extracto de ${periodMonthName(overview.payable[0].period)}`
                           : 'Pagar tarjeta'}
-                      </button>
+                      </Button>
                     )}
                     <div className="credit-card__links">
                       {target && (
-                        <button type="button" className="credit-card__link credit-card__link--button" onClick={() => setEditing({ overview, statement: target })}>
+                        <LinkButton tone="inverse" onClick={() => setEditing({ overview, statement: target })}>
                           <Icon name="edit" size={16} />
                           Cambiar fechas de este mes
-                        </button>
+                        </LinkButton>
                       )}
-                      <button type="button" className="credit-card__link credit-card__link--button" onClick={() => navigate(`/tarjetas/${method.id}/extractos`)}>
+                      <LinkButton tone="inverse" onClick={() => navigate(`/tarjetas/${method.id}/extractos`)}>
                         Fechas y extractos
                         <Icon name="chevronRight" size={16} />
-                      </button>
+                      </LinkButton>
                     </div>
                   </>
                 )}

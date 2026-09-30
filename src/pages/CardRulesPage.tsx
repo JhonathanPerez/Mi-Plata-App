@@ -5,6 +5,7 @@ import { RuleSheet } from '@/components/cards/RuleSheet';
 import { Button } from '@/components/ui/Button';
 import { Icon } from '@/components/ui/Icon';
 import { PageHeader } from '@/components/ui/PageHeader';
+import { PickerField } from '@/components/ui/PickerField';
 import { useQuery } from '@/hooks/useQuery';
 import {
   WEEKEND_LABELS,
@@ -24,22 +25,9 @@ import { paymentMethodService } from '@/services/paymentMethodService';
 
 const DEFAULT_RULES: CycleRules = { cut: { kind: 'last' }, due: { kind: 'day', day: 20 }, dueNextMonth: true, weekend: 'keep' };
 
-function RuleField({ label, value, hint, onOpen }: { label: string; value: string; hint?: string; onOpen: () => void }) {
-  return (
-    <div className="field">
-      <span className="field__label">{label}</span>
-      <button type="button" className="picker-link" aria-haspopup="dialog" onClick={onOpen}>
-        <span className="picker-link__text">
-          <span className="picker-link__name">{value}</span>
-        </span>
-        <span className="picker-link__action">
-          Cambiar
-          <Icon name="chevronRight" size={16} />
-        </span>
-      </button>
-      {hint && <p className="field__hint">{hint}</p>}
-    </div>
-  );
+/** Un campo de regla: muestra la regla en texto y abre la hoja para cambiarla. */
+function RuleField({ label, value, onOpen }: { label: string; value: string; onOpen: () => void }) {
+  return <PickerField label={label} selected={{ name: value }} onOpen={onOpen} />;
 }
 
 /** Reglas de corte y pago de una tarjeta de crédito: día fijo, último día o "el segundo viernes". */

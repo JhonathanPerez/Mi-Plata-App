@@ -144,29 +144,3 @@
   background: var(--danger);
   color: var(--on-danger);
 }
-
-.row-action {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  width: 100%;
-  min-height: var(--tap);
-  padding: 12px 4px;
-  border: none;
-  background: none;
-  color: var(--ink);
-  font: inherit;
-  text-align: left;
-  cursor: pointer;
-}
-
-.row-action small {
-  display: block;
-  color: var(--ink-2);
-  font-size: 0.8em;
-  font-weight: 400;
-}
-
-.row-action--danger {
-  color: var(--danger);
-}

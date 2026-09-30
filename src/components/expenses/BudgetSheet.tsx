@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 import { useToast } from '@/app/providers/ToastProvider';
-import { Button } from '@/components/ui/Button';
 import { MoneyInput } from '@/components/ui/MoneyInput';
 import { Sheet } from '@/components/ui/Sheet';
 import { formatMonthTitle } from '@/lib/dates';
@@ -42,24 +41,18 @@ export function BudgetSheet({ open, onClose, yearMonth, currentAmount }: BudgetS
       open={open}
       onClose={onClose}
       title="Presupuesto mensual"
-      footer={
-        <>
-          <Button
-            size="lg"
-            block
-            loading={saving}
-            disabled={amount <= 0}
-            onClick={() => save(amount, 'Presupuesto guardado')}
-          >
-            Guardar presupuesto
-          </Button>
-          {currentAmount > 0 && (
-            <Button variant="ghost" block disabled={saving} onClick={() => save(0, 'Presupuesto eliminado')}>
-              Quitar presupuesto
-            </Button>
-          )}
-        </>
-      }
+      actions={{
+        primary: {
+          label: 'Guardar presupuesto',
+          loading: saving,
+          disabled: amount <= 0,
+          onClick: () => void save(amount, 'Presupuesto guardado'),
+        },
+        secondary:
+          currentAmount > 0
+            ? { label: 'Quitar presupuesto', disabled: saving, onClick: () => void save(0, 'Presupuesto eliminado') }
+            : undefined,
+      }}
     >
       <MoneyInput id="budget-amount" label={`Presupuesto para ${formatMonthTitle(yearMonth)}`} value={amount} onChange={setAmount} size="hero" autoFocus />
       <p className="field__hint">Se aplica a este mes y a los siguientes hasta que lo cambies.</p>

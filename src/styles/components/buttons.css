@@ -48,6 +48,13 @@
   color: var(--primary);
 }
 
+/* Blanco, para ponerlo sobre un fondo de color (la tarjeta de crédito). */
+.btn--inverse {
+  background: var(--white);
+  color: var(--plum-ink);
+  font-weight: 800;
+}
+
 .btn:disabled {
   opacity: 0.45;
   cursor: not-allowed;

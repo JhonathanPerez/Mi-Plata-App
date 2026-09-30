@@ -1,11 +1,12 @@
-import { useEffect, useRef, useState, type ChangeEvent, type ReactNode } from 'react';
+import { useEffect, useRef, useState, type ChangeEvent, type ComponentProps, type ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useConfirm } from '@/app/providers/ConfirmProvider';
 import { useTheme } from '@/app/providers/ThemeProvider';
 import { useToast } from '@/app/providers/ToastProvider';
 import { BudgetSheet } from '@/components/expenses/BudgetSheet';
-import { Icon, type IconName } from '@/components/ui/Icon';
+import { Icon } from '@/components/ui/Icon';
 import { PageHeader } from '@/components/ui/PageHeader';
+import { Row } from '@/components/ui/Row';
 import { Segmented } from '@/components/ui/Segmented';
 import { Toggle } from '@/components/ui/Toggle';
 import { PendingReminderCard } from '@/components/cards/PendingReminderCard';
@@ -25,27 +26,9 @@ import { importService } from '@/services/importService';
 import { lockService } from '@/services/lockService';
 import type { ThemeMode } from '@/types/models';
 
-interface RowProps {
-  icon: IconName;
-  title: string;
-  detail?: string;
-  onClick: () => void;
-  disabled?: boolean;
-}
-
-function Row({ icon, title, detail, onClick, disabled }: RowProps) {
-  return (
-    <button type="button" className="row" onClick={onClick} disabled={disabled}>
-      <span className="row__icon">
-        <Icon name={icon} size={22} />
-      </span>
-      <span className="row__body">
-        <span className="row__title">{title}</span>
-        {detail && <span className="row__detail">{detail}</span>}
-      </span>
-      <Icon name="chevronRight" size={20} className="row__chevron" />
-    </button>
-  );
+/** Fila de ajustes: la fila genérica con su ícono y una flecha al final. */
+function SettingsRow(props: Omit<ComponentProps<typeof Row>, 'chevron'>) {
+  return <Row chevron="chevronRight" {...props} />;
 }
 
 function Group({ title, children }: { title: string; children: ReactNode }) {
@@ -162,7 +145,7 @@ export function SettingsPage() {
       <PageHeader title="Configuración" />
 
       <Group title="Presupuesto">
-        <Row
+        <SettingsRow
           icon="target"
           title="Presupuesto mensual"
           detail={budget && budget > 0 ? formatCOP(budget) : 'Sin definir'}
@@ -171,9 +154,9 @@ export function SettingsPage() {
       </Group>
 
       <Group title="Organizar">
-        <Row icon="tag" title="Categorías" detail="Crear y editar" onClick={() => navigate('/ajustes/categorias')} />
-        <Row icon="card" title="Métodos de pago" detail="Efectivo y tarjetas" onClick={() => navigate('/ajustes/metodos')} />
-        <Row icon="calendar" title="Tarjetas y extractos" detail="Cortes, pagos y qué debes" onClick={() => navigate('/tarjetas')} />
+        <SettingsRow icon="tag" title="Categorías" detail="Crear y editar" onClick={() => navigate('/ajustes/categorias')} />
+        <SettingsRow icon="card" title="Métodos de pago" detail="Efectivo y tarjetas" onClick={() => navigate('/ajustes/metodos')} />
+        <SettingsRow icon="calendar" title="Tarjetas y extractos" detail="Cortes, pagos y qué debes" onClick={() => navigate('/tarjetas')} />
       </Group>
 
       <section className="section">
@@ -211,13 +194,13 @@ export function SettingsPage() {
       </section>
 
       <Group title="Captura automática">
-        <Row
+        <SettingsRow
           icon="inbox"
           title="Gastos por categorizar"
           detail={pendingCount ? `${pendingCount} ${pluralize(pendingCount, 'pendiente', 'pendientes')}` : 'Ninguno por ahora'}
           onClick={() => navigate('/pendientes')}
         />
-        <Row
+        <SettingsRow
           icon="bell"
           title="Notificaciones y SMS del banco"
           detail="Detectar compras automáticamente"
@@ -256,10 +239,10 @@ export function SettingsPage() {
       </section>
 
       <Group title="Tus datos">
-        <Row icon="download" title="Exportar a Excel" detail="Por mes, año o rango de fechas" onClick={() => navigate('/ajustes/exportar')} />
-        <Row icon="upload" title="Importar desde Excel" detail="Columnas: Fecha, Categoría, Descripción, Método, Valor (y Estado, opcional)" onClick={() => importRef.current?.click()} disabled={busy !== null} />
-        <Row icon="save" title="Crear copia de seguridad" detail="Archivo completo para guardar o compartir" onClick={onBackup} disabled={busy !== null} />
-        <Row icon="refresh" title="Restaurar copia de seguridad" detail="Reemplaza todos los datos actuales" onClick={() => restoreRef.current?.click()} disabled={busy !== null} />
+        <SettingsRow icon="download" title="Exportar a Excel" detail="Por mes, año o rango de fechas" onClick={() => navigate('/ajustes/exportar')} />
+        <SettingsRow icon="upload" title="Importar desde Excel" detail="Columnas: Fecha, Categoría, Descripción, Método, Valor (y Estado, opcional)" onClick={() => importRef.current?.click()} disabled={busy !== null} />
+        <SettingsRow icon="save" title="Crear copia de seguridad" detail="Archivo completo para guardar o compartir" onClick={onBackup} disabled={busy !== null} />
+        <SettingsRow icon="refresh" title="Restaurar copia de seguridad" detail="Reemplaza todos los datos actuales" onClick={() => restoreRef.current?.click()} disabled={busy !== null} />
       </Group>
 
       <input

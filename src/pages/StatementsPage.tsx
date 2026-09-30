@@ -1,11 +1,13 @@
 import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { StatementDatesSheet } from '@/components/cards/StatementDatesSheet';
+import { LinkButton } from '@/components/ui/Button';
 import { EmojiTile } from '@/components/ui/EmojiTile';
 import { Icon } from '@/components/ui/Icon';
 import { Amount } from '@/components/ui/Money';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { PrivacyToggle } from '@/components/ui/PrivacyToggle';
+import { Row } from '@/components/ui/Row';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { useQuery } from '@/hooks/useQuery';
 import { cx } from '@/lib/cx';
@@ -63,9 +65,7 @@ export function StatementsPage() {
       ) : !rules ? (
         <section className="statement-open">
           <span className="muted">Falta configurar el corte y el pago de esta tarjeta.</span>
-          <button type="button" className="link link--button" onClick={() => navigate(`/tarjetas/${id}/fechas`)}>
-            Configurar fechas
-          </button>
+          <LinkButton onClick={() => navigate(`/tarjetas/${id}/fechas`)}>Configurar fechas</LinkButton>
         </section>
       ) : (
         <>
@@ -89,39 +89,36 @@ export function StatementsPage() {
               const normal = statementDates(rules, statement.period);
               const adjusted = statement.fixed && (normal.cut !== statement.cutDate || normal.due !== statement.dueDate);
               return (
-                <button type="button" className="statement-row statement-row--button" key={statement.period} onClick={() => setEditing(statement)}>
-                  <EmojiTile emoji={state.tone === 'paid' ? '✅' : '🧾'} color={state.tone === 'paid' ? '#2A9D8F' : '#F5B301'} />
-                  <span className="statement-row__body">
-                    <strong>
+                <Row
+                  key={statement.period}
+                  onClick={() => setEditing(statement)}
+                  leading={<EmojiTile emoji={state.tone === 'paid' ? '✅' : '🧾'} color={state.tone === 'paid' ? '#2A9D8F' : '#F5B301'} />}
+                  title={
+                    <>
                       {capitalize(periodMonthName(statement.period))} {statement.period.slice(0, 4) !== today.slice(0, 4) ? statement.period.slice(0, 4) : ''}
                       {adjusted && <span className="statement-tag">Ajustado</span>}
-                    </strong>
-                    <span className="muted nowrap">Corte {formatDayMonth(statement.cutDate)}</span>
-                    <span className="muted nowrap">Pago máx. {formatDayMonth(statement.dueDate)}</span>
-                    <span className={cx('statement-row__state', state.tone === 'due' && 'is-due', state.tone === 'late' && 'is-late')}>{state.text}</span>
-                  </span>
-                  <strong className="statement-row__amount">
-                    <Amount value={statement.total} />
-                  </strong>
-                </button>
+                    </>
+                  }
+                  amount={<Amount value={statement.total} />}
+                >
+                  <span className="row__detail nowrap">Corte {formatDayMonth(statement.cutDate)}</span>
+                  <span className="row__detail nowrap">Pago máx. {formatDayMonth(statement.dueDate)}</span>
+                  <span className={cx('row__status', state.tone === 'due' && 'row__status--due', state.tone === 'late' && 'row__status--late')}>{state.text}</span>
+                </Row>
               );
             })}
             {shown.filter((s) => s.closed).length === 0 && <p className="muted empty-note">Aún no hay extractos cerrados.</p>}
           </div>
 
           {!showAll && closed.length > VISIBLE && (
-            <button type="button" className="link link--button" onClick={() => setShowAll(true)}>
-              Ver extractos anteriores
-            </button>
+            <LinkButton onClick={() => setShowAll(true)}>Ver extractos anteriores</LinkButton>
           )}
 
           <p className="muted statement-footnote">
             <Icon name="info" size={16} />
             <span>Toca un extracto para ajustar sus fechas. Cada uno guarda las suyas: cambiar un mes no altera los demás.</span>
           </p>
-          <button type="button" className="link link--button" onClick={() => navigate(`/tarjetas/${id}/fechas`)}>
-            Editar las reglas de corte y pago
-          </button>
+          <LinkButton onClick={() => navigate(`/tarjetas/${id}/fechas`)}>Editar las reglas de corte y pago</LinkButton>
         </>
       )}
 

@@ -1,7 +1,7 @@
 import { EmojiTile } from '@/components/ui/EmojiTile';
 import { Icon } from '@/components/ui/Icon';
+import { Row } from '@/components/ui/Row';
 import { Sheet } from '@/components/ui/Sheet';
-import { cx } from '@/lib/cx';
 import { haptics } from '@/lib/haptics';
 
 export interface PickerOption {
@@ -30,25 +30,22 @@ export function OptionSheet({ open, title, options, value, onSelect, onClose }: 
         {options.map((option) => {
           const selected = option.id === value;
           return (
-            <button
+            <Row
               key={option.id}
-              type="button"
+              variant="card"
               role="radio"
               aria-checked={selected}
-              className={cx('option-row', selected && 'is-selected')}
+              selected={selected}
+              leading={<EmojiTile emoji={option.icon} color={option.color} />}
+              title={option.name}
+              detail={option.description}
+              trailing={selected ? <Icon name="check" size={20} className="row__check" /> : undefined}
               onClick={() => {
                 void haptics.tap();
                 onSelect(option.id);
                 onClose();
               }}
-            >
-              <EmojiTile emoji={option.icon} color={option.color} />
-              <span className="option-row__text">
-                <span className="option-row__name">{option.name}</span>
-                {option.description && <span className="option-row__desc">{option.description}</span>}
-              </span>
-              {selected && <Icon name="check" size={20} className="option-row__check" />}
-            </button>
+            />
           );
         })}
       </div>

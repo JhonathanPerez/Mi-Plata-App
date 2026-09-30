@@ -1,10 +1,9 @@
 import { useEffect, useState } from 'react';
-import { Button } from '@/components/ui/Button';
+import { Chip } from '@/components/ui/Chip';
 import { Field } from '@/components/ui/Field';
 import { MoneyInput } from '@/components/ui/MoneyInput';
 import { Segmented } from '@/components/ui/Segmented';
 import { Sheet } from '@/components/ui/Sheet';
-import { cx } from '@/lib/cx';
 import type { Category, PaymentMethod } from '@/types/models';
 
 export type PeriodMode = 'month' | 'range' | 'all';
@@ -68,14 +67,11 @@ export function FilterSheet({ open, onClose, value, onApply, categories, methods
       open={open}
       onClose={onClose}
       title="Filtros"
-      footer={
-        <div className="dialog__actions">
-          <Button variant="secondary" onClick={() => setDraft({ ...draft, ...EMPTY_FILTERS })}>
-            Limpiar
-          </Button>
-          <Button onClick={apply}>Aplicar filtros</Button>
-        </div>
-      }
+      actions={{
+        layout: 'split',
+        secondary: { label: 'Limpiar', onClick: () => setDraft({ ...draft, ...EMPTY_FILTERS }) },
+        primary: { label: 'Aplicar filtros', onClick: apply },
+      }}
     >
       <div className="form">
         <Field label="Periodo">
@@ -108,16 +104,10 @@ export function FilterSheet({ open, onClose, value, onApply, categories, methods
             {categories.map((category) => {
               const selected = draft.categoryIds.includes(category.id);
               return (
-                <button
-                  key={category.id}
-                  type="button"
-                  aria-pressed={selected}
-                  className={cx('chip', selected && 'is-selected')}
-                  onClick={() => setDraft({ ...draft, categoryIds: toggle(draft.categoryIds, category.id) })}
-                >
+                <Chip key={category.id} selected={selected} onClick={() => setDraft({ ...draft, categoryIds: toggle(draft.categoryIds, category.id) })}>
                   <span aria-hidden="true">{category.icon}</span>
                   {category.name}
-                </button>
+                </Chip>
               );
             })}
           </div>
@@ -129,16 +119,10 @@ export function FilterSheet({ open, onClose, value, onApply, categories, methods
             {methods.map((method) => {
               const selected = draft.methodIds.includes(method.id);
               return (
-                <button
-                  key={method.id}
-                  type="button"
-                  aria-pressed={selected}
-                  className={cx('chip', selected && 'is-selected')}
-                  onClick={() => setDraft({ ...draft, methodIds: toggle(draft.methodIds, method.id) })}
-                >
+                <Chip key={method.id} selected={selected} onClick={() => setDraft({ ...draft, methodIds: toggle(draft.methodIds, method.id) })}>
                   <span aria-hidden="true">{method.icon}</span>
                   {method.name}
-                </button>
+                </Chip>
               );
             })}
           </div>

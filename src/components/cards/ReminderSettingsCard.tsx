@@ -1,9 +1,9 @@
 import { useToast } from '@/app/providers/ToastProvider';
 import { Button } from '@/components/ui/Button';
+import { Chip } from '@/components/ui/Chip';
 import { Icon } from '@/components/ui/Icon';
 import { Segmented } from '@/components/ui/Segmented';
 import { Toggle } from '@/components/ui/Toggle';
-import { cx } from '@/lib/cx';
 import { errorMessage } from '@/lib/errors';
 import { haptics } from '@/lib/haptics';
 import { HOUR_LABELS, HOUR_OPTIONS, LEAD_DAY_OPTIONS, LEAD_LABELS } from '@/lib/reminders';
@@ -89,9 +89,9 @@ export function ReminderSettingsCard() {
               {LEAD_DAY_OPTIONS.map((days) => {
                 const on = settings.leadDays.includes(days);
                 return (
-                  <button key={days} type="button" aria-pressed={on} className={cx('chip', on && 'is-selected')} onClick={() => void toggleLead(days)}>
+                  <Chip key={days} selected={on} onClick={() => void toggleLead(days)}>
                     {LEAD_LABELS[days]}
-                  </button>
+                  </Chip>
                 );
               })}
             </div>

@@ -40,34 +40,9 @@
   vertical-align:1px;
 }
 
-.swipe-row {
-  position:relative;
-  overflow:hidden;
-}
 
-.swipe-row__reveal {
-  position:absolute;
-  inset:0;
-  display:flex;
-  align-items:center;
-  gap:8px;
-  padding-left:20px;
-  background:var(--primary);
-  color:var(--white);
-  font-weight:800;
-}
 
-.swipe-row__reveal--danger {
-  padding-left:0;
-  padding-right:20px;
-  justify-content:flex-end;
-  background:var(--danger);
-}
 
-.swipe-row__front {
-  position:relative;
-  background:var(--surface);
-}
 
 .due-summary {
   display:flex;
@@ -264,9 +239,6 @@
   color: inherit;
 }
 
-.swipe-row__reveal--undo {
-  background: var(--ink-2);
-}
 
 .reminder-note {
   display: flex;

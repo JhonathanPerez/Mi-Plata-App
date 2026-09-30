@@ -3,13 +3,15 @@ import { useNavigate } from 'react-router-dom';
 import { useConfirm } from '@/app/providers/ConfirmProvider';
 import { useToast } from '@/app/providers/ToastProvider';
 import { Button } from '@/components/ui/Button';
+import { Chip } from '@/components/ui/Chip';
 import { ColorPicker } from '@/components/ui/ColorPicker';
 import { EmojiTile } from '@/components/ui/EmojiTile';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { Field } from '@/components/ui/Field';
-import { Icon } from '@/components/ui/Icon';
 import { IconPicker } from '@/components/ui/IconPicker';
 import { PageHeader } from '@/components/ui/PageHeader';
+import { PickerField } from '@/components/ui/PickerField';
+import { Row } from '@/components/ui/Row';
 import { Sheet } from '@/components/ui/Sheet';
 import { Toggle } from '@/components/ui/Toggle';
 import {
@@ -20,7 +22,6 @@ import {
   PAYMENT_TYPE_LABELS,
 } from '@/config/constants';
 import { useQuery } from '@/hooks/useQuery';
-import { cx } from '@/lib/cx';
 import { describeCut, describeDue } from '@/lib/cycles';
 import { errorMessage, ValidationError } from '@/lib/errors';
 import { pluralize } from '@/lib/text';
@@ -117,20 +118,24 @@ export function PaymentMethodsPage() {
       ) : (
         <div className="card card--flush list-gap">
           {(methods ?? []).map((method) => (
-            <button key={method.id} type="button" className="row" onClick={() => setEditing(method)}>
-              <EmojiTile emoji={method.icon} color={method.color} />
-              <span className="row__body">
-                <span className="row__title">
+            <Row
+              key={method.id}
+              leading={<EmojiTile emoji={method.icon} color={method.color} />}
+              title={
+                <>
                   {method.name}
                   {method.last4 && <span className="muted"> · •••• {method.last4}</span>}
-                </span>
-                <span className="row__detail">
+                </>
+              }
+              detail={
+                <>
                   {PAYMENT_TYPE_LABELS[method.type]} · {method.expenseCount} {pluralize(method.expenseCount, 'gasto', 'gastos')}
                   {!method.isActive && ' · Oculto al registrar'}
-                </span>
-              </span>
-              <Icon name="edit" size={20} className="row__chevron" />
-            </button>
+                </>
+              }
+              chevron="edit"
+              onClick={() => setEditing(method)}
+            />
           ))}
         </div>
       )}
@@ -139,18 +144,12 @@ export function PaymentMethodsPage() {
         open={editing !== null}
         onClose={close}
         title={editing === 'new' ? 'Nuevo método de pago' : 'Editar método de pago'}
-        footer={
-          <>
-            <Button size="lg" block loading={saving} onClick={save}>
-              Guardar
-            </Button>
-            {current && (
-              <Button variant="danger" block icon="trash" onClick={remove} disabled={current.expenseCount > 0}>
-                Eliminar método
-              </Button>
-            )}
-          </>
-        }
+        actions={{
+          primary: { label: 'Guardar', loading: saving, onClick: save },
+          secondary: current
+            ? { label: 'Eliminar método', variant: 'danger', icon: 'trash', onClick: remove, disabled: current.expenseCount > 0 }
+            : undefined,
+        }}
       >
         <div className="form">
           <Field label="Nombre" htmlFor="pm-name" error={errors.name}>
@@ -169,16 +168,9 @@ export function PaymentMethodsPage() {
             <legend className="field__label">Tipo</legend>
             <div className="chip-row" role="radiogroup" aria-label="Tipo de método de pago">
               {PAYMENT_TYPES.map((type) => (
-                <button
-                  key={type}
-                  type="button"
-                  role="radio"
-                  aria-checked={draft.type === type}
-                  className={cx('chip', draft.type === type && 'is-selected')}
-                  onClick={() => setDraft({ ...draft, type })}
-                >
+                <Chip key={type} role="radio" selected={draft.type === type} onClick={() => setDraft({ ...draft, type })}>
                   {PAYMENT_TYPE_LABELS[type]}
-                </button>
+                </Chip>
               ))}
             </div>
           </fieldset>
@@ -211,31 +203,20 @@ export function PaymentMethodsPage() {
             onChange={(isActive) => setDraft({ ...draft, isActive })}
           />
           {current && current.type === 'credit_card' && (
-            <div className="field">
-              <span className="field__label">Fechas del ciclo</span>
-              <button
-                type="button"
-                className="picker-link"
-                aria-haspopup="dialog"
-                onClick={() => {
-                  const target = current.id;
-                  close();
-                  navigate(`/tarjetas/${target}/fechas`);
-                }}
-              >
-                <span className="picker-link__text">
-                  <span className="picker-link__name">{current.cycle ? describeCut(current.cycle) : 'Sin configurar'}</span>
-                  <span className="picker-link__desc">
-                    {current.cycle ? `Pago: ${describeDue(current.cycle).toLowerCase()}` : 'Toca para elegir el corte y el pago'}
-                  </span>
-                </span>
-                <span className="picker-link__action">
-                  Cambiar
-                  <Icon name="chevronRight" size={16} />
-                </span>
-              </button>
-              <p className="field__hint">Con estas fechas se arman los extractos y se sabe cuándo vence cada pago.</p>
-            </div>
+            <PickerField
+              label="Fechas del ciclo"
+              popup={false}
+              selected={{
+                name: current.cycle ? describeCut(current.cycle) : 'Sin configurar',
+                description: current.cycle ? `Pago: ${describeDue(current.cycle).toLowerCase()}` : 'Toca para elegir el corte y el pago',
+              }}
+              hint="Con estas fechas se arman los extractos y se sabe cuándo vence cada pago."
+              onOpen={() => {
+                const target = current.id;
+                close();
+                navigate(`/tarjetas/${target}/fechas`);
+              }}
+            />
           )}
           {current && current.expenseCount > 0 && (
             <p className="field__hint">

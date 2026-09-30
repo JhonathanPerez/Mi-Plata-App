@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
 import { useToast } from '@/app/providers/ToastProvider';
+import { Button } from '@/components/ui/Button';
+import { Chip } from '@/components/ui/Chip';
 import { Segmented } from '@/components/ui/Segmented';
 import { Toggle } from '@/components/ui/Toggle';
-import { cx } from '@/lib/cx';
 import { errorMessage } from '@/lib/errors';
 import { haptics } from '@/lib/haptics';
 import { formatInterval, INTERVAL_PRESETS, MAX_INTERVAL_MINUTES, MIN_INTERVAL_MINUTES } from '@/lib/pendingReminders';
@@ -99,27 +100,20 @@ export function PendingReminderCard() {
             <span className="field__label">Recordar cada</span>
             <div className="chip-row" role="group" aria-label="Cada cuánto recordar">
               {INTERVAL_PRESETS.map((value) => (
-                <button
+                <Chip
                   key={value}
-                  type="button"
-                  aria-pressed={minutes === value}
-                  className={cx('chip', minutes === value && 'is-selected')}
+                  selected={minutes === value}
                   onClick={() => {
                     setCustomOpen(false);
                     void choose(value);
                   }}
                 >
                   {formatInterval(value)}
-                </button>
+                </Chip>
               ))}
-              <button
-                type="button"
-                aria-pressed={customOpen || !isPreset}
-                className={cx('chip', (customOpen || !isPreset) && 'is-selected')}
-                onClick={() => setCustomOpen(true)}
-              >
+              <Chip selected={customOpen || !isPreset} onClick={() => setCustomOpen(true)}>
                 Otro
-              </button>
+              </Chip>
             </div>
           </div>
 
@@ -162,9 +156,9 @@ export function PendingReminderCard() {
 
           {exactAlarm === 'denied' && (
             <div className="stack">
-              <button type="button" className="btn btn--secondary" onClick={() => void exactAlarmBridge.openSettings()}>
+              <Button variant="secondary" onClick={() => void exactAlarmBridge.openSettings()}>
                 Permitir alarmas exactas
-              </button>
+              </Button>
             </div>
           )}
         </>
