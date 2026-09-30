@@ -7,6 +7,7 @@ export const MONTH_NAMES = [
 ];
 export const MONTH_SHORT = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];
 export const WEEKDAY_SHORT = ['dom', 'lun', 'mar', 'mié', 'jue', 'vie', 'sáb'];
+export const WEEKDAY_LONG = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'];
 
 const pad = (n: number): string => String(n).padStart(2, '0');
 
@@ -93,6 +94,13 @@ export function formatMonthTitle(yearMonth: YearMonth): string {
 export function formatLongDate(iso: IsoDate): string {
   const [year, month, day] = iso.split('-').map(Number);
   return `${day} ${MONTH_NAMES[month - 1]} ${year}`;
+}
+
+/** "sábado 19 de septiembre" (con el año solo si no es el actual: "sábado 19 de septiembre de 2025"). */
+export function formatWeekdayDate(iso: IsoDate, now: Date = new Date()): string {
+  const date = parseIsoDate(iso);
+  const base = `${WEEKDAY_LONG[date.getDay()]} ${date.getDate()} de ${MONTH_NAMES[date.getMonth()]}`;
+  return date.getFullYear() === now.getFullYear() ? base : `${base} de ${date.getFullYear()}`;
 }
 
 /** "19 sep" */

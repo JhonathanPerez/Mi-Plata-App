@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useConfirm } from '@/app/providers/ConfirmProvider';
 import { useToast } from '@/app/providers/ToastProvider';
 import { LinkButton } from '@/components/ui/Button';
+import { DateField } from '@/components/ui/DateField';
 import { Icon } from '@/components/ui/Icon';
 import { Sheet } from '@/components/ui/Sheet';
 import { errorMessage } from '@/lib/errors';
@@ -127,20 +128,12 @@ export function StatementDatesSheet({ open, methodId, rules, statement, onClose,
       }}
     >
       <div className="stack">
-        <div className="field">
-          <label className="field__label" htmlFor="st-cut">
-            Fecha de corte
-          </label>
-          <input id="st-cut" className="input" type="date" value={cut} onChange={(event) => setCut(event.target.value)} />
+        <DateField label="Fecha de corte" value={cut} onChange={setCut}>
           <p className="field__hint">Normalmente: {describeCut(rules).toLowerCase()} ({formatDayMonth(normal.cut)})</p>
-        </div>
-        <div className="field">
-          <label className="field__label" htmlFor="st-due">
-            Pagar hasta
-          </label>
-          <input id="st-due" className="input" type="date" value={due} onChange={(event) => setDue(event.target.value)} />
+        </DateField>
+        <DateField label="Pagar hasta" value={due} onChange={setDue}>
           <p className="field__hint">Normalmente: {describeDue(rules).toLowerCase()} ({formatDayMonth(normal.due)})</p>
-        </div>
+        </DateField>
 
         {preview?.error ? (
           <p className="field__error" role="alert">

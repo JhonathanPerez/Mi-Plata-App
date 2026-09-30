@@ -4,7 +4,7 @@ import { useConfirm } from '@/app/providers/ConfirmProvider';
 import { useToast } from '@/app/providers/ToastProvider';
 import { haptics } from '@/lib/haptics';
 import { Button, IconButton } from '@/components/ui/Button';
-import { Chip } from '@/components/ui/Chip';
+import { DateField } from '@/components/ui/DateField';
 import { OptionSheet, type PickerOption } from '@/components/expenses/OptionSheet';
 import { Field } from '@/components/ui/Field';
 import { Icon } from '@/components/ui/Icon';
@@ -15,7 +15,7 @@ import { PickerField } from '@/components/ui/PickerField';
 import { Segmented } from '@/components/ui/Segmented';
 import { NOTE_MAX_LENGTH } from '@/config/constants';
 import { useQuery } from '@/hooks/useQuery';
-import { addDays, formatLongDate, todayIso } from '@/lib/dates';
+import { todayIso } from '@/lib/dates';
 import { errorMessage } from '@/lib/errors';
 import { describePaymentMethod } from '@/lib/payment';
 import { captureService, suggestPaymentMethodId } from '@/services/captureService';
@@ -159,9 +159,6 @@ export function ExpenseFormPage() {
     );
   }
 
-  const today = todayIso();
-  const yesterday = addDays(today, -1);
-
   const submit = async () => {
     const input: ExpenseInput = {
       amount,
@@ -258,27 +255,7 @@ export function ExpenseFormPage() {
             />
           </Field>
 
-          <fieldset className="fieldset">
-            <legend className="field__label">Fecha</legend>
-            <div className="chip-row">
-              <Chip selected={date === today} onClick={() => setDate(today)}>
-                Hoy
-              </Chip>
-              <Chip selected={date === yesterday} onClick={() => setDate(yesterday)}>
-                Ayer
-              </Chip>
-              <input
-                className="input input--date"
-                type="date"
-                aria-label="Elegir otra fecha"
-                value={date}
-                max="2100-12-31"
-                min="2000-01-01"
-                onChange={(event) => setDate(event.target.value)}
-              />
-            </div>
-            <p className="field__hint">{errors.date ?? formatLongDate(date)}</p>
-          </fieldset>
+          <DateField label="Fecha" quick value={date} onChange={setDate} min="2000-01-01" max="2100-12-31" error={errors.date} />
 
           <PickerField
             label="Categoría"

@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   addDays, addMonths, daysInMonth, diffDays, elapsedDaysInMonth, formatDayHeading, formatLongDate,
-  formatMonthTitle, formatTime, isValidIsoDate, monthRange, toIsoDate,
+  formatMonthTitle, formatTime, formatWeekdayDate, isValidIsoDate, monthRange, toIsoDate,
 } from './dates';
 
 describe('fechas locales', () => {
@@ -26,6 +26,8 @@ describe('fechas locales', () => {
   });
   it('formatea en español', () => {
     expect(formatLongDate('2026-09-19')).toBe('19 septiembre 2026');
+    expect(formatWeekdayDate('2026-09-30', new Date(2026, 8, 30))).toBe('miércoles 30 de septiembre');
+    expect(formatWeekdayDate('2025-12-25', new Date(2026, 8, 30))).toBe('jueves 25 de diciembre de 2025');
     expect(formatMonthTitle('2026-09')).toBe('Septiembre 2026');
     expect(formatTime('14:05')).toBe('2:05 p. m.');
     expect(formatTime('00:30')).toBe('12:30 a. m.');
