@@ -44,35 +44,15 @@
   color:var(--warning-text);
 }
 
-.due-summary__row {
-  display:flex;
-  align-items:center;
-  gap:var(--space-3);
-  padding:var(--space-3) var(--space-3);
-  border-radius:var(--radius-m);
-  background:var(--surface-2);
-}
-
-.due-summary__row>div {
-  flex:1;
-  display:flex;
-  flex-direction:column;
-}
-
-.due-summary__row span {
-  font-size:var(--fs-xs);
-  color:var(--ink-2);
-}
-
-.due-summary__row>strong {
-  font-family:var(--font-display);
-}
-
 .pay-summary {
   padding:var(--space-4);
   border-radius:var(--radius-l);
   background:var(--hero-grad);
   box-shadow:var(--shadow-raised);
+}
+
+.due-summary__list {
+  margin-inline: calc(-1 * var(--space-4));
 }
 
 .pay-list-head {
@@ -81,67 +61,40 @@
   align-items:baseline;
 }
 
-.pay-item {
-  display:flex;
-  align-items:center;
-  gap:var(--space-3);
-  padding:var(--space-3) var(--space-4);
+/* Gasto del extracto: la fila entera marca o desmarca. Ver components/ui/Row.tsx. */
+.pay-row.is-off .row__body,
+.pay-row.is-off .row__side {
+  opacity: 0.55;
 }
 
-.pay-item+.pay-item {
-  border-top:1px solid var(--line);
+.pay-row.is-off .row__amount {
+  text-decoration: line-through;
 }
 
-.pay-item__body {
-  flex:1;
-  min-width:0;
-  display:flex;
-  flex-direction:column;
+.pay-row__check {
+  flex: none;
+  width: 26px;
+  height: 26px;
+  border-radius: var(--radius-xs);
+  border: 2px solid var(--line-strong);
+  display: grid;
+  place-items: center;
+  color: var(--white);
+  background: var(--surface);
 }
 
-.pay-item__body small {
-  color:var(--ink-2);
-  font-size:var(--fs-xs);
+.pay-row__check.is-on {
+  background: var(--primary);
+  border-color: var(--primary);
 }
 
-.pay-item__amount {
-  font-family:var(--font-display);
-  font-variant-numeric:tabular-nums;
-}
-
-.pay-item.is-off .pay-item__body {
-  opacity:.55;
-}
-
-.pay-item.is-off .pay-item__amount {
-  opacity:.55;
-  text-decoration:line-through;
-}
-
-.pay-item__check {
-  flex:none;
-  width:26px;
-  height:26px;
-  border-radius:var(--radius-xs);
-  border:2px solid var(--line-strong);
-  display:grid;
-  place-items:center;
-  color:var(--white);
-  background:var(--surface);
-}
-
-.pay-item__check.is-on {
-  background:var(--primary);
-  border-color:var(--primary);
-}
-
-.pay-item__lock {
-  flex:none;
-  width:26px;
-  height:26px;
-  display:grid;
-  place-items:center;
-  color:var(--ink-2);
+.pay-row__lock {
+  flex: none;
+  width: 26px;
+  height: 26px;
+  display: grid;
+  place-items: center;
+  color: var(--ink-2);
 }
 
 .pay-locked {
@@ -150,16 +103,6 @@
 
 .pay-link {
   white-space:nowrap;
-}
-
-.due-summary__row .due-summary__late {
-  color: var(--danger);
-  font-weight: 700;
-}
-
-.due-summary__row--link {
-  text-decoration: none;
-  color: inherit;
 }
 
 .reminder-note {

@@ -1,4 +1,5 @@
 import { Chip } from '@/components/ui/Chip';
+import { Row } from '@/components/ui/Row';
 import { Segmented } from '@/components/ui/Segmented';
 import { Sheet } from '@/components/ui/Sheet';
 import { cx } from '@/lib/cx';
@@ -170,12 +171,16 @@ export function RuleSheet({ open, which, rules, onChange, onClose, fromPeriod }:
         <section className="upcoming-statements upcoming-statements--sheet" aria-label="Así quedaría">
           <h3 className="upcoming-statements__title">Así quedaría</h3>
           {examples.map((example) => (
-            <div className="upcoming-statements__row upcoming-statements__row--pair" key={example.period}>
-              <strong>{capitalize(periodMonthName(example.period))}</strong>
-              <span>
-                {isDue ? 'Pago' : 'Corte'} <b>{formatDayMonth(example.date)}</b>
-              </span>
-            </div>
+            <Row
+              as="div"
+              key={example.period}
+              title={capitalize(periodMonthName(example.period))}
+              detail={
+                <>
+                  {isDue ? 'Pago' : 'Corte'} <b>{formatDayMonth(example.date)}</b>
+                </>
+              }
+            />
           ))}
         </section>
       </div>

@@ -9,6 +9,7 @@ import { Amount } from '@/components/ui/Money';
 import { Notice } from '@/components/ui/Notice';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { PrivacyToggle } from '@/components/ui/PrivacyToggle';
+import { Row } from '@/components/ui/Row';
 import { Stat } from '@/components/ui/Stat';
 import { useQuery } from '@/hooks/useQuery';
 import { addDays, formatShortDate, todayIso } from '@/lib/dates';
@@ -154,22 +155,23 @@ export function PayCardPage() {
                   const category = categories.get(expense.categoryId);
                   const on = selected.has(expense.id);
                   return (
-                    <label className={cx('pay-item', !on && 'is-off')} key={expense.id}>
-                      <input className="sr-only" type="checkbox" checked={on} onChange={() => toggle(expense.id)} />
-                      <span className={cx('pay-item__check', on && 'is-on')} aria-hidden="true">
-                        {on && <Icon name="check" size={16} />}
-                      </span>
-                      <EmojiTile emoji={category?.icon ?? '🧾'} color={category?.color ?? 'var(--neutral-tile)'} />
-                      <span className="pay-item__body">
-                        <strong>{expense.note ?? category?.name ?? 'Gasto'}</strong>
-                        <small>
-                          {category?.name ?? 'Sin categoría'} · {formatShortDate(expense.date)}
-                        </small>
-                      </span>
-                      <strong className="pay-item__amount">
-                        <Amount value={expense.amount} />
-                      </strong>
-                    </label>
+                    <Row
+                      as="label"
+                      key={expense.id}
+                      className={cx('pay-row', !on && 'is-off')}
+                      leading={
+                        <>
+                          <input className="sr-only" type="checkbox" checked={on} onChange={() => toggle(expense.id)} />
+                          <span className={cx('pay-row__check', on && 'is-on')} aria-hidden="true">
+                            {on && <Icon name="check" size={16} />}
+                          </span>
+                          <EmojiTile emoji={category?.icon ?? '🧾'} color={category?.color ?? 'var(--neutral-tile)'} />
+                        </>
+                      }
+                      title={expense.note ?? category?.name ?? 'Gasto'}
+                      detail={`${category?.name ?? 'Sin categoría'} · ${formatShortDate(expense.date)}`}
+                      amount={<Amount value={expense.amount} />}
+                    />
                   );
                 })}
               </div>
@@ -186,21 +188,22 @@ export function PayCardPage() {
             {openUnpaid.map((expense) => {
               const category = categories.get(expense.categoryId);
               return (
-                <div className="pay-item" key={expense.id}>
-                  <span className="pay-item__lock" aria-hidden="true">
-                    <Icon name="lock" size={16} />
-                  </span>
-                  <EmojiTile emoji={category?.icon ?? '🧾'} color={category?.color ?? 'var(--neutral-tile)'} />
-                  <span className="pay-item__body">
-                    <strong>{expense.note ?? category?.name ?? 'Gasto'}</strong>
-                    <small>
-                      {category?.name ?? 'Sin categoría'} · {formatShortDate(expense.date)}
-                    </small>
-                  </span>
-                  <strong className="pay-item__amount">
-                        <Amount value={expense.amount} />
-                      </strong>
-                </div>
+                <Row
+                  as="div"
+                  key={expense.id}
+                  className="pay-row"
+                  leading={
+                    <>
+                      <span className="pay-row__lock" aria-hidden="true">
+                        <Icon name="lock" size={16} />
+                      </span>
+                      <EmojiTile emoji={category?.icon ?? '🧾'} color={category?.color ?? 'var(--neutral-tile)'} />
+                    </>
+                  }
+                  title={expense.note ?? category?.name ?? 'Gasto'}
+                  detail={`${category?.name ?? 'Sin categoría'} · ${formatShortDate(expense.date)}`}
+                  amount={<Amount value={expense.amount} />}
+                />
               );
             })}
           </div>

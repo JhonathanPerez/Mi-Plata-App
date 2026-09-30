@@ -6,7 +6,9 @@
   align-items: center;
   border: 0;
   background: transparent;
+  color: inherit;
   text-align: left;
+  text-decoration: none;
 }
 
 /* Dentro de una tarjeta: con divisores entre filas. */
@@ -27,8 +29,8 @@
   padding: var(--space-3) var(--space-1);
 }
 
-.row--list:active:not(:disabled),
-.row--flush:active:not(:disabled) {
+.row--list:active:not(:disabled):not(.row--static),
+.row--flush:active:not(:disabled):not(.row--static) {
   background: var(--surface-2);
 }
 
@@ -60,6 +62,11 @@
 /* Contenido arriba: para filas con líneas de texto que pueden ocupar varios renglones. */
 .row--start {
   align-items: flex-start;
+}
+
+/* Fila que solo muestra datos (no se toca) y fila que envuelve una casilla. */
+.row--label {
+  cursor: pointer;
 }
 
 /* La fila abre algo al mantenerla presionada: sin selección de texto ni menú del sistema. */

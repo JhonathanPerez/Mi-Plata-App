@@ -1,9 +1,9 @@
-import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/Button';
 import { EmojiTile } from '@/components/ui/EmojiTile';
 import { Icon } from '@/components/ui/Icon';
 import { Amount } from '@/components/ui/Money';
 import { Notice } from '@/components/ui/Notice';
+import { Row } from '@/components/ui/Row';
 import { dueLabel } from '@/lib/statementText';
 import type { DueSummary } from '@/services/cardService';
 
@@ -28,39 +28,35 @@ export function DueSummaryCard({ summary, onPay }: DueSummaryCardProps) {
         </strong>
       </div>
 
-      {summary.cards.map((card) => (
-        <div className="due-summary__row" key={card.methodId}>
-          <EmojiTile emoji={card.icon} color={card.color} />
-          <div>
-            <strong>{card.name}</strong>
-            <span className={card.nextDue?.overdue ? 'due-summary__late' : undefined}>
-              {card.nextDue
-                ? dueLabel(card.nextDue.date, card.nextDue.daysLeft)
-                : card.configured
-                  ? 'Ciclo abierto'
-                  : 'Falta configurar las fechas'}
-            </span>
-          </div>
-          <strong>
-            <Amount value={card.total} />
-          </strong>
-        </div>
-      ))}
+      <div className="due-summary__list">
+        {summary.cards.map((card) => {
+          const label = card.nextDue
+            ? dueLabel(card.nextDue.date, card.nextDue.daysLeft)
+            : card.configured
+              ? 'Ciclo abierto'
+              : 'Falta configurar las fechas';
+          return (
+            <Row
+              as="div"
+              key={card.methodId}
+              leading={<EmojiTile emoji={card.icon} color={card.color} />}
+              title={card.name}
+              detail={card.nextDue?.overdue ? <span className="row__status row__status--late">{label}</span> : label}
+              amount={<Amount value={card.total} />}
+            />
+          );
+        })}
 
-      {summary.other.count > 0 && (
-        <Link className="due-summary__row due-summary__row--link" to="/gastos?estado=por-pagar">
-          <EmojiTile emoji="🧾" color="var(--neutral-tile)" />
-          <div>
-            <strong>Otros métodos</strong>
-            <span>
-              {summary.other.count} {summary.other.count === 1 ? 'gasto pendiente' : 'gastos pendientes'}
-            </span>
-          </div>
-          <strong>
-            <Amount value={summary.other.total} />
-          </strong>
-        </Link>
-      )}
+        {summary.other.count > 0 && (
+          <Row
+            to="/gastos?estado=por-pagar"
+            leading={<EmojiTile emoji="🧾" color="var(--neutral-tile)" />}
+            title="Otros métodos"
+            detail={`${summary.other.count} ${summary.other.count === 1 ? 'gasto pendiente' : 'gastos pendientes'}`}
+            amount={<Amount value={summary.other.total} />}
+          />
+        )}
+      </div>
 
       {hasCards && (
         <Button block icon={anyClosed ? 'check' : 'card'} onClick={onPay}>

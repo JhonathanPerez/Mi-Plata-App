@@ -1,8 +1,16 @@
-import type { ButtonHTMLAttributes, ReactNode } from 'react';
+import type { ButtonHTMLAttributes, ElementType, ReactNode } from 'react';
+import { Link } from 'react-router-dom';
 import { cx } from '@/lib/cx';
 import { Icon, type IconName } from './Icon';
 
 interface RowProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'title'> {
+  /**
+   * Elemento de la fila: `button` (por defecto) si se toca, `label` si envuelve una casilla y `div` si solo muestra datos
+   * (sin estado de «presionado»).
+   */
+  as?: 'button' | 'div' | 'label';
+  /** La fila navega: se dibuja como enlace (`as` se ignora). */
+  to?: string;
   title: ReactNode;
   /** Línea secundaria bajo el título. */
   detail?: ReactNode;
@@ -39,6 +47,8 @@ interface RowProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'title'
 
 /** Fila táctil de lista: (ícono) título, detalle y algo a la derecha. Es el único sitio donde vive ese patrón. */
 export function Row({
+  as = 'button',
+  to,
   title,
   detail,
   children,
@@ -56,15 +66,18 @@ export function Row({
   className,
   ...rest
 }: RowProps) {
+  const Tag: ElementType = to ? Link : as;
   return (
-    <button
-      type="button"
+    <Tag
+      {...(to ? { to } : as === 'button' ? { type: 'button' } : {})}
       className={cx(
         'row',
         `row--${variant}`,
         align === 'start' && 'row--start',
         tone === 'danger' && 'row--danger',
         holdable && 'row--holdable',
+        !to && as === 'div' && 'row--static',
+        !to && as === 'label' && 'row--label',
         selected && 'is-selected',
         className,
       )}
@@ -89,6 +102,6 @@ export function Row({
       )}
       {trailing}
       {chevron && <Icon name={chevron} size={20} className="row__chevron" />}
-    </button>
+    </Tag>
   );
 }
