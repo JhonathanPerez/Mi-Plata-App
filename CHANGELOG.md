@@ -1,3 +1,10 @@
+## [1.0.2](https://github.com/JhonathanPerez/Mi-Plata-App/compare/v1.0.1...v1.0.2) (2026-09-30)
+
+
+### Bug Fixes
+
+* **styles:** derivar tintes de la marca de --primary para el tema oscuro (E1-T06) ([20be19d](https://github.com/JhonathanPerez/Mi-Plata-App/commit/20be19d7f78171878c116ec9a3ccb79c0b629865))
+
 ## [1.0.1](https://github.com/JhonathanPerez/Mi-Plata-App/compare/v1.0.0...v1.0.1) (2026-09-28)
 
 
