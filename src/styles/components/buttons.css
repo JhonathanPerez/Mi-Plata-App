@@ -48,11 +48,11 @@
   color: var(--primary);
 }
 
-/* Blanco, para ponerlo sobre un fondo de color (la tarjeta de crédito). */
+/* Blanco, para ponerlo sobre un fondo de color (la tarjeta de crédito). El texto usa un tono fijo: --ink cambia con el tema y en oscuro quedaría claro sobre blanco. */
 .btn--inverse {
   background: var(--white);
-  color: var(--plum-ink);
-  font-weight: 800;
+  color: var(--on-white);
+  font-weight: 700;
 }
 
 .btn:disabled {
