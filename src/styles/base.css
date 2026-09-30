@@ -15,7 +15,7 @@ body {
   margin: 0;
   background: var(--bg);
   /* Un velo de verde muy suave arriba, para que el fondo no sea plano. */
-  background-image: radial-gradient(120% 46% at 50% -6%, var(--primary-veil), transparent 70%);
+  background-image: radial-gradient(120% 46% at 50% -6%, var(--primary-tint), transparent 70%);
   background-repeat: no-repeat;
   color: var(--ink);
   font-family: var(--font-body);
@@ -257,7 +257,7 @@ ul {
   border-radius: var(--radius-l);
   display: grid;
   place-items: center;
-  background: var(--accent-grad-fab);
+  background: var(--accent-grad);
   color: var(--on-accent);
   box-shadow: var(--shadow-accent);
   text-decoration: none;

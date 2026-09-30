@@ -17,7 +17,7 @@
 .preview-backdrop {
   position: absolute;
   inset: 0;
-  background: var(--scrim-soft);
+  background: var(--scrim);
   animation: fade-in 0.14s ease-out;
 }
 

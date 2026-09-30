@@ -19,7 +19,7 @@
   font-size: var(--fs-hero);
   background: var(--surface-2);
   background: radial-gradient(circle at 32% 26%, var(--surface) 0%, var(--surface-2) 100%);
-  box-shadow: 0 0 0 9px var(--primary-halo), var(--shadow-card);
+  box-shadow: 0 0 0 9px var(--primary-tint), var(--shadow-card);
 }
 
 .empty__title {
@@ -40,7 +40,7 @@
   z-index: 80;
   display: grid;
   place-items: center;
-  background: var(--scrim-strong);
+  background: var(--scrim);
   color: var(--white);
   font-weight: 700;
   font-size: var(--fs-lg);
