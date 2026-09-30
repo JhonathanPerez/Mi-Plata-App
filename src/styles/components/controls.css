@@ -31,7 +31,7 @@
   inset: 0;
   border-radius: var(--radius-s);
   background: var(--surface);
-  box-shadow: var(--shadow-thumb);
+  box-shadow: var(--shadow-raised);
 }
 
 .segmented__label {
@@ -156,7 +156,6 @@
   height: 26px;
   border-radius: 50%;
   background: var(--white);
-  box-shadow: var(--shadow-knob);
   transition: transform 0.15s;
 }
 

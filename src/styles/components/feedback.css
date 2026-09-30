@@ -19,7 +19,7 @@
   font-size: var(--fs-hero);
   background: var(--surface-2);
   background: radial-gradient(circle at 32% 26%, var(--surface) 0%, var(--surface-2) 100%);
-  box-shadow: 0 0 0 9px var(--primary-halo), var(--shadow);
+  box-shadow: 0 0 0 9px var(--primary-halo), var(--shadow-card);
 }
 
 .empty__title {
