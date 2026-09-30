@@ -3,6 +3,7 @@ import { App as CapacitorApp } from '@capacitor/app';
 import { Capacitor } from '@capacitor/core';
 import { AnimatePresence, motion } from 'motion/react';
 import { Button } from '@/components/ui/Button';
+import { RingLogo } from '@/components/ui/RingLogo';
 import { APP_NAME } from '@/config/constants';
 import { useQuery } from '@/hooks/useQuery';
 import { authenticate, getBiometricSupport, isBiometricPromptActive, isBiometricPromptOpen } from '@/lib/biometrics';
@@ -124,16 +125,7 @@ export function LockGate({ children }: { children: ReactNode }) {
             exit={{ opacity: 0, scale: 1.04 }}
             transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
           >
-            <div className="splash__mark" aria-hidden="true">
-              <svg viewBox="0 0 108 108">
-                <circle className="ring-seg s1" cx="54" cy="52" r="25" stroke="#E4572E" transform="rotate(-90 54 52)" />
-                <circle className="ring-seg s2" cx="54" cy="52" r="25" stroke="#9B5DE5" transform="rotate(1.44 54 52)" />
-                <circle className="ring-seg s3" cx="54" cy="52" r="25" stroke="#2A9D8F" transform="rotate(79.92 54 52)" />
-                <circle className="ring-seg s4" cx="54" cy="52" r="25" stroke="#3D8FD1" transform="rotate(151.92 54 52)" />
-                <circle className="ring-seg s5" cx="54" cy="52" r="25" stroke="#4C5C68" transform="rotate(217.44 54 52)" />
-                <circle className="center-dot" cx="54" cy="52" r="8.6" fill="#F5B301" />
-              </svg>
-            </div>
+            <RingLogo />
             <h1 className="splash__name">{APP_NAME}</h1>
             {status === 'checking' ? (
               <p className="splash__text">Abriendo…</p>
