@@ -11,6 +11,7 @@ import { EmojiTile } from '@/components/ui/EmojiTile';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { Icon } from '@/components/ui/Icon';
 import { Money } from '@/components/ui/Money';
+import { Notice } from '@/components/ui/Notice';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { PrivacyToggle } from '@/components/ui/PrivacyToggle';
 import { Skeleton } from '@/components/ui/Skeleton';
@@ -67,18 +68,9 @@ export function HomePage() {
 
       {pendingCount ? (
         <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} transition={{ type: 'spring', stiffness: 420, damping: 32 }}>
-        <Link to="/pendientes" className="pending-banner">
-          <span className="pending-banner__badge" aria-hidden="true">
-            {pendingCount}
-          </span>
-          <span className="pending-banner__text">
-            <strong>
-              {pendingCount} {pluralize(pendingCount, 'gasto por categorizar', 'gastos por categorizar')}
-            </strong>
-            <small>Detectados en tus notificaciones y mensajes</small>
-          </span>
-          <Icon name="chevronRight" size={20} />
-        </Link>
+        <Notice tone="warning" icon="inbox" to="/pendientes" title={`${pendingCount} ${pluralize(pendingCount, 'gasto por categorizar', 'gastos por categorizar')}`}>
+          Detectados en tus notificaciones y mensajes
+        </Notice>
         </motion.div>
       ) : null}
 
@@ -117,18 +109,14 @@ export function HomePage() {
         )}
 
         {budget.level === 'over' && (
-          <p className="hero__notice" role="status">
-            <Icon name="warning" size={20} />
-            <span>
-              Este mes gastaste {cop(budget.overBy)} más de lo planeado. Puedes ajustar el presupuesto o revisar tus gastos.
-            </span>
-          </p>
+          <Notice tone="danger" role="status">
+            Este mes gastaste {cop(budget.overBy)} más de lo planeado. Puedes ajustar el presupuesto o revisar tus gastos.
+          </Notice>
         )}
         {budget.level === 'near' && (
-          <p className="hero__notice" role="status">
-            <Icon name="info" size={20} />
-            <span>Ya usaste {formatPercent(budget.percentUsed)} de tu presupuesto. Te quedan {cop(budget.available)}.</span>
-          </p>
+          <Notice tone="warning" icon="info" role="status">
+            Ya usaste {formatPercent(budget.percentUsed)} de tu presupuesto. Te quedan {cop(budget.available)}.
+          </Notice>
         )}
       </section>
 

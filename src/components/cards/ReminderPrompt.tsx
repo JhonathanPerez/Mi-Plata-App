@@ -1,6 +1,6 @@
 import { useToast } from '@/app/providers/ToastProvider';
 import { Button } from '@/components/ui/Button';
-import { Icon } from '@/components/ui/Icon';
+import { Notice } from '@/components/ui/Notice';
 import { errorMessage } from '@/lib/errors';
 import { enableReminders } from '@/services/reminderSync';
 import { useReminderStatus } from './useReminderStatus';
@@ -23,17 +23,18 @@ export function ReminderPrompt() {
   };
 
   return (
-    <section className="reminder-prompt" aria-label="Avisos de pago">
-      <span className="reminder-prompt__icon" aria-hidden="true">
-        <Icon name="bell" size={22} />
-      </span>
-      <div>
-        <strong>No te olvides de pagar a tiempo</strong>
-        <p>{permission === 'denied' ? 'El permiso de notificaciones está bloqueado en el teléfono.' : 'Te avisamos un día antes y el mismo día de cada vencimiento.'}</p>
-      </div>
-      <Button size="md" icon="bell" onClick={() => void enable()}>
-        Activar avisos
-      </Button>
-    </section>
+    <Notice
+      tone="info"
+      icon="bell"
+      aria-label="Avisos de pago"
+      title="No te olvides de pagar a tiempo"
+      action={
+        <Button size="md" icon="bell" onClick={() => void enable()}>
+          Activar avisos
+        </Button>
+      }
+    >
+      {permission === 'denied' ? 'El permiso de notificaciones está bloqueado en el teléfono.' : 'Te avisamos un día antes y el mismo día de cada vencimiento.'}
+    </Notice>
   );
 }

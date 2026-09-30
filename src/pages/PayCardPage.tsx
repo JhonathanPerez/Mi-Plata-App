@@ -6,6 +6,7 @@ import { Chip } from '@/components/ui/Chip';
 import { EmojiTile } from '@/components/ui/EmojiTile';
 import { Icon } from '@/components/ui/Icon';
 import { Amount } from '@/components/ui/Money';
+import { Notice } from '@/components/ui/Notice';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { PrivacyToggle } from '@/components/ui/PrivacyToggle';
 import { useQuery } from '@/hooks/useQuery';
@@ -175,10 +176,7 @@ export function PayCardPage() {
               </div>
             </section>
           ))}
-          <p className="muted pay-tip">
-            <Icon name="info" size={16} />
-            <span>Desmarca lo que no pagaste con este extracto (por ejemplo, algo que pagaste aparte): seguirá como «Por pagar».</span>
-          </p>
+          <Notice>Desmarca lo que no pagaste con este extracto (por ejemplo, algo que pagaste aparte): seguirá como «Por pagar».</Notice>
         </>
       )}
 
@@ -207,10 +205,7 @@ export function PayCardPage() {
               );
             })}
           </div>
-          <p className="muted pay-tip">
-            <Icon name="info" size={16} />
-            <span>Entran al extracto que corta el {formatDayMonth(open.cutDate)} y se pagarán entonces.</span>
-          </p>
+          <Notice>Entran al extracto que corta el {formatDayMonth(open.cutDate)} y se pagarán entonces.</Notice>
         </section>
       )}
 

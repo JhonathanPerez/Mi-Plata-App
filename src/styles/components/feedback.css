@@ -127,3 +127,83 @@
   flex-direction: column;
   gap: var(--space-3);
 }
+
+/* Aviso: mensaje destacado con icono. Ver components/ui/Notice.tsx. El fondo tintado va sobre --surface para que siga legible sobre la tarjeta verde de Inicio. */
+.notice {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-m);
+  color: var(--ink);
+  font-size: var(--fs-sm);
+  text-decoration: none;
+}
+
+.notice--info {
+  background: linear-gradient(var(--primary-tint), var(--primary-tint)), var(--surface);
+}
+
+.notice--warning {
+  background: linear-gradient(var(--accent-soft), var(--accent-soft)), var(--surface);
+}
+
+.notice--danger {
+  background: linear-gradient(color-mix(in srgb, var(--danger) 12%, transparent), color-mix(in srgb, var(--danger) 12%, transparent)), var(--surface);
+}
+
+.notice--link {
+  flex-wrap: nowrap;
+  align-items: center;
+  min-height: var(--tap);
+}
+
+.notice__icon {
+  flex: none;
+  margin-top: var(--space-0);
+}
+
+.notice--info .notice__icon {
+  color: var(--primary);
+}
+
+.notice--warning .notice__icon,
+.notice--warning .notice__title {
+  color: var(--warning-text);
+}
+
+.notice--danger .notice__icon,
+.notice--danger .notice__title {
+  color: var(--danger);
+}
+
+.notice--link .notice__icon {
+  margin-top: 0;
+}
+
+.notice__body {
+  flex: 1 1 160px;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-0);
+}
+
+.notice__title {
+  font-weight: 700;
+}
+
+.notice__action {
+  flex: none;
+  margin-inline-start: auto;
+}
+
+.notice__chevron {
+  flex: none;
+  color: var(--ink-2);
+}
+
+.card + .notice {
+  margin-top: var(--space-3);
+}

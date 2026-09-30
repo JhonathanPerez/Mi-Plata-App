@@ -1,31 +1,5 @@
 /* Pagos: estado pagado / por pagar, deslizar para pagar, resumen de pendientes, pagar tarjeta y avisos. */
 
-.payment-hint {
-  display:flex;
-  gap:var(--space-2);
-  align-items:flex-start;
-  margin-top:var(--space-2);
-  padding:var(--space-3) var(--space-3);
-  border-radius:var(--radius-s);
-  background:var(--primary-tint);
-  color:var(--ink-2);
-  font-size:var(--fs-sm);
-}
-
-.payment-hint svg {
-  flex:none;
-  margin-top:var(--space-0);
-  color:var(--primary);
-}
-
-.payment-hint--due {
-  background:var(--accent-soft);
-}
-
-.payment-hint--due svg {
-  color:var(--warning-text);
-}
-
 .payment-badge {
   display:inline-block;
   margin-left:var(--space-2);
@@ -39,10 +13,6 @@
   text-transform:uppercase;
   vertical-align:1px;
 }
-
-
-
-
 
 .due-summary {
   display:flex;
@@ -96,19 +66,6 @@
 
 .due-summary__row>strong {
   font-family:var(--font-display);
-}
-
-.due-summary__note {
-  display:flex;
-  gap:var(--space-2);
-  align-items:flex-start;
-  font-size:var(--fs-xs);
-  color:var(--ink-2);
-}
-
-.due-summary__note svg {
-  flex:none;
-  margin-top:var(--space-0);
 }
 
 .pay-summary {
@@ -212,19 +169,6 @@
   opacity:.75;
 }
 
-.pay-tip {
-  display:flex;
-  gap:var(--space-2);
-  align-items:flex-start;
-  font-size:var(--fs-sm);
-  margin-top:var(--space-2);
-}
-
-.pay-tip svg {
-  flex:none;
-  margin-top:var(--space-0);
-}
-
 .pay-link {
   white-space:nowrap;
 }
@@ -239,7 +183,6 @@
   color: inherit;
 }
 
-
 .reminder-note {
   display: flex;
   gap: var(--space-2);
@@ -251,34 +194,3 @@
   margin-top: var(--space-0);
 }
 
-.reminder-prompt {
-  display: grid;
-  grid-template-columns: auto 1fr;
-  gap: var(--space-3);
-  align-items: center;
-  padding: var(--space-4) var(--space-4);
-  border-radius: var(--radius-l);
-  background: var(--surface);
-  border: 1px solid var(--line);
-  box-shadow: var(--shadow-card);
-}
-
-.reminder-prompt__icon {
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  display: grid;
-  place-items: center;
-  background: var(--primary-tint);
-  color: var(--primary);
-}
-
-.reminder-prompt p {
-  margin-top: var(--space-0);
-  font-size: var(--fs-sm);
-  color: var(--ink-2);
-}
-
-.reminder-prompt > button {
-  grid-column: 1 / -1;
-}

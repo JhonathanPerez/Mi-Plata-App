@@ -85,23 +85,6 @@ number-flow-react {
   border-color: transparent;
 }
 
-.hero__notice {
-  display: flex;
-  gap: var(--space-3);
-  align-items: flex-start;
-  padding: var(--space-3) var(--space-4);
-  border-radius: var(--radius-s);
-  background: var(--accent);
-  color: var(--on-accent);
-  font-size: var(--fs-sm);
-  font-weight: 600;
-}
-
-.hero__notice svg {
-  flex: none;
-  margin-top: var(--space-0);
-}
-
 .tiles {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -335,44 +318,6 @@ number-flow-react {
 }
 
 /* ---------- Gastos detectados automáticamente ---------- */
-.pending-banner {
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
-  padding: var(--space-3) var(--space-4);
-  border-radius: var(--radius-l);
-  background: var(--accent-grad);
-  color: var(--on-accent);
-  box-shadow: var(--shadow-accent);
-  text-decoration: none;
-}
-
-.pending-banner__badge {
-  flex: none;
-  min-width: 34px;
-  height: 34px;
-  padding: 0 var(--space-2);
-  display: grid;
-  place-items: center;
-  border-radius: var(--radius-pill);
-  background: var(--on-accent);
-  color: var(--accent);
-  font-family: var(--font-display);
-  font-weight: 800;
-}
-
-.pending-banner__text {
-  flex: 1;
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-}
-
-.pending-banner__text small {
-  font-size: var(--fs-xs);
-  opacity: 0.85;
-}
-
 .capture-status {
   display: flex;
   align-items: flex-start;
