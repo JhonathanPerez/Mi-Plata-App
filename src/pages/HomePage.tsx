@@ -114,6 +114,10 @@ export function HomePage() {
         )}
       </section>
 
+      {dueSummary && dueSummary.total + dueSummary.other.total > 0 && (
+        <DueSummaryCard summary={dueSummary} onPay={() => navigate('/tarjetas')} />
+      )}
+
       {budget.hasBudget ? (
         <div className="tiles">
           <Stat size="sm" label="Gastos de hoy" value={<Money value={data.todayTotal} />} />
@@ -121,10 +125,6 @@ export function HomePage() {
         </div>
       ) : (
         <Stat size="sm" label="Hoy" value={<Money value={data.todayTotal} />} />
-      )}
-
-      {dueSummary && dueSummary.total + dueSummary.other.total > 0 && (
-        <DueSummaryCard summary={dueSummary} onPay={() => navigate('/tarjetas')} />
       )}
 
       {!hasSpending ? (
@@ -138,18 +138,6 @@ export function HomePage() {
       ) : (
         <>
           <section className="section">
-            <h2 className="section__title">Por categoría</h2>
-            <div className="card">
-              <CategoryBars items={data.byCategory} limit={3} highlightFirst />
-              {data.byCategory.length > 3 && (
-                <Link className="link" to="/estadisticas">
-                  Ver todas las categorías
-                </Link>
-              )}
-            </div>
-          </section>
-
-          <section className="section">
             <div className="section__head">
               <h2 className="section__title">Recientes</h2>
               <Link className="link" to="/gastos">
@@ -160,6 +148,18 @@ export function HomePage() {
               {data.recent.map((expense) => (
                 <ExpenseRow key={expense.id} expense={expense} showDate onSelect={(id) => navigate(`/gasto/${id}`)} />
               ))}
+            </div>
+          </section>
+
+          <section className="section">
+            <h2 className="section__title">Por categoría</h2>
+            <div className="card">
+              <CategoryBars items={data.byCategory} limit={3} highlightFirst />
+              {data.byCategory.length > 3 && (
+                <Link className="link" to="/estadisticas">
+                  Ver todas las categorías
+                </Link>
+              )}
             </div>
           </section>
         </>
