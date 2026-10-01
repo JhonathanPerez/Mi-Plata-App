@@ -16,13 +16,13 @@ interface ExpenseRowProps {
   /** Muestra la fecha (útil cuando la lista no está agrupada por día). */
   showDate?: boolean;
   /**
-   * Dos líneas: la descripción como título y «categoría · método» como meta. Es opt-in (Inicio y Gastos).
+   * Descripción como título y «categoría · método» como meta. Es opt-in (Inicio y Gastos).
    * Sin descripción, la categoría pasa a ser el título.
    */
   compact?: boolean;
   /**
-   * Solo con `compact`: cada dato en su propio renglón (descripción, categoría y método), para que todas las filas
-   * de una lista tengan la misma forma sin importar cuánto mida el monto. Lo usa Gastos; Inicio mantiene la meta en una línea.
+   * Solo con `compact`: descripción, categoría y método cada uno en su renglón, sin saltar de línea (si no caben, se recortan
+   * con «…»), para que todas las filas de una lista midan lo mismo. Lo usa Gastos; Inicio deja que la meta se parta.
    */
   stacked?: boolean;
   /** Solo con `compact`: incluye el método de pago en la meta. Inicio lo oculta cuando todas las filas visibles lo comparten. */
@@ -44,6 +44,8 @@ export function ExpenseRow({ expense, onSelect, showDate, compact = false, stack
   const unbreakable = (text: string): ReactNode => <span className="row__nowrap">{text}</span>;
   const method = unbreakable(`${expense.paymentMethodIcon} ${expense.paymentMethodName}`);
   const parts: ReactNode[] = (compact ? [expense.note ? expense.categoryName : null, showMethod ? method : null, time] : [method, time]).filter(Boolean);
+  // Gastos: categoría y método cada uno en su renglón, sin saltar de línea (si no caben, se recortan con «…»).
+  const stackedMethod = showMethod ? [`${expense.paymentMethodIcon} ${expense.paymentMethodName}`, time].filter(Boolean).join(' · ') : null;
   const joined = (items: ReactNode[]) =>
     items.map((part, index) => (
       <Fragment key={index}>
@@ -69,7 +71,7 @@ export function ExpenseRow({ expense, onSelect, showDate, compact = false, stack
         {compact && stacked ? (
           <>
             {expense.note && <span className="row__detail row__detail--truncate">{expense.categoryName}</span>}
-            {showMethod && <span className="row__detail row__detail--truncate">{joined([method, time].filter(Boolean))}</span>}
+            {stackedMethod && <span className="row__detail row__detail--truncate">{stackedMethod}</span>}
           </>
         ) : (
           parts.length > 0 && <span className="row__detail">{joined(parts)}</span>

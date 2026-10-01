@@ -35,6 +35,16 @@
   box-shadow: var(--shadow-raised);
 }
 
+/* Opción elegida con el color de la marca: se distingue de un vistazo, no solo por un tono más claro. */
+.segmented--primary .segmented__item.is-active {
+  color: var(--primary);
+}
+
+.segmented--primary .segmented__thumb {
+  background: color-mix(in srgb, var(--primary) 14%, var(--surface));
+  box-shadow: inset 0 0 0 1.5px var(--primary-underline);
+}
+
 .segmented__label {
   position: relative;
   z-index: 1;

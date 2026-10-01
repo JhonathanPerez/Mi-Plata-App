@@ -99,7 +99,7 @@
   gap: var(--space-4);
 }
 
-/* Fila de Gastos: la fila (abre el gasto) y a su lado el botón ⋮ de opciones. */
+/* Fila de Gastos: ocupa todo el ancho; sus acciones se hacen deslizando (ver SwipeRow). */
 .expense-item {
   display: flex;
   align-items: center;
@@ -111,18 +111,12 @@
   width: auto;
   min-width: 0;
   gap: var(--space-3);
-  padding-right: var(--space-2);
 }
 
 /* Columna del monto con un ancho mínimo fijo: así el texto de todas las filas tiene el mismo ancho disponible,
    tenga la fila un monto de $9.000 o de $12.000.000, y nada se acomoda distinto de una fila a otra. */
 .expense-item .row__side {
   min-width: 11ch;
-}
-
-.expense-item__more {
-  margin-right: var(--space-1);
-  color: var(--ink-2);
 }
 
 .expense-group__head {

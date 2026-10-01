@@ -3,7 +3,6 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { ExpenseList } from '@/components/expenses/ExpenseList';
 import { ExpenseListSkeleton } from '@/components/expenses/ExpenseListSkeleton';
 import { EMPTY_FILTERS, FilterSheet, type HistoryFilters } from '@/components/expenses/FilterSheet';
-import { ActionSheet, type SheetAction } from '@/components/ui/ActionSheet';
 import { Button, IconButton } from '@/components/ui/Button';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { ErrorState } from '@/components/ui/ErrorState';
@@ -19,6 +18,7 @@ import { useToast } from '@/app/providers/ToastProvider';
 import { errorMessage } from '@/lib/errors';
 import { haptics } from '@/lib/haptics';
 import { useDebounced } from '@/hooks/useDebounced';
+import { useSwipeHint } from '@/hooks/useSwipeHint';
 import { useQuery } from '@/hooks/useQuery';
 import { currentYearMonth, formatNumericDate, monthRange } from '@/lib/dates';
 import { pluralize } from '@/lib/text';
@@ -38,9 +38,6 @@ export function HistoryPage() {
   const [filters, setFilters] = useState<HistoryFilters>({ mode: 'month', from: '', to: '', ...EMPTY_FILTERS });
   const [search, setSearch] = useState('');
   const [sheetOpen, setSheetOpen] = useState(false);
-  // Menú ⋮ de una fila. El gasto se conserva al cerrar para que la hoja no se vacíe mientras se anima su salida.
-  const [menuExpense, setMenuExpense] = useState<ExpenseWithRefs | null>(null);
-  const [menuOpen, setMenuOpen] = useState(false);
   const debouncedSearch = useDebounced(search);
 
   const refs = useQuery(async () => ({
@@ -72,6 +69,8 @@ export function HistoryPage() {
 
   const { data: expenses, loading, error: loadError, retry } = useQuery(() => expenseService.list(sqlFilters), [JSON.stringify(sqlFilters)]);
 
+  const swipeHint = useSwipeHint((expenses?.length ?? 0) > 0);
+
   const activeCount =
     (filters.mode === 'month' ? 0 : 1) +
     (filters.categoryIds.length > 0 ? 1 : 0) +
@@ -94,6 +93,7 @@ export function HistoryPage() {
     const nowPaid = expense.paidAt === null;
     try {
       await expenseService.setPaid(expense.id, nowPaid);
+      swipeHint.markLearned();
       void haptics.success();
       toast.show(nowPaid ? 'Marcado como pagado' : 'Marcado como por pagar');
     } catch (error) {
@@ -111,24 +111,13 @@ export function HistoryPage() {
     if (!ok) return;
     try {
       await expenseService.remove(expense.id);
+      swipeHint.markLearned();
       void haptics.success();
       toast.show('Gasto eliminado');
     } catch (error) {
       toast.show(errorMessage(error), 'error');
     }
   };
-
-  const menuActions: SheetAction[] = menuExpense
-    ? [
-        {
-          icon: menuExpense.paidAt === null ? 'check' : 'refresh',
-          label: menuExpense.paidAt === null ? 'Marcar como pagado' : 'Marcar como por pagar',
-          onSelect: () => void togglePaid(menuExpense),
-        },
-        { icon: 'edit', label: 'Editar gasto', onSelect: () => navigate(`/gasto/${menuExpense.id}`) },
-        { icon: 'trash', label: 'Eliminar gasto', tone: 'danger', onSelect: () => void removeExpense(menuExpense) },
-      ]
-    : [];
 
   const hasSearch = search.trim() !== '';
 
@@ -181,6 +170,7 @@ export function HistoryPage() {
 
       <Segmented<StatusView>
         label="Estado de los gastos"
+        tone="primary"
         value={status}
         onChange={setStatus}
         options={[
@@ -227,14 +217,9 @@ export function HistoryPage() {
           onSelect={(id) => navigate(`/gasto/${id}`)}
           onTogglePaid={togglePaid}
           onDelete={removeExpense}
-          onMore={(expense) => {
-            setMenuExpense(expense);
-            setMenuOpen(true);
-          }}
+          hintFirst={swipeHint.showHint}
         />
       )}
-
-      <ActionSheet open={menuOpen} title="Opciones del gasto" actions={menuActions} onClose={() => setMenuOpen(false)} />
 
       <FilterSheet
         open={sheetOpen}
