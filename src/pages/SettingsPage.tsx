@@ -196,7 +196,7 @@ export function SettingsPage() {
       <Group title="Captura automática">
         <SettingsRow
           icon="inbox"
-          title="Gastos por categorizar"
+          title="Por categorizar"
           detail={pendingCount ? `${pendingCount} ${pluralize(pendingCount, 'pendiente', 'pendientes')}` : 'Ninguno por ahora'}
           onClick={() => navigate('/pendientes')}
         />
@@ -214,7 +214,7 @@ export function SettingsPage() {
       </section>
 
       <section className="section">
-        <h2 className="section__title">Gastos por categorizar</h2>
+        <h2 className="section__title">Recordatorio de pendientes</h2>
         <PendingReminderCard />
       </section>
 
@@ -261,20 +261,12 @@ export function SettingsPage() {
             {APP_NAME} <span className="muted">v{APP_VERSION}</span>
           </p>
           <p className="about__line">
-            <Icon name="edit" size={18} />
+            <Icon name="user" size={18} />
             <span>Desarrollado por {APP_AUTHOR}</span>
           </p>
           <p className="about__line">
             <Icon name="shield" size={18} />
-            <span>Tus datos se guardan solo en este teléfono y la app funciona sin Internet.</span>
-          </p>
-          <p className="about__line">
-            <Icon name="info" size={18} />
-            <span>
-              No pedimos claves ni acceso a tus cuentas bancarias, ni guardamos números de tarjeta (solo los últimos 4
-              dígitos). Si activas la captura automática, la app lee las notificaciones y SMS de tus bancos, solo en este
-              teléfono.
-            </span>
+            <span>Tus datos viven solo en este teléfono y la app funciona sin Internet. No pedimos claves ni números de tarjeta.</span>
           </p>
         </div>
       </section>
