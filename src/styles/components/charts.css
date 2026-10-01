@@ -18,6 +18,13 @@
   flex: none;
 }
 
+.strip__caption {
+  display: block;
+  margin-top: var(--space-2);
+  font-size: var(--fs-xs);
+  color: var(--hero-ink-2);
+}
+
 .strip__tick {
   position: absolute;
   top: 0;
@@ -112,6 +119,24 @@
 .bars__percent {
   font-size: var(--fs-xs);
   color: var(--ink-2);
+}
+
+/* Versión de Inicio: barra y porcentaje en la misma línea. */
+.bars__meter {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.bars__meter .bars__track {
+  flex: 1;
+}
+
+.bars__percent--inline {
+  flex: none;
+  min-width: 40px;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
 }
 
 .donut {
