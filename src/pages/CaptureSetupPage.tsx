@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { App as CapacitorApp } from '@capacitor/app';
 import { useConfirm } from '@/app/providers/ConfirmProvider';
 import { useToast } from '@/app/providers/ToastProvider';
@@ -19,7 +18,6 @@ import { spamLearningService } from '@/services/spamLearningService';
 
 /** Guía para activar la lectura de notificaciones y SMS del banco (permiso "Acceso a notificaciones"). */
 export function CaptureSetupPage() {
-  const navigate = useNavigate();
   const toast = useToast();
   const confirm = useConfirm();
   const supported = captureBridge.isSupported();
@@ -195,10 +193,6 @@ export function CaptureSetupPage() {
           )}
         </div>
       </section>
-
-      <Button variant="secondary" block onClick={() => navigate('/pendientes')}>
-        Ver gastos por categorizar
-      </Button>
 
       <CaptureAppsSheet
         open={pickerOpen}
