@@ -1,19 +1,5 @@
 /* Pagos: estado pagado / por pagar, deslizar para pagar, resumen de pendientes, pagar tarjeta y avisos. */
 
-.payment-badge {
-  display:inline-block;
-  margin-left:var(--space-2);
-  padding:var(--space-0) var(--space-2);
-  border-radius:var(--radius-pill);
-  background:var(--accent-soft-strong);
-  color:var(--warning-text);
-  font-size:var(--fs-xs);
-  font-weight:800;
-  letter-spacing:.02em;
-  text-transform:uppercase;
-  vertical-align:1px;
-}
-
 .due-summary {
   display:flex;
   flex-direction:column;

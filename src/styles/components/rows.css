@@ -118,8 +118,25 @@
   overflow: hidden;
 }
 
+/* Gastos: la descripción en un solo renglón que aprovecha todo el ancho de la fila; si no cabe, se recorta con «…». */
+.row--stacked .row__title {
+  display: block;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
 .row--compact .row__detail {
   font-size: var(--fs-xs);
+}
+
+/* Texto que no se parte entre renglones (método de pago con su ícono). Si de verdad no cabe, se recorta con «…». */
+.row__nowrap {
+  display: inline-block;
+  max-width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  vertical-align: bottom;
 }
 
 .row__note {
@@ -135,6 +152,13 @@
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
+}
+
+/* Un solo renglón: si el texto no cabe, se recorta con «…». Mantiene todas las filas de una lista con la misma altura. */
+.row__detail--truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .row__status {

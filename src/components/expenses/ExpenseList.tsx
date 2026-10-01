@@ -51,7 +51,7 @@ function PayableExpenseRow({ expense, onSelect, onTogglePaid, onDelete, onMore }
       }
     >
       <div className="expense-item">
-        <ExpenseRow expense={expense} onSelect={onSelect} compact />
+        <ExpenseRow expense={expense} onSelect={onSelect} compact stacked />
         {onMore && (
           <IconButton className="expense-item__more" icon="more" label={`Opciones del gasto: ${subject}`} onClick={() => onMore(expense)} />
         )}
@@ -95,7 +95,7 @@ export function ExpenseList({ expenses, onSelect, onTogglePaid, onDelete, onMore
                   onMore={onMore}
                 />
               ) : (
-                <ExpenseRow key={expense.id} expense={expense} onSelect={onSelect} compact />
+                <ExpenseRow key={expense.id} expense={expense} onSelect={onSelect} compact stacked />
               ),
             )}
           </div>

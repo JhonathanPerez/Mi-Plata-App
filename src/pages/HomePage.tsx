@@ -155,7 +155,7 @@ export function HomePage() {
             </div>
             <div className="card card--flush">
               {data.recent.map((expense) => (
-                <ExpenseRow key={expense.id} expense={expense} showDate showStatus={false} compact showMethod={showMethod} onSelect={(id) => navigate(`/gasto/${id}`)} />
+                <ExpenseRow key={expense.id} expense={expense} showDate compact showMethod={showMethod} onSelect={(id) => navigate(`/gasto/${id}`)} />
               ))}
             </div>
           </section>
