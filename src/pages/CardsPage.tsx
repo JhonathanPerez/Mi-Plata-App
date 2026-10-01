@@ -1,40 +1,24 @@
-import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ReminderPrompt } from '@/components/cards/ReminderPrompt';
-import { StatementDatesSheet } from '@/components/cards/StatementDatesSheet';
 import { Button, LinkButton } from '@/components/ui/Button';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { Icon } from '@/components/ui/Icon';
 import { Amount } from '@/components/ui/Money';
-import { Notice } from '@/components/ui/Notice';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { PrivacyToggle } from '@/components/ui/PrivacyToggle';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { useQuery } from '@/hooks/useQuery';
-import { useAmountFormat } from '@/app/providers/PrivacyProvider';
 import { diffDays, todayIso } from '@/lib/dates';
 import { cssVars } from '@/lib/cssVars';
+import { cx } from '@/lib/cx';
 import { dueLabel, formatDayMonth, periodMonthName, relativeDays, shadeColor } from '@/lib/statementText';
-import { cardService, type CardOverview, type CardStatement } from '@/services/cardService';
+import { cardService } from '@/services/cardService';
 
 /** Tarjetas de crédito: qué se debe, cuándo corta cada una y cuándo vence el pago. */
 export function CardsPage() {
   const navigate = useNavigate();
   const today = todayIso();
-  const { cop } = useAmountFormat();
   const { data, loading } = useQuery(() => cardService.listOverviews());
-  const [editing, setEditing] = useState<{ overview: CardOverview; statement: CardStatement } | null>(null);
-
-  // Avisos: extractos que vencen en 3 días o menos (o ya vencidos).
-  const alerts = useMemo(
-    () =>
-      (data ?? []).flatMap((overview) =>
-        overview.payable
-          .map((statement) => ({ overview, statement, daysLeft: diffDays(today, statement.dueDate) }))
-          .filter((item) => item.daysLeft <= 3),
-      ),
-    [data, today],
-  );
 
   return (
     <div className="page">
@@ -57,22 +41,8 @@ export function CardsPage() {
         <>
           <ReminderPrompt />
 
-          {alerts.map(({ overview, statement, daysLeft }) => (
-            <Notice
-              key={`${overview.method.id}-${statement.period}`}
-              tone={daysLeft < 0 ? 'danger' : 'warning'}
-              role="status"
-              title={`Tu extracto de ${periodMonthName(statement.period)} de ${overview.method.name} ${
-                daysLeft < 0 ? `venció ${relativeDays(daysLeft)}` : daysLeft === 0 ? 'vence hoy' : `vence ${relativeDays(daysLeft)}`
-              }`}
-            >
-              Son {cop(statement.unpaidTotal)}.
-            </Notice>
-          ))}
-
           {(data ?? []).map((overview) => {
             const { method } = overview;
-            const target = overview.payable[0] ?? overview.open;
             return (
               <section
                 key={method.id}
@@ -92,7 +62,7 @@ export function CardsPage() {
                       <small>Sin esas fechas no se pueden armar los extractos de esta tarjeta.</small>
                     </div>
                     <Button variant="inverse" block icon="calendar" onClick={() => navigate(`/tarjetas/${method.id}/fechas`)}>
-                      Configurar fechas
+                      Configurar corte y pago
                     </Button>
                   </>
                 ) : (
@@ -105,7 +75,7 @@ export function CardsPage() {
                         <strong>
                           <Amount value={statement.unpaidTotal} />
                         </strong>
-                        <em>
+                        <em className={cx(diffDays(today, statement.dueDate) <= 0 && 'credit-card__badge')}>
                           {diffDays(today, statement.dueDate) <= 0 && <Icon name="warning" size={15} />}
                           {dueLabel(statement.dueDate, diffDays(today, statement.dueDate))}
                         </em>
@@ -131,14 +101,12 @@ export function CardsPage() {
                       </Button>
                     )}
                     <div className="credit-card__links">
-                      {target && (
-                        <LinkButton tone="inverse" onClick={() => setEditing({ overview, statement: target })}>
-                          <Icon name="edit" size={16} />
-                          Cambiar fechas de este mes
-                        </LinkButton>
-                      )}
                       <LinkButton tone="inverse" onClick={() => navigate(`/tarjetas/${method.id}/extractos`)}>
-                        Fechas y extractos
+                        Ver extractos
+                        <Icon name="chevronRight" size={16} />
+                      </LinkButton>
+                      <LinkButton tone="inverse" onClick={() => navigate(`/tarjetas/${method.id}/fechas`)}>
+                        Reglas de corte y pago
                         <Icon name="chevronRight" size={16} />
                       </LinkButton>
                     </div>
@@ -148,17 +116,6 @@ export function CardsPage() {
             );
           })}
         </>
-      )}
-
-      {editing && editing.overview.method.cycle && (
-        <StatementDatesSheet
-          open
-          methodId={editing.overview.method.id}
-          rules={editing.overview.method.cycle}
-          statement={editing.statement}
-          onClose={() => setEditing(null)}
-          onEditRules={() => navigate(`/tarjetas/${editing.overview.method.id}/fechas`)}
-        />
       )}
     </div>
   );

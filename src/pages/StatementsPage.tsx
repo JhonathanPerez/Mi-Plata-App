@@ -65,7 +65,7 @@ export function StatementsPage() {
       ) : !rules ? (
         <section className="statement-open">
           <span className="muted">Falta configurar el corte y el pago de esta tarjeta.</span>
-          <LinkButton onClick={() => navigate(`/tarjetas/${id}/fechas`)}>Configurar fechas</LinkButton>
+          <LinkButton onClick={() => navigate(`/tarjetas/${id}/fechas`)}>Configurar corte y pago</LinkButton>
         </section>
       ) : (
         <>
@@ -80,6 +80,10 @@ export function StatementsPage() {
               <small>
                 {open.expenses.length} {open.expenses.length === 1 ? 'gasto' : 'gastos'} hasta hoy · se paga hasta el {formatDayMonth(open.dueDate)}
               </small>
+              <LinkButton onClick={() => setEditing(open)}>
+                <Icon name="edit" size={16} />
+                Cambiar fechas de este mes
+              </LinkButton>
             </section>
           )}
 
@@ -118,7 +122,7 @@ export function StatementsPage() {
             <Icon name="info" size={16} />
             <span>Toca un extracto para ajustar sus fechas. Cada uno guarda las suyas: cambiar un mes no altera los demás.</span>
           </p>
-          <LinkButton onClick={() => navigate(`/tarjetas/${id}/fechas`)}>Editar las reglas de corte y pago</LinkButton>
+          <LinkButton onClick={() => navigate(`/tarjetas/${id}/fechas`)}>Reglas de corte y pago</LinkButton>
         </>
       )}
 

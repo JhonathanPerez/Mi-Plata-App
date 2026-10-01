@@ -204,7 +204,7 @@ export function PaymentMethodsPage() {
           />
           {current && current.type === 'credit_card' && (
             <PickerField
-              label="Fechas del ciclo"
+              label="Reglas de corte y pago"
               popup={false}
               selected={{
                 name: current.cycle ? describeCut(current.cycle) : 'Sin configurar',
