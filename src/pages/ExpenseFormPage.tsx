@@ -17,25 +17,13 @@ import { NOTE_MAX_LENGTH } from '@/config/constants';
 import { useQuery } from '@/hooks/useQuery';
 import { todayIso } from '@/lib/dates';
 import { errorMessage } from '@/lib/errors';
-import { describePaymentMethod } from '@/lib/payment';
+import { describePaymentMethod, statusHint } from '@/lib/payment';
 import { captureService, suggestPaymentMethodId } from '@/services/captureService';
 import { categoryService } from '@/services/categoryService';
 import { expenseService, validateExpenseInput, type ExpenseFieldErrors } from '@/services/expenseService';
 import { paymentMethodService } from '@/services/paymentMethodService';
 import { settingsService } from '@/services/settingsService';
 import type { ExpenseInput } from '@/types/models';
-
-/** Explica qué significa el estado elegido, según el método de pago. */
-function statusHint(paid: boolean, methodType: string | null, methodName: string | undefined): string {
-  if (methodType === 'credit_card') {
-    return paid
-      ? 'Ya se lo pagaste al banco: no aparecerá en «Pagar tarjeta».'
-      : `Con tarjeta de crédito queda por pagar hasta que le pagues el extracto a ${methodName ?? 'tu banco'}.`;
-  }
-  return paid
-    ? 'Con este método se marca como pagado. Puedes cambiarlo si fue fiado.'
-    : 'Queda pendiente hasta que lo marques como pagado.';
-}
 
 async function loadFormData(id: string | undefined, pendingId: string | null) {
   const [categories, methods, lastMethodId, existing, pending] = await Promise.all([
@@ -288,7 +276,7 @@ export function ExpenseFormPage() {
               ]}
             />
             <Notice tone={paid ? 'info' : 'warning'} icon={paid ? 'check' : 'info'}>
-              {statusHint(paid, methodType, selectedMethod?.name)}
+              {statusHint(paid, methodType)}
             </Notice>
           </div>
 
