@@ -50,7 +50,7 @@
   width:var(--tap);
   height:var(--tap);
   margin-block:calc(-1 * var(--space-3));
-  margin-inline-start:calc(-1 * var(--space-2));
+  margin-inline:calc(-1 * var(--space-2)) calc(-1 * var(--space-3));
   border:0;
   background:transparent;
   color:var(--ink-2);

@@ -5,7 +5,7 @@ import { Icon } from '@/components/ui/Icon';
 import { Amount } from '@/components/ui/Money';
 import { Notice } from '@/components/ui/Notice';
 import { Row } from '@/components/ui/Row';
-import { dueShortLabel } from '@/lib/statementText';
+import { formatDayMonth, relativeDays } from '@/lib/statementText';
 import type { DueSummary } from '@/services/cardService';
 
 type DueTone = 'neutral' | 'warning' | 'danger';
@@ -41,6 +41,13 @@ function DueLabel({ tone, children }: { tone: DueTone; children: string }) {
   );
 }
 
+/** «Vence en 6 días» (la fecha va aparte, bajo el monto): cabe en un renglón. */
+function dueText(daysLeft: number): string {
+  if (daysLeft < 0) return `Vencido hace ${-daysLeft} ${-daysLeft === 1 ? 'día' : 'días'}`;
+  if (daysLeft === 0) return 'Vence hoy';
+  return `Vence ${relativeDays(daysLeft)}`;
+}
+
 interface DueSummaryCardProps {
   summary: DueSummary;
   onPay: () => void;
@@ -51,6 +58,11 @@ export function DueSummaryCard({ summary, onPay }: DueSummaryCardProps) {
   const hasCards = summary.cards.length > 0;
   const anyClosed = summary.cards.some((card) => card.hasClosedStatement);
   const [infoOpen, setInfoOpen] = useState(false);
+  const info = (
+    <button type="button" className="due-summary__info" aria-expanded={infoOpen} aria-label="¿Esto cuenta en mis gastos del mes?" onClick={() => setInfoOpen((open) => !open)}>
+      <Icon name="info" size={20} />
+    </button>
+  );
   // Con una sola fila su monto ya es el total: el encabezado solo suma cuando hay varias.
   const rowCount = summary.cards.length + (summary.other.count > 0 ? 1 : 0);
   return (
@@ -59,14 +71,14 @@ export function DueSummaryCard({ summary, onPay }: DueSummaryCardProps) {
         <span>
           <Icon name="card" size={18} />
           Por pagar
-          <button type="button" className="due-summary__info" aria-expanded={infoOpen} aria-label="¿Esto cuenta en mis gastos del mes?" onClick={() => setInfoOpen((open) => !open)}>
-            <Icon name="info" size={20} />
-          </button>
+          {rowCount > 1 && info}
         </span>
-        {rowCount > 1 && (
+        {rowCount > 1 ? (
           <strong>
             <Amount value={summary.total + summary.other.total} />
           </strong>
+        ) : (
+          info
         )}
       </div>
       {infoOpen && <Notice>Ya está incluido en «Gastos del mes»: pagar no cambia tu presupuesto.</Notice>}
@@ -74,7 +86,7 @@ export function DueSummaryCard({ summary, onPay }: DueSummaryCardProps) {
       <div className="due-summary__list">
         {summary.cards.map((card) => {
           const label = card.nextDue
-            ? dueShortLabel(card.nextDue.date, card.nextDue.daysLeft)
+            ? dueText(card.nextDue.daysLeft)
             : card.configured
               ? 'Ciclo abierto'
               : 'Falta configurar las fechas';
@@ -86,6 +98,7 @@ export function DueSummaryCard({ summary, onPay }: DueSummaryCardProps) {
               title={card.name}
               detail={card.nextDue ? <DueLabel tone={dueTone(card.nextDue.daysLeft)}>{label}</DueLabel> : label}
               amount={<Amount value={card.total} />}
+              aside={card.nextDue ? formatDayMonth(card.nextDue.date) : undefined}
             />
           );
         })}
