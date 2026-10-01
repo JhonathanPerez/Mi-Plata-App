@@ -105,9 +105,6 @@ export function PendingPage() {
               ))}
             </AnimatePresence>
           </div>
-          <Link className="link" to="/ajustes/captura">
-            Configurar captura automática
-          </Link>
         </>
       )}
 
