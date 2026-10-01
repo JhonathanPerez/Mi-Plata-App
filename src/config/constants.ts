@@ -30,6 +30,7 @@ export const SETTING_KEYS = {
   pendingReminderMinutes: 'pending_reminder_minutes',
   captureApps: 'capture_apps',
   hideAmounts: 'hide_amounts',
+  swipeHintCount: 'swipe_hint_count',
 } as const;
 
 export const CATEGORY_COLORS = [
