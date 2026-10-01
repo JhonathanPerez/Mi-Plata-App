@@ -42,7 +42,7 @@ number-flow-react {
   align-items: center;
   justify-content: space-between;
   gap: var(--space-3);
-  min-height: 44px;
+  min-height: var(--tap);
   padding: 0;
   border: 0;
   background: transparent;

@@ -4,8 +4,8 @@
   position: relative;
   display: flex;
   gap: var(--space-0);
-  height: 22px;
-  border-radius: var(--radius-xs);
+  height: 10px;
+  border-radius: var(--radius-pill);
   background: var(--hero-track);
   overflow: hidden;
 }
