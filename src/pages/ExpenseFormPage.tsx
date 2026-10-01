@@ -212,7 +212,7 @@ export function ExpenseFormPage() {
       note: note.trim() ? note.trim() : null,
       paid,
     };
-    const found = validateExpenseInput(input);
+    const found = validateExpenseInput(input, { requireNote: true });
     setErrors(found);
     if (Object.keys(found).length > 0) {
       // Lleva la vista al primer error para que se vea sin buscarlo.
@@ -286,6 +286,21 @@ export function ExpenseFormPage() {
             size="hero"
           />
 
+          <Field label="Descripción" htmlFor="expense-note" error={errors.note}>
+            <input
+              id="expense-note"
+              className="input"
+              type="text"
+              placeholder="¿En qué gastaste? Ej.: Almuerzo con el equipo"
+              maxLength={NOTE_MAX_LENGTH}
+              aria-required="true"
+              value={note}
+              onChange={(event) => setNote(event.target.value)}
+            />
+          </Field>
+
+          <DateField label="Fecha" quick value={date} onChange={setDate} min="2000-01-01" max="2100-12-31" error={errors.date} />
+
           <PickerField
             label="Categoría"
             placeholder="Elegir categoría"
@@ -301,20 +316,6 @@ export function ExpenseFormPage() {
             error={errors.method}
             onOpen={() => setPicker('method')}
           />
-
-          <DateField label="Fecha" quick value={date} onChange={setDate} min="2000-01-01" max="2100-12-31" error={errors.date} />
-
-          <Field label="Descripción (opcional)" htmlFor="expense-note" error={errors.note}>
-            <input
-              id="expense-note"
-              className="input"
-              type="text"
-              placeholder="¿En qué gastaste? Ej.: Almuerzo con el equipo"
-              maxLength={NOTE_MAX_LENGTH}
-              value={note}
-              onChange={(event) => setNote(event.target.value)}
-            />
-          </Field>
 
           <div className="field">
             <span className="field__label">Estado</span>
