@@ -58,6 +58,19 @@ number-flow-react {
   color: var(--hero-ink-2);
 }
 
+/* La barra lleva a Estadísticas: área de 48 px que se solapa con los huecos vecinos (sin mover nada visualmente). */
+.hero__strip {
+  display: block;
+  padding-block: calc((var(--tap) - 10px) / 2);
+  margin-block: calc(-1 * (var(--tap) - 10px) / 2);
+  color: inherit;
+  text-decoration: none;
+}
+
+.hero__strip:active {
+  opacity: 0.85;
+}
+
 /* Sin presupuesto: el mismo pie de una línea que con presupuesto, sin botón blanco que le quite protagonismo a la cifra. */
 .hero__cta {
   display: inline-flex;

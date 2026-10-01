@@ -68,9 +68,7 @@ export function HomePage() {
 
       {pendingCount ? (
         <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} transition={{ type: 'spring', stiffness: 420, damping: 32 }}>
-        <Notice tone="warning" icon="inbox" to="/pendientes" title={`${pendingCount} ${pluralize(pendingCount, 'gasto por categorizar', 'gastos por categorizar')}`}>
-          {pluralize(pendingCount, 'Toca para elegir su categoría', 'Toca para elegir sus categorías')}
-        </Notice>
+        <Notice tone="warning" icon="inbox" to="/pendientes" title={`${pendingCount} ${pluralize(pendingCount, 'gasto por categorizar', 'gastos por categorizar')}`} />
         </motion.div>
       ) : null}
 
@@ -87,7 +85,9 @@ export function HomePage() {
           <Stat tone="hero" size="lg" label="Gastado este mes" value={<Money value={data.monthTotal} />} />
         )}
 
-        <BudgetStrip segments={data.byCategory} budget={budget.budget} spent={budget.spent} />
+        <Link to="/estadisticas" className="hero__strip" aria-label="Ver estadísticas del mes">
+          <BudgetStrip segments={data.byCategory} budget={budget.budget} spent={budget.spent} />
+        </Link>
 
         {budget.hasBudget ? (
           <button type="button" className="hero__foot" onClick={() => setBudgetOpen(true)}>
