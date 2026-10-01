@@ -31,11 +31,21 @@ export function BudgetStrip({ segments, budget, spent }: BudgetStripProps) {
             style={cssVars({ '--seg-w': `${(segment.total / scale) * 100}%`, '--swatch': segment.color })}
           />
         ))}
-        <span className="strip__tick strip__tick--25" />
-        <span className="strip__tick strip__tick--50" />
-        <span className="strip__tick strip__tick--75" />
+        {/* Las marcas del 25/50/75 % solo significan algo cuando la barra es el avance del presupuesto. */}
+        {hasBudget && (
+          <>
+            <span className="strip__tick strip__tick--25" />
+            <span className="strip__tick strip__tick--50" />
+            <span className="strip__tick strip__tick--75" />
+          </>
+        )}
         {budgetMark !== null && <span className="strip__limit" style={cssVars({ '--limit-left': `${budgetMark}%` })} />}
       </div>
+      {!hasBudget && segments.length > 0 && (
+        <span className="strip__caption" aria-hidden="true">
+          Gastos por categoría
+        </span>
+      )}
     </div>
   );
 }
