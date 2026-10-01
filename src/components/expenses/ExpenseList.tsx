@@ -1,3 +1,4 @@
+import { IconButton } from '@/components/ui/Button';
 import { formatDayHeading } from '@/lib/dates';
 import { Amount } from '@/components/ui/Money';
 import { SwipeRow } from '@/components/ui/SwipeRow';
@@ -11,6 +12,8 @@ interface ExpenseListProps {
   onTogglePaid?: (expense: ExpenseWithRefs) => void;
   /** Si se pasa (junto con onTogglePaid), deslizar a la izquierda pide eliminar el gasto. */
   onDelete?: (expense: ExpenseWithRefs) => void;
+  /** Si se pasa (junto con onTogglePaid), cada fila muestra un botón ⋮ con las mismas acciones que los gestos, para quien no los conoce. */
+  onMore?: (expense: ExpenseWithRefs) => void;
 }
 
 interface PayableRowProps {
@@ -18,13 +21,14 @@ interface PayableRowProps {
   onSelect: (id: string) => void;
   onTogglePaid: (expense: ExpenseWithRefs) => void;
   onDelete?: (expense: ExpenseWithRefs) => void;
+  onMore?: (expense: ExpenseWithRefs) => void;
 }
 
 /**
  * Una fila del historial que se desliza a la derecha para marcarla como pagada (si estaba por pagar) o de nuevo
  * como por pagar, y a la izquierda para eliminarla (si hay `onDelete`; la confirmación queda a cargo de quien lo reciba).
  */
-function PayableExpenseRow({ expense, onSelect, onTogglePaid, onDelete }: PayableRowProps) {
+function PayableExpenseRow({ expense, onSelect, onTogglePaid, onDelete, onMore }: PayableRowProps) {
   const isDue = expense.paidAt === null;
   const subject = `${expense.categoryName} ${expense.note ?? ''}`;
   return (
@@ -46,13 +50,18 @@ function PayableExpenseRow({ expense, onSelect, onTogglePaid, onDelete }: Payabl
         }
       }
     >
-      <ExpenseRow expense={expense} onSelect={onSelect} />
+      <div className="expense-item">
+        <ExpenseRow expense={expense} onSelect={onSelect} compact />
+        {onMore && (
+          <IconButton className="expense-item__more" icon="more" label={`Opciones del gasto: ${subject}`} onClick={() => onMore(expense)} />
+        )}
+      </div>
     </SwipeRow>
   );
 }
 
-/** Lista agrupada por día, con el total de cada día. */
-export function ExpenseList({ expenses, onSelect, onTogglePaid, onDelete }: ExpenseListProps) {
+/** Lista agrupada por día, con el total de cada día. Cada fila usa dos líneas: la descripción como título y «categoría · método» debajo. */
+export function ExpenseList({ expenses, onSelect, onTogglePaid, onDelete, onMore }: ExpenseListProps) {
   const groups: Array<{ date: string; items: ExpenseWithRefs[]; total: number }> = [];
   for (const expense of expenses) {
     const last = groups[groups.length - 1];
@@ -83,9 +92,10 @@ export function ExpenseList({ expenses, onSelect, onTogglePaid, onDelete }: Expe
                   onSelect={onSelect}
                   onTogglePaid={onTogglePaid}
                   onDelete={onDelete}
+                  onMore={onMore}
                 />
               ) : (
-                <ExpenseRow key={expense.id} expense={expense} onSelect={onSelect} />
+                <ExpenseRow key={expense.id} expense={expense} onSelect={onSelect} compact />
               ),
             )}
           </div>

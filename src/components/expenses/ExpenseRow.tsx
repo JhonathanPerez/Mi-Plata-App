@@ -18,7 +18,7 @@ interface ExpenseRowProps {
   /** Muestra la insignia «Por pagar» (por defecto sí). En Inicio se oculta: la tarjeta «Por pagar» ya lo dice. */
   showStatus?: boolean;
   /**
-   * Dos líneas: la descripción como título y «categoría · método» como meta. Es opt-in (Inicio): Gastos conserva las tres líneas.
+   * Dos líneas: la descripción como título y «categoría · método» como meta. Es opt-in (Inicio y Gastos).
    * Sin descripción, la categoría pasa a ser el título.
    */
   compact?: boolean;

@@ -99,6 +99,25 @@
   gap: var(--space-4);
 }
 
+/* Fila de Gastos: la fila (abre el gasto) y a su lado el botón ⋮ de opciones. */
+.expense-item {
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.expense-item .row {
+  flex: 1;
+  width: auto;
+  min-width: 0;
+  padding-right: var(--space-2);
+}
+
+.expense-item__more {
+  margin-right: var(--space-1);
+  color: var(--ink-2);
+}
+
 .expense-group__head {
   display: flex;
   justify-content: space-between;
