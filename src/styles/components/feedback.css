@@ -33,6 +33,11 @@
   margin-bottom: var(--space-2);
 }
 
+.empty--error .empty__icon {
+  background: color-mix(in srgb, var(--danger) 12%, transparent);
+  color: var(--danger);
+}
+
 .busy {
   position: fixed;
   inset: 0;
@@ -119,6 +124,10 @@
 
 .skeleton-row + .skeleton-row {
   border-top: 1px solid var(--line);
+}
+
+.skeleton-row--expense {
+  padding-block: var(--space-3);
 }
 
 .skeleton-row__body {

@@ -1,4 +1,4 @@
-import { useEffect, useState, useSyncExternalStore } from 'react';
+import { useCallback, useEffect, useMemo, useState, useSyncExternalStore } from 'react';
 import { getDataVersion, subscribeDataChanged } from '@/lib/dataBus';
 
 export function useDataVersion(): number {
@@ -9,7 +9,11 @@ export interface QueryState<T> {
   data: T | undefined;
   loading: boolean;
   error: Error | null;
+  /** Vuelve a leer los datos (por ejemplo desde el botón «Reintentar» de una pantalla con error). */
+  retry: () => void;
 }
+
+type QueryResult<T> = Omit<QueryState<T>, 'retry'>;
 
 /**
  * Lee datos locales y se actualiza sola cuando cualquier servicio guarda cambios.
@@ -17,7 +21,8 @@ export interface QueryState<T> {
  */
 export function useQuery<T>(fetcher: () => Promise<T>, deps: readonly unknown[] = []): QueryState<T> {
   const version = useDataVersion();
-  const [state, setState] = useState<QueryState<T>>({ data: undefined, loading: true, error: null });
+  const [attempt, setAttempt] = useState(0);
+  const [state, setState] = useState<QueryResult<T>>({ data: undefined, loading: true, error: null });
 
   useEffect(() => {
     let cancelled = false;
@@ -38,7 +43,12 @@ export function useQuery<T>(fetcher: () => Promise<T>, deps: readonly unknown[] 
       cancelled = true;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [version, ...deps]);
+  }, [version, attempt, ...deps]);
 
-  return state;
+  const retry = useCallback(() => {
+    setState((prev) => ({ ...prev, loading: true, error: null }));
+    setAttempt((n) => n + 1);
+  }, []);
+
+  return useMemo(() => ({ ...state, retry }), [state, retry]);
 }
