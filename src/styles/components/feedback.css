@@ -291,6 +291,18 @@
   padding-block: var(--space-3);
 }
 
+/* Hoy sin gastos: una fila baja y tranquila que crece sola cuando hay un monto. */
+.stat--quiet {
+  min-height: 0;
+  padding-block: var(--space-3);
+}
+
+.stat--quiet .stat__value {
+  font-size: var(--fs-md);
+  font-weight: 600;
+  color: var(--ink-2);
+}
+
 .stat--inline .stat__label {
   font-size: var(--fs-sm);
 }
