@@ -103,6 +103,12 @@ export function formatWeekdayDate(iso: IsoDate, now: Date = new Date()): string 
   return date.getFullYear() === now.getFullYear() ? base : `${base} de ${date.getFullYear()}`;
 }
 
+/** "miércoles 30": el mes ya lo dice el título de Inicio, así que no se repite. */
+export function formatWeekdayDay(iso: IsoDate): string {
+  const date = parseIsoDate(iso);
+  return `${WEEKDAY_LONG[date.getDay()]} ${date.getDate()}`;
+}
+
 /** "19 sep" */
 export function formatShortDate(iso: IsoDate): string {
   const [, month, day] = iso.split('-').map(Number);
