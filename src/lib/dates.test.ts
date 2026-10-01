@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   addDays, addMonths, daysInMonth, diffDays, elapsedDaysInMonth, formatDayHeading, formatLongDate,
-  formatMonthTitle, formatRelativeDate, formatTime, formatWeekdayDate, formatWeekdayDay, isValidIsoDate, monthRange, toIsoDate,
+  formatMonthTitle, formatShortDate, formatTime, formatWeekdayDate, formatWeekdayDay, isValidIsoDate, monthRange, toIsoDate,
 } from './dates';
 
 describe('fechas locales', () => {
@@ -38,13 +38,10 @@ describe('fechas locales', () => {
     expect(formatDayHeading('2026-09-18', now)).toBe('Ayer');
     expect(formatDayHeading('2026-09-12', now)).toBe('sáb 12 sep');
   });
-  it('fecha relativa para listas recientes', () => {
-    const now = new Date(2026, 8, 30);
-    expect(formatRelativeDate('2026-09-30', now)).toBe('Hoy');
-    expect(formatRelativeDate('2026-09-29', now)).toBe('Ayer');
-    expect(formatRelativeDate('2026-09-24', now)).toBe('Hace 6 días');
-    expect(formatRelativeDate('2026-09-23', now)).toBe('23 sep');
-    expect(formatRelativeDate('2026-10-02', now)).toBe('2 oct');
+  it('fecha corta siempre con día y mes, también para hoy y ayer', () => {
+    expect(formatShortDate('2026-09-30')).toBe('30 sep');
+    expect(formatShortDate('2026-09-29')).toBe('29 sep');
+    expect(formatShortDate('2026-10-02')).toBe('2 oct');
   });
   it('días transcurridos para promedios', () => {
     const now = new Date(2026, 8, 19);

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { EmojiTile } from '@/components/ui/EmojiTile';
 import { Row } from '@/components/ui/Row';
-import { formatRelativeDate, formatShortDate, formatTime } from '@/lib/dates';
+import { formatShortDate, formatTime } from '@/lib/dates';
 import { formatCOP } from '@/lib/money';
 import { usePrivacy } from '@/app/providers/PrivacyProvider';
 import { Amount } from '@/components/ui/Money';
@@ -51,7 +51,7 @@ export function ExpenseRow({ expense, onSelect, showDate, showStatus = true, com
         className={compact ? 'row--compact' : undefined}
         title={compact ? (expense.note || expense.categoryName) : expense.categoryName}
         amount={<Amount value={expense.amount} />}
-        aside={showDate ? (compact ? formatRelativeDate(expense.date) : formatShortDate(expense.date)) : undefined}
+        aside={showDate ? formatShortDate(expense.date) : undefined}
       >
         {!compact && expense.note && <span className="row__note">{expense.note}</span>}
         {(meta || badge) && (

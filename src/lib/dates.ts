@@ -115,15 +115,6 @@ export function formatShortDate(iso: IsoDate): string {
   return `${day} ${MONTH_SHORT[month - 1]}`;
 }
 
-/** Para listas recientes: "Hoy", "Ayer", "Hace 4 días" y, de una semana en adelante, "19 sep". */
-export function formatRelativeDate(iso: IsoDate, now: Date = new Date()): string {
-  const ago = diffDays(iso, todayIso(now));
-  if (ago === 0) return 'Hoy';
-  if (ago === 1) return 'Ayer';
-  if (ago >= 2 && ago <= 6) return `Hace ${ago} días`;
-  return formatShortDate(iso);
-}
-
 /** "19/09/2026" */
 export function formatNumericDate(iso: IsoDate): string {
   const [year, month, day] = iso.split('-');
