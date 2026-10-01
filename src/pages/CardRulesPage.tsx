@@ -65,7 +65,7 @@ export function CardRulesPage() {
   if (!loading && (!method || method.type !== 'credit_card')) {
     return (
       <div className="page">
-        <PageHeader title="Fechas del ciclo" back />
+        <PageHeader title="Reglas de corte y pago" back />
         <p className="muted">Las fechas de corte y pago son solo para tarjetas de crédito.</p>
       </div>
     );
@@ -75,7 +75,7 @@ export function CardRulesPage() {
     setSaving(true);
     try {
       await paymentMethodService.setCycleRules(id, rules);
-      toast.show('Fechas del ciclo guardadas');
+      toast.show('Reglas de corte y pago guardadas');
       navigate(-1);
     } catch (error) {
       toast.show(errorMessage(error), 'error');
@@ -85,12 +85,12 @@ export function CardRulesPage() {
 
   return (
     <div className="page page--form">
-      <PageHeader title={method ? `Fechas de ${method.name}` : 'Fechas del ciclo'} back />
+      <PageHeader title="Reglas de corte y pago" subtitle={method?.name} back />
 
       <section className="rule-panel">
         <h2 className="rule-panel__title">
           <Icon name="calendar" size={20} />
-          Fechas del ciclo
+          Reglas de siempre
         </h2>
         <RuleField label="Corte" value={describeCut(rules)} onOpen={() => setSheet('cut')} />
         <RuleField label="Fecha límite de pago" value={describeDue(rules)} onOpen={() => setSheet('due')} />
@@ -98,8 +98,8 @@ export function CardRulesPage() {
         <p className="rule-note">
           <Icon name="info" size={16} />
           <span>
-            Son las reglas de siempre. Si un mes el banco las cambia, ajusta solo ese extracto desde <strong>Tarjetas</strong>. Los extractos ya pagados
-            conservan sus fechas.
+            Si un mes el banco las cambia, ajusta solo ese extracto desde <strong>Extractos</strong>. Los extractos ya pagados conservan sus
+            fechas.
           </span>
         </p>
       </section>
