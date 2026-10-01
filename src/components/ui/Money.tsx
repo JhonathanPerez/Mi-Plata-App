@@ -23,7 +23,7 @@ export function Money({ value, className }: MoneyProps) {
   const { hidden } = usePrivacy();
   if (hidden) {
     return (
-      <span className={cx(className, 'amount-mask')} role="img" aria-label="Valor oculto">
+      <span className={cx(className, 'amount-mask', 'amount-mask--flow')} role="img" aria-label="Valor oculto">
         {HIDDEN_AMOUNT}
       </span>
     );
