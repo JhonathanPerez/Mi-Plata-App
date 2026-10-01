@@ -33,6 +33,7 @@ import {
   Trash,
   Tray,
   UploadSimple,
+  User,
   Warning,
   X,
   type Icon as PhosphorIcon,
@@ -43,7 +44,7 @@ export type IconName =
   | 'home' | 'list' | 'chart' | 'sliders' | 'plus' | 'back' | 'close' | 'chevronRight' | 'chevronLeft'
   | 'check' | 'trash' | 'edit' | 'search' | 'filter' | 'calendar' | 'download' | 'upload' | 'warning'
   | 'arrowUp' | 'arrowDown' | 'shield' | 'info' | 'moon' | 'tag' | 'card' | 'target' | 'refresh' | 'save'
-  | 'lock' | 'bell' | 'inbox' | 'apps' | 'phone' | 'eye' | 'eyeOff' | 'flag';
+  | 'lock' | 'bell' | 'inbox' | 'apps' | 'phone' | 'eye' | 'eyeOff' | 'flag' | 'user';
 
 /**
  * Íconos Phosphor. Los de "contenido" (casa, tarjeta, campana…) van en duotono, con un tono suave de relleno;
@@ -86,6 +87,7 @@ const ICONS: Record<IconName, { Component: PhosphorIcon; weight: IconWeight }> =
   eye: { Component: Eye, weight: 'duotone' },
   eyeOff: { Component: EyeSlash, weight: 'duotone' },
   flag: { Component: Flag, weight: 'duotone' },
+  user: { Component: User, weight: 'duotone' },
 };
 
 interface IconProps {
