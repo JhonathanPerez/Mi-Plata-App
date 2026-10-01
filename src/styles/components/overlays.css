@@ -81,6 +81,17 @@
   border-top: 1px solid var(--line);
 }
 
+/* Pie de hoja con dos botones lado a lado: el secundario a la izquierda. */
+.sheet__actions {
+  display: flex;
+  gap: var(--space-3);
+  margin-top: var(--space-2);
+}
+
+.sheet__actions > * {
+  flex: 1;
+}
+
 .dialog {
   position: relative;
   z-index: 1;

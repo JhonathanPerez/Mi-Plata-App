@@ -50,7 +50,7 @@ function FooterButton({ button, fallback, big }: { button: SheetButton; fallback
 function FooterActions({ primary, secondary, layout = 'stack' }: SheetActions) {
   if (layout === 'split') {
     return (
-      <div className="dialog__actions">
+      <div className="sheet__actions">
         {secondary && <FooterButton button={secondary} fallback="secondary" />}
         <FooterButton button={primary} fallback="primary" />
       </div>
