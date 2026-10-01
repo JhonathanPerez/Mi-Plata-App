@@ -152,14 +152,16 @@ export function HomePage() {
           </section>
 
           <section className="section">
-            <h2 className="section__title">Por categoría</h2>
-            <div className="card">
-              <CategoryBars items={data.byCategory} limit={3} highlightFirst />
+            <div className="section__head">
+              <h2 className="section__title">Por categoría</h2>
               {data.byCategory.length > 3 && (
                 <Link className="link" to="/estadisticas">
-                  Ver todas las categorías
+                  Ver todas
                 </Link>
               )}
+            </div>
+            <div className="card">
+              <CategoryBars items={data.byCategory} limit={3} highlightFirst />
             </div>
           </section>
         </>
