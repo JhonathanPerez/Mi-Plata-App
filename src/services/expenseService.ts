@@ -14,8 +14,16 @@ import type { Expense, ExpenseFilters, ExpenseInput, ExpenseWithRefs, IsoDate, P
 export type ExpenseField = 'amount' | 'category' | 'method' | 'date' | 'time' | 'note';
 export type ExpenseFieldErrors = Partial<Record<ExpenseField, string>>;
 
+export interface ValidateExpenseOptions {
+  /**
+   * Exige descripción. Es una regla del formulario: los gastos importados, los de pruebas y los
+   * anteriores a esta regla pueden no tenerla, así que el servicio no la impone por defecto.
+   */
+  requireNote?: boolean;
+}
+
 /** Validación pura (sin base de datos). La usa el formulario para mostrar errores en línea. */
-export function validateExpenseInput(input: ExpenseInput): ExpenseFieldErrors {
+export function validateExpenseInput(input: ExpenseInput, options: ValidateExpenseOptions = {}): ExpenseFieldErrors {
   const errors: ExpenseFieldErrors = {};
 
   if (!Number.isFinite(input.amount) || input.amount <= 0) {
@@ -37,7 +45,9 @@ export function validateExpenseInput(input: ExpenseInput): ExpenseFieldErrors {
   }
 
   if (input.time !== null && !isValidTime(input.time)) errors.time = 'La hora no es válida.';
-  if (input.note && input.note.trim().length > NOTE_MAX_LENGTH) {
+  if (options.requireNote && !input.note?.trim()) {
+    errors.note = 'Escribe una descripción.';
+  } else if (input.note && input.note.trim().length > NOTE_MAX_LENGTH) {
     errors.note = `Máximo ${NOTE_MAX_LENGTH} caracteres.`;
   }
   return errors;

@@ -39,6 +39,14 @@ suite('servicios con SQLite real', () => {
     expect(validateExpenseInput({ ...base, time: '25:00' }).time).toBeTruthy();
   });
 
+  it('exige descripción solo cuando el formulario lo pide', () => {
+    const base = { amount: 35000, categoryId: 'cat_alimentacion', paymentMethodId: 'pm_nubank', date: '2026-09-19', time: null, note: null };
+    expect(validateExpenseInput(base).note).toBeUndefined();
+    expect(validateExpenseInput(base, { requireNote: true }).note).toBeTruthy();
+    expect(validateExpenseInput({ ...base, note: '   ' }, { requireNote: true }).note).toBeTruthy();
+    expect(validateExpenseInput({ ...base, note: 'Almuerzo' }, { requireNote: true })).toEqual({});
+  });
+
   it('crea, edita, filtra y elimina gastos', async () => {
     const created = await expenseService.create({
       amount: 35000, categoryId: 'cat_alimentacion', paymentMethodId: 'pm_nubank',
