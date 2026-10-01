@@ -70,34 +70,6 @@ number-flow-react {
   gap: var(--space-3);
 }
 
-.top-category {
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
-}
-
-.top-category > div {
-  flex: 1;
-  min-width: 0;
-}
-
-.top-category__label {
-  font-size: var(--fs-sm);
-  color: var(--ink-2);
-}
-
-.top-category__name {
-  font-family: var(--font-display);
-  font-weight: 700;
-  font-size: var(--fs-lg);
-}
-
-.top-category__amount {
-  font-family: var(--font-display);
-  font-weight: 700;
-  font-variant-numeric: tabular-nums;
-}
-
 /* ---------- Estadísticas ---------- */
 .compare {
   display: flex;

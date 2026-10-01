@@ -3,11 +3,9 @@ import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'motion/react';
 import { BudgetStrip } from '@/components/charts/BudgetStrip';
 import { CategoryBars } from '@/components/charts/CategoryBars';
-import { DonutChart } from '@/components/charts/DonutChart';
 import { BudgetSheet } from '@/components/expenses/BudgetSheet';
 import { ExpenseRow } from '@/components/expenses/ExpenseRow';
 import { Button } from '@/components/ui/Button';
-import { EmojiTile } from '@/components/ui/EmojiTile';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { Icon } from '@/components/ui/Icon';
 import { Money } from '@/components/ui/Money';
@@ -106,20 +104,24 @@ export function HomePage() {
 
         {budget.level === 'over' && (
           <Notice tone="danger" role="status">
-            Este mes gastaste {cop(budget.overBy)} más de lo planeado. Puedes ajustar el presupuesto o revisar tus gastos.
+            Superaste el presupuesto
           </Notice>
         )}
         {budget.level === 'near' && (
           <Notice tone="warning" icon="info" role="status">
-            Ya usaste {formatPercent(budget.percentUsed)} de tu presupuesto. Te quedan {cop(budget.available)}.
+            Vas cerca del límite
           </Notice>
         )}
       </section>
 
-      <div className="tiles">
-        <Stat size="sm" label="Gastos de hoy" value={<Money value={data.todayTotal} />} />
-        <Stat size="sm" label="Gastos del mes" value={<Money value={data.monthTotal} />} />
-      </div>
+      {budget.hasBudget ? (
+        <div className="tiles">
+          <Stat size="sm" label="Gastos de hoy" value={<Money value={data.todayTotal} />} />
+          <Stat size="sm" label="Gastos del mes" value={<Money value={data.monthTotal} />} />
+        </div>
+      ) : (
+        <Stat size="sm" label="Hoy" value={<Money value={data.todayTotal} />} />
+      )}
 
       {dueSummary && dueSummary.total + dueSummary.other.total > 0 && (
         <DueSummaryCard summary={dueSummary} onPay={() => navigate('/tarjetas')} />
@@ -131,44 +133,19 @@ export function HomePage() {
             icon="list"
             title="Aún no hay gastos este mes"
             description="Toca el botón + para registrar el primero. Toma menos de diez segundos."
-            action={
-              <Button icon="plus" onClick={() => navigate('/gasto/nuevo')}>
-                Agregar gasto
-              </Button>
-            }
           />
         </div>
       ) : (
         <>
-          {data.topCategory && (
-            <section className="card top-category" aria-label="Categoría con más gasto">
-              <EmojiTile emoji={data.topCategory.icon} color={data.topCategory.color} />
-              <div>
-                <p className="top-category__label">Mayor gasto del mes</p>
-                <p className="top-category__name">{data.topCategory.name}</p>
-              </div>
-              <p className="top-category__amount">
-                <Money value={data.topCategory.total} />
-              </p>
-            </section>
-          )}
-
           <section className="section">
             <h2 className="section__title">Por categoría</h2>
             <div className="card">
-              <CategoryBars items={data.byCategory} limit={5} />
-              {data.byCategory.length > 5 && (
+              <CategoryBars items={data.byCategory} limit={3} highlightFirst />
+              {data.byCategory.length > 3 && (
                 <Link className="link" to="/estadisticas">
                   Ver todas las categorías
                 </Link>
               )}
-            </div>
-          </section>
-
-          <section className="section">
-            <h2 className="section__title">Método de pago</h2>
-            <div className="card">
-              <DonutChart items={data.byMethod} total={data.monthTotal} />
             </div>
           </section>
 
