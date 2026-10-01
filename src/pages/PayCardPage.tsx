@@ -53,7 +53,6 @@ export function PayCardPage() {
   const allIds = payable.flatMap((s) => unpaidOf(s).map((e) => e.id));
   const chosen = payable.flatMap((s) => unpaidOf(s)).filter((e) => selected.has(e.id));
   const total = chosen.reduce((sum, e) => sum + e.amount, 0);
-  const grandTotal = payable.reduce((sum, s) => sum + s.unpaidTotal, 0);
 
   const toggle = (expenseId: string) => {
     void haptics.tap();
@@ -112,8 +111,8 @@ export function PayCardPage() {
                 ? `Extracto de ${periodMonthName(payable[0].period)} · corte ${formatDayMonth(payable[0].cutDate)}`
                 : `${payable.length} extractos cerrados`
             }
-            value={<Amount value={total} />}
-            foot={`${chosen.length} de ${allIds.length} gastos seleccionados${total !== grandTotal ? ` · total del extracto ${cop(grandTotal)}` : ''}`}
+            value={`${chosen.length} de ${allIds.length}`}
+            foot="gastos seleccionados"
           />
 
           <DateField label="Fecha del pago" quick max={today} value={paidOn} onChange={(value) => value && setPaidOn(value)} />
