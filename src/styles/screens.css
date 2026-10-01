@@ -78,6 +78,30 @@ number-flow-react {
   gap: var(--space-2);
 }
 
+/* Cifras del día y del mes: un panel de vidrio dentro del hero. Una fila (sin presupuesto) o dos columnas con divisor (con presupuesto). */
+.hero__stats {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  align-items: center;
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-m);
+  background: var(--white-a12);
+}
+
+.hero__stats--pair {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  column-gap: var(--space-4);
+}
+
+.hero__stats--pair > .stat + .stat {
+  padding-left: var(--space-4);
+  border-left: 1px solid var(--white-a24);
+}
+
+.hero__stats .stat__label {
+  font-size: var(--fs-xs);
+}
+
 .tiles {
   display: grid;
   grid-template-columns: 1fr 1fr;

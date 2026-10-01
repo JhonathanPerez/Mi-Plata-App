@@ -281,30 +281,25 @@
   font-size: var(--fs-md);
 }
 
-/* Una sola cifra a ancho completo (Inicio sin presupuesto): etiqueta a la izquierda y valor a la derecha, en una fila baja. */
+/* Una cifra en fila (Hoy en el hero sin presupuesto): etiqueta a la izquierda y valor a la derecha. */
 .stat--inline {
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
   gap: var(--space-3);
-  min-height: var(--tap);
-  padding-block: var(--space-3);
 }
 
-/* Hoy sin gastos: una fila baja y tranquila que crece sola cuando hay un monto. */
-.stat--quiet {
-  min-height: 0;
-  padding-block: var(--space-3);
-}
-
+/* Hoy sin gastos: el valor se aquieta para no competir con la cifra principal. */
 .stat--quiet .stat__value {
-  font-size: var(--fs-md);
   font-weight: 600;
-  color: var(--ink-2);
 }
 
-.stat--inline .stat__label {
-  font-size: var(--fs-sm);
+.stat--inline.stat--quiet .stat__value {
+  font-size: var(--fs-md);
+}
+
+.stat--hero.stat--quiet .stat__value {
+  color: var(--hero-ink-2);
 }
 
 /* Solo la cifra principal de Inicio. */

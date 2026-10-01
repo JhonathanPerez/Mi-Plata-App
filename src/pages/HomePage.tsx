@@ -14,6 +14,7 @@ import { PrivacyToggle } from '@/components/ui/PrivacyToggle';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { Stat } from '@/components/ui/Stat';
 import { useQuery } from '@/hooks/useQuery';
+import { cx } from '@/lib/cx';
 import { formatMonthTitle, formatWeekdayDay } from '@/lib/dates';
 import { formatPercent } from '@/lib/money';
 import { useAmountFormat } from '@/app/providers/PrivacyProvider';
@@ -41,11 +42,7 @@ export function HomePage() {
         ) : (
           <div className="page-skeleton" role="status" aria-label="Cargando tus gastos">
             <Skeleton height={34} width="62%" radius="s" />
-            <Skeleton height={150} radius="l" />
-            <div className="tiles">
-              <Skeleton height={76} radius="l" />
-              <Skeleton height={76} radius="l" />
-            </div>
+            <Skeleton height={232} radius="l" />
             <Skeleton height={72} radius="l" />
           </div>
         )}
@@ -57,6 +54,17 @@ export function HomePage() {
   const hasSpending = data.monthCount > 0;
   // Si todos los gastos visibles son del mismo método, repetirlo en cada fila es ruido.
   const showMethod = new Set(data.recent.map((expense) => expense.paymentMethodId)).size > 1;
+  // «Hoy» vive al pie del hero: en una fila sin presupuesto, y en columna junto a lo gastado en el mes con presupuesto.
+  const noSpendToday = data.todayTotal === 0;
+  const todayStat = (
+    <Stat
+      tone="hero"
+      size="sm"
+      className={cx(!budget.hasBudget && 'stat--inline', noSpendToday && 'stat--quiet')}
+      label="Hoy"
+      value={noSpendToday ? 'Sin gastos' : <Money value={data.todayTotal} />}
+    />
+  );
 
   return (
     <div className="page">
@@ -72,7 +80,7 @@ export function HomePage() {
         </motion.div>
       ) : null}
 
-      <section className="hero" aria-label="Resumen del presupuesto">
+      <section className="hero" aria-label="Resumen del mes">
         {budget.hasBudget ? (
           <Stat
             tone="hero"
@@ -117,24 +125,15 @@ export function HomePage() {
             Vas cerca del límite
           </Notice>
         )}
+
+        <div className={cx('hero__stats', budget.hasBudget && 'hero__stats--pair')}>
+          {todayStat}
+          {budget.hasBudget && <Stat tone="hero" size="sm" label="Gastado este mes" value={<Money value={data.monthTotal} />} />}
+        </div>
       </section>
 
       {dueSummary && dueSummary.total + dueSummary.other.total > 0 && (
         <DueSummaryCard summary={dueSummary} onPay={() => navigate('/tarjetas')} />
-      )}
-
-      {budget.hasBudget ? (
-        <div className="tiles">
-          <Stat size="sm" label="Gastos de hoy" value={<Money value={data.todayTotal} />} />
-          <Stat size="sm" label="Gastos del mes" value={<Money value={data.monthTotal} />} />
-        </div>
-      ) : (
-        <Stat
-          size="sm"
-          className={data.todayTotal === 0 ? 'stat--inline stat--quiet' : 'stat--inline'}
-          label="Hoy"
-          value={data.todayTotal === 0 ? 'Sin gastos' : <Money value={data.todayTotal} />}
-        />
       )}
 
       {!hasSpending ? (
