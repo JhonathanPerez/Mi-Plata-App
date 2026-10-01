@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
+import { useLocation, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { useConfirm } from '@/app/providers/ConfirmProvider';
 import { useToast } from '@/app/providers/ToastProvider';
 import { haptics } from '@/lib/haptics';
@@ -53,6 +53,7 @@ export function ExpenseFormPage() {
   // Si viene de "Por categorizar", el valor, el comercio, la fecha y el método ya llegan rellenos.
   const pendingId = useSearchParams()[0].get('pendiente');
   const navigate = useNavigate();
+  const location = useLocation();
   const toast = useToast();
   const confirm = useConfirm();
   const { data, loading } = useQuery(() => loadFormData(id, pendingId), [id, pendingId]);
@@ -226,8 +227,9 @@ export function ExpenseFormPage() {
       void haptics.success();
       setSaved(true);
       leaveTimer.current = setTimeout(() => {
-        // Editar o categorizar un pendiente regresa a la pantalla anterior (la bandeja, para seguir con el siguiente).
-        if (isEdit || pendingId) navigate(-1);
+        // Se vuelve a donde se estaba (Inicio o Gastos, desde donde se tocó «+»; o la bandeja de pendientes).
+        // `key === 'default'` es la primera pantalla de la sesión (enlace directo): no hay a dónde volver, así que va a Inicio.
+        if (location.key !== 'default') navigate(-1);
         else navigate('/', { replace: true });
       }, 850);
     } catch (error) {
