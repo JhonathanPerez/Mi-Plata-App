@@ -28,7 +28,7 @@
 .due-summary__head {
   display:flex;
   justify-content:space-between;
-  align-items:baseline;
+  align-items:center;
   font-weight:700;
 }
 
@@ -40,8 +40,46 @@
 
 .due-summary__head strong {
   font-family:var(--font-display);
-  font-size:var(--fs-2xl);
+  font-size:var(--fs-lg);
+}
+
+/* Área táctil de 48 px sin agrandar el encabezado. */
+.due-summary__info {
+  display:grid;
+  place-items:center;
+  width:var(--tap);
+  height:var(--tap);
+  margin-block:calc(-1 * var(--space-3));
+  margin-inline-start:calc(-1 * var(--space-2));
+  border:0;
+  background:transparent;
+  color:var(--ink-2);
+}
+
+/* Vencimiento: el color dice la urgencia (calma, atención, urgente) y el icono al final refuerza que hay que actuar. */
+.due-label--neutral {
+  color:var(--ink-2);
+}
+
+.due-label--warning {
   color:var(--warning-text);
+  font-weight:600;
+}
+
+.due-label--danger {
+  color:var(--danger);
+  font-weight:600;
+}
+
+/* Última palabra + icono: no se separan al cortar el renglón. */
+.due-label__tail {
+  white-space:nowrap;
+}
+
+.due-label__tail > svg {
+  display:inline-block;
+  margin-inline-start:var(--space-1);
+  vertical-align:-3px;
 }
 
 .pay-summary {

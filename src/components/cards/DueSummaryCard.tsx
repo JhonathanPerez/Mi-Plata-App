@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Button } from '@/components/ui/Button';
 import { EmojiTile } from '@/components/ui/EmojiTile';
 import { Icon } from '@/components/ui/Icon';
@@ -6,6 +7,39 @@ import { Notice } from '@/components/ui/Notice';
 import { Row } from '@/components/ui/Row';
 import { dueShortLabel } from '@/lib/statementText';
 import type { DueSummary } from '@/services/cardService';
+
+type DueTone = 'neutral' | 'warning' | 'danger';
+
+/** Urgencia del vencimiento: más de 7 días es calma; 7 o menos pide atención; hoy o vencido es urgente. */
+function dueTone(daysLeft: number): DueTone {
+  if (daysLeft <= 0) return 'danger';
+  return daysLeft <= 7 ? 'warning' : 'neutral';
+}
+
+const LABEL_CLASS: Record<DueTone, string> = {
+  neutral: 'due-label due-label--neutral',
+  warning: 'due-label due-label--warning',
+  danger: 'due-label due-label--danger',
+};
+
+/**
+ * Vencimiento sin óvalo: texto del color de la urgencia y, si hay que atenderlo, un icono de advertencia al final.
+ * El texto fluye en línea; el icono viaja pegado a la última palabra para no quedar solo en un renglón.
+ */
+function DueLabel({ tone, children }: { tone: DueTone; children: string }) {
+  if (tone === 'neutral') return <span className={LABEL_CLASS[tone]}>{children}</span>;
+  const words = children.split(' ');
+  const last = words.pop();
+  return (
+    <span className={LABEL_CLASS[tone]}>
+      {words.join(' ')}{' '}
+      <span className="due-label__tail">
+        {last}
+        <Icon name="warning" size={16} />
+      </span>
+    </span>
+  );
+}
 
 interface DueSummaryCardProps {
   summary: DueSummary;
@@ -16,19 +50,26 @@ interface DueSummaryCardProps {
 export function DueSummaryCard({ summary, onPay }: DueSummaryCardProps) {
   const hasCards = summary.cards.length > 0;
   const anyClosed = summary.cards.some((card) => card.hasClosedStatement);
-  // Con una sola fila, su monto sería el mismo del encabezado: se muestra una sola vez.
-  const singleRow = summary.cards.length + (summary.other.count > 0 ? 1 : 0) === 1;
+  const [infoOpen, setInfoOpen] = useState(false);
+  // Con una sola fila su monto ya es el total: el encabezado solo suma cuando hay varias.
+  const rowCount = summary.cards.length + (summary.other.count > 0 ? 1 : 0);
   return (
     <section className="due-summary" aria-label="Por pagar">
       <div className="due-summary__head">
         <span>
           <Icon name="card" size={18} />
           Por pagar
+          <button type="button" className="due-summary__info" aria-expanded={infoOpen} aria-label="¿Esto cuenta en mis gastos del mes?" onClick={() => setInfoOpen((open) => !open)}>
+            <Icon name="info" size={20} />
+          </button>
         </span>
-        <strong>
-          <Amount value={summary.total + summary.other.total} />
-        </strong>
+        {rowCount > 1 && (
+          <strong>
+            <Amount value={summary.total + summary.other.total} />
+          </strong>
+        )}
       </div>
+      {infoOpen && <Notice>Ya está incluido en «Gastos del mes»: pagar no cambia tu presupuesto.</Notice>}
 
       <div className="due-summary__list">
         {summary.cards.map((card) => {
@@ -43,8 +84,8 @@ export function DueSummaryCard({ summary, onPay }: DueSummaryCardProps) {
               key={card.methodId}
               leading={<EmojiTile emoji={card.icon} color={card.color} />}
               title={card.name}
-              detail={card.nextDue?.overdue ? <span className="row__status row__status--late">{label}</span> : label}
-              amount={singleRow ? undefined : <Amount value={card.total} />}
+              detail={card.nextDue ? <DueLabel tone={dueTone(card.nextDue.daysLeft)}>{label}</DueLabel> : label}
+              amount={<Amount value={card.total} />}
             />
           );
         })}
@@ -55,7 +96,7 @@ export function DueSummaryCard({ summary, onPay }: DueSummaryCardProps) {
             leading={<EmojiTile emoji="🧾" color="var(--neutral-tile)" />}
             title="Otros métodos"
             detail={`${summary.other.count} ${summary.other.count === 1 ? 'gasto pendiente' : 'gastos pendientes'}`}
-            amount={singleRow ? undefined : <Amount value={summary.other.total} />}
+            amount={<Amount value={summary.other.total} />}
           />
         )}
       </div>
@@ -65,7 +106,6 @@ export function DueSummaryCard({ summary, onPay }: DueSummaryCardProps) {
           {anyClosed ? 'Pagar tarjeta' : 'Ver tarjetas'}
         </Button>
       )}
-      <Notice>Ya está incluido en «Gastos del mes»: pagar no cambia tu presupuesto.</Notice>
     </section>
   );
 }
