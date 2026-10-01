@@ -70,7 +70,8 @@ export function FilterSheet({ open, onClose, value, onApply, categories, methods
       title="Filtros"
       actions={{
         layout: 'split',
-        secondary: { label: 'Limpiar', onClick: () => setDraft({ ...draft, ...EMPTY_FILTERS }) },
+        // «Limpiar» deja todo como al principio, también el periodo.
+        secondary: { label: 'Limpiar', onClick: () => setDraft({ mode: 'month', from: '', to: '', ...EMPTY_FILTERS }) },
         primary: { label: 'Aplicar filtros', onClick: apply },
       }}
     >
@@ -96,7 +97,7 @@ export function FilterSheet({ open, onClose, value, onApply, categories, methods
         )}
 
         <fieldset className="fieldset">
-          <legend className="field__label">Categoría</legend>
+          <legend className="field__label">Categoría{draft.categoryIds.length > 0 ? ` · ${draft.categoryIds.length}` : ''}</legend>
           <div className="chip-row">
             {categories.map((category) => {
               const selected = draft.categoryIds.includes(category.id);
@@ -111,7 +112,7 @@ export function FilterSheet({ open, onClose, value, onApply, categories, methods
         </fieldset>
 
         <fieldset className="fieldset">
-          <legend className="field__label">Método de pago</legend>
+          <legend className="field__label">Método de pago{draft.methodIds.length > 0 ? ` · ${draft.methodIds.length}` : ''}</legend>
           <div className="chip-row">
             {methods.map((method) => {
               const selected = draft.methodIds.includes(method.id);
