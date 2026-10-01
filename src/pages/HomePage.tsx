@@ -124,7 +124,7 @@ export function HomePage() {
           <Stat size="sm" label="Gastos del mes" value={<Money value={data.monthTotal} />} />
         </div>
       ) : (
-        <Stat size="sm" label="Hoy" value={<Money value={data.todayTotal} />} />
+        <Stat size="sm" className="stat--inline" label="Hoy" value={<Money value={data.todayTotal} />} />
       )}
 
       {!hasSpending ? (

@@ -255,6 +255,20 @@
   font-size: var(--fs-md);
 }
 
+/* Una sola cifra a ancho completo (Inicio sin presupuesto): etiqueta a la izquierda y valor a la derecha, en una fila baja. */
+.stat--inline {
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  min-height: var(--tap);
+  padding-block: var(--space-3);
+}
+
+.stat--inline .stat__label {
+  font-size: var(--fs-sm);
+}
+
 /* Solo la cifra principal de Inicio. */
 .stat--lg .stat__value {
   font-size: var(--fs-hero);
