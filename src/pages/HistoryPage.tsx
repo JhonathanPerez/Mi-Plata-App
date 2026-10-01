@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { ExpenseList } from '@/components/expenses/ExpenseList';
 import { EMPTY_FILTERS, FilterSheet, type HistoryFilters } from '@/components/expenses/FilterSheet';
-import { Button } from '@/components/ui/Button';
+import { Button, IconButton } from '@/components/ui/Button';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { Icon } from '@/components/ui/Icon';
 import { MonthNavigator } from '@/components/ui/MonthNavigator';
@@ -130,17 +130,25 @@ export function HistoryPage() {
           value={search}
           onChange={(event) => setSearch(event.target.value)}
         />
+        <IconButton
+          className="search__filter"
+          icon="filter"
+          label={activeCount > 0 ? `Filtros, ${activeCount} ${pluralize(activeCount, 'activo', 'activos')}` : 'Filtros'}
+          badge={activeCount}
+          onClick={() => setSheetOpen(true)}
+        />
       </div>
 
       <div className="toolbar">
-        {filters.mode === 'month' && status !== 'due' ? (
-          <MonthNavigator value={yearMonth} onChange={setYearMonth} />
-        ) : (
-          <p className="toolbar__period">{periodText}</p>
-        )}
-        <Button variant="secondary" icon="filter" onClick={() => setSheetOpen(true)}>
-          Filtros{activeCount > 0 ? ` (${activeCount})` : ''}
-        </Button>
+        {periodText === null ? <MonthNavigator value={yearMonth} onChange={setYearMonth} /> : <p className="period-pill">{periodText}</p>}
+        <p className="toolbar__summary" aria-live="polite">
+          <span className="toolbar__count">
+            {count} {status === 'due' ? 'por pagar' : pluralize(count, 'gasto', 'gastos')}
+          </span>
+          <strong className="toolbar__total">
+            <Amount value={total} />
+          </strong>
+        </p>
       </div>
 
       <Segmented<StatusView>
@@ -153,18 +161,6 @@ export function HistoryPage() {
           { value: 'paid', label: 'Pagados' },
         ]}
       />
-
-      <p className="summary-line" aria-live="polite">
-        {status === 'due' ? (
-          <>
-            {count} por pagar · <strong><Amount value={total} /></strong>
-          </>
-        ) : (
-          <>
-            {count} {pluralize(count, 'gasto', 'gastos')} · <strong><Amount value={total} /></strong>
-          </>
-        )}
-      </p>
 
       {loading && !expenses ? (
         <p className="muted">Cargando…</p>

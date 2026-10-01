@@ -144,34 +144,58 @@ number-flow-react {
   color: var(--ink);
 }
 
+/* El botón de filtros mide 48 × 48 dentro de un campo de 48 con borde de 1.5 px: los márgenes negativos compensan el borde y el relleno derecho del campo. */
+.search__filter {
+  margin: -1.5px calc(-1.5px - var(--space-4)) -1.5px 0;
+}
+
+/* Segunda fila: mes (o periodo) a la izquierda, resumen a la derecha. Siempre mide lo mismo, así nada salta al cambiar de estado. */
 .toolbar {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: var(--space-2);
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-3);
+  min-height: var(--tap);
 }
 
 .toolbar .stepper {
-  flex: 1;
-  min-width: 0;
-}
-
-.toolbar .btn {
-  padding: 0 var(--space-4);
   flex: none;
 }
 
-.toolbar__period {
-  font-weight: 650;
+.toolbar .stepper__label {
+  font-size: var(--fs-md);
 }
 
-.summary-line {
+.toolbar__summary {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  margin-left: auto;
+  text-align: right;
+  line-height: 1.25;
+}
+
+.toolbar__count {
+  font-size: var(--fs-xs);
   color: var(--ink-2);
 }
 
-.summary-line strong {
-  color: var(--ink);
+.toolbar__total {
   font-family: var(--font-display);
+  font-size: var(--fs-md);
+  font-weight: 700;
+  color: var(--ink);
+}
+
+/* Periodo fijo (Por pagar, rango de fechas, todo el historial): misma altura que el selector de mes. */
+.period-pill {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--tap);
+  padding: 0 var(--space-4);
+  border-radius: var(--radius-pill);
+  background: var(--primary-tint);
+  font-weight: 650;
 }
 
 /* ---------- Configuración ---------- */
