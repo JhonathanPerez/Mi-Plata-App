@@ -16,7 +16,7 @@ export interface BudgetStatus {
   /** Nunca negativo. */
   available: number;
   overBy: number;
-  /** 0-100+ (puede pasar de 100 si se excede). */
+  /** 0-100. Si se excede el presupuesto se queda en 100: cuánto se pasó lo dice `overBy`. */
   percentUsed: number;
   level: BudgetLevel;
 }
@@ -24,7 +24,7 @@ export interface BudgetStatus {
 /** Cálculo puro del estado del presupuesto (fácil de probar). */
 export function computeBudgetStatus(yearMonth: YearMonth, budget: number, spent: number): BudgetStatus {
   const hasBudget = budget > 0;
-  const percentUsed = hasBudget ? (spent / budget) * 100 : 0;
+  const percentUsed = hasBudget ? Math.min(100, (spent / budget) * 100) : 0;
   let level: BudgetLevel = 'none';
   if (hasBudget) level = spent > budget ? 'over' : percentUsed >= 85 ? 'near' : 'ok';
   return {

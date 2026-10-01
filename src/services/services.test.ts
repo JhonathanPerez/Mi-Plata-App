@@ -108,6 +108,9 @@ suite('servicios con SQLite real', () => {
     expect(status.level).toBe('ok');
     expect(computeBudgetStatus('2026-09', 1000, 1200).level).toBe('over');
     expect(computeBudgetStatus('2026-09', 1000, 1200).overBy).toBe(200);
+    // Excedido: el porcentaje nunca pasa de 100.
+    expect(computeBudgetStatus('2026-09', 1000, 1200).percentUsed).toBe(100);
+    expect(computeBudgetStatus('2026-09', 1000, 5000).percentUsed).toBe(100);
     expect(computeBudgetStatus('2026-09', 1000, 900).level).toBe('near');
     expect(computeBudgetStatus('2026-09', 0, 900).level).toBe('none');
   });

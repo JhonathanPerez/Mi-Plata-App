@@ -16,7 +16,7 @@ export function BudgetStrip({ segments, budget, spent }: BudgetStripProps) {
   const hasBudget = budget > 0;
   const scale = Math.max(hasBudget ? budget : spent, spent, 1);
   const budgetMark = hasBudget && spent > budget ? (budget / scale) * 100 : null;
-  const percent = hasBudget ? (spent / budget) * 100 : 0;
+  const percent = hasBudget ? Math.min(100, (spent / budget) * 100) : 0;
   const description = hasBudget
     ? `Has usado ${formatPercent(percent)} de tu presupuesto mensual.`
     : 'Distribución de tus gastos del mes por categoría.';
