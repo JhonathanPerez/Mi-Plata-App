@@ -166,11 +166,9 @@ export function HomePage() {
                 <h2 className="section__title">Por categoría</h2>
                 <p className="section__hint">Porcentaje sobre el total del mes</p>
               </div>
-              {data.byCategory.length > 3 && (
-                <Link className="link" to="/estadisticas">
-                  Ver todas
-                </Link>
-              )}
+              <Link className="link" to="/estadisticas" state={{ scrollTo: 'por-categoria' }}>
+                Ver todas
+              </Link>
             </div>
             <div className="card">
               <CategoryBars items={data.byCategory} limit={3} highlightFirst compact />
