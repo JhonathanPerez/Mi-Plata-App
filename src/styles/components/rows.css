@@ -110,6 +110,17 @@
   overflow-wrap: anywhere;
 }
 
+/* Variante de Inicio: título de una línea (con puntos suspensivos) y meta pequeña debajo. */
+.row--compact .row__title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.row--compact .row__detail {
+  font-size: var(--fs-xs);
+}
+
 .row__note {
   color: var(--ink);
   overflow: hidden;

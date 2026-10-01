@@ -17,9 +17,16 @@ interface ExpenseRowProps {
   showDate?: boolean;
   /** Muestra la insignia «Por pagar» (por defecto sí). En Inicio se oculta: la tarjeta «Por pagar» ya lo dice. */
   showStatus?: boolean;
+  /**
+   * Dos líneas: la descripción como título y «categoría · método» como meta. Es opt-in (Inicio): Gastos conserva las tres líneas.
+   * Sin descripción, la categoría pasa a ser el título.
+   */
+  compact?: boolean;
+  /** Solo con `compact`: incluye el método de pago en la meta. Inicio lo oculta cuando todas las filas visibles lo comparten. */
+  showMethod?: boolean;
 }
 
-export function ExpenseRow({ expense, onSelect, showDate, showStatus = true }: ExpenseRowProps) {
+export function ExpenseRow({ expense, onSelect, showDate, showStatus = true, compact = false, showMethod = true }: ExpenseRowProps) {
   const { hidden } = usePrivacy();
   const [previewing, setPreviewing] = useState(false);
   const longPress = useLongPress({
@@ -28,12 +35,10 @@ export function ExpenseRow({ expense, onSelect, showDate, showStatus = true }: E
       void haptics.tap();
     },
   });
-  const meta = [
-    `${expense.paymentMethodIcon} ${expense.paymentMethodName}`,
-    expense.time ? formatTime(expense.time) : null,
-  ]
-    .filter(Boolean)
-    .join(' · ');
+  const method = `${expense.paymentMethodIcon} ${expense.paymentMethodName}`;
+  const time = expense.time ? formatTime(expense.time) : null;
+  const meta = (compact ? [expense.note ? expense.categoryName : null, showMethod ? method : null, time] : [method, time]).filter(Boolean).join(' · ');
+  const badge = showStatus && expense.paidAt === null && <span className="payment-badge">Por pagar</span>;
 
   return (
     <>
@@ -43,15 +48,18 @@ export function ExpenseRow({ expense, onSelect, showDate, showStatus = true }: E
         aria-label={`${expense.categoryName}${hidden ? '' : `, ${formatCOP(expense.amount)}`}${expense.paidAt === null ? ', por pagar' : ''}. Editar gasto`}
         {...longPress}
         leading={<EmojiTile emoji={expense.categoryIcon} color={expense.categoryColor} />}
-        title={expense.categoryName}
+        className={compact ? 'row--compact' : undefined}
+        title={compact ? (expense.note || expense.categoryName) : expense.categoryName}
         amount={<Amount value={expense.amount} />}
         aside={showDate ? formatShortDate(expense.date) : undefined}
       >
-        {expense.note && <span className="row__note">{expense.note}</span>}
-        <span className="row__detail">
-          {meta}
-          {showStatus && expense.paidAt === null && <span className="payment-badge">Por pagar</span>}
-        </span>
+        {!compact && expense.note && <span className="row__note">{expense.note}</span>}
+        {(meta || badge) && (
+          <span className="row__detail">
+            {meta}
+            {badge}
+          </span>
+        )}
       </Row>
       {/* Fuera del <button>: un portal renderiza su contenido en otro punto del DOM, pero en React
           los clics dentro de él siguen "burbujeando" por el árbol de componentes. Si quedara dentro
