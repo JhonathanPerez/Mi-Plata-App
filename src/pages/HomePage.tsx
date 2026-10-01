@@ -68,7 +68,7 @@ export function HomePage() {
       {pendingCount ? (
         <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} transition={{ type: 'spring', stiffness: 420, damping: 32 }}>
         <Notice tone="warning" icon="inbox" to="/pendientes" title={`${pendingCount} ${pluralize(pendingCount, 'gasto por categorizar', 'gastos por categorizar')}`}>
-          Detectados en tus notificaciones y mensajes
+          {pluralize(pendingCount, 'Toca para elegir su categoría', 'Toca para elegir sus categorías')}
         </Notice>
         </motion.div>
       ) : null}

@@ -178,8 +178,34 @@
   color: var(--danger);
 }
 
+/* Aviso que navega (Inicio › Por categorizar): icono en un círculo del color del tono, título en tinta y una sola línea de texto. */
+.notice--link {
+  gap: var(--space-3);
+  padding-block: var(--space-3);
+}
+
 .notice--link .notice__icon {
+  box-sizing: border-box;
+  width: 40px;
+  height: 40px;
+  padding: calc(var(--space-2) + var(--space-0));
   margin-top: 0;
+  border-radius: 50%;
+  background: color-mix(in srgb, currentColor 18%, transparent);
+}
+
+.notice--link .notice__body {
+  flex-basis: 0;
+}
+
+.notice--link .notice__title {
+  color: var(--ink);
+  font-size: var(--fs-md);
+}
+
+.notice--link .notice__text {
+  font-size: var(--fs-xs);
+  color: var(--ink-2);
 }
 
 .notice__body {
