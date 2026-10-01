@@ -53,7 +53,13 @@ export function percentOf(part: number, total: number): number {
   return total > 0 ? (part / total) * 100 : 0;
 }
 
+/**
+ * Porcentaje entero que no miente en los extremos: lo que existe pero redondea a 0 se escribe «<1%» y lo que
+ * redondea a 100 sin llegar se escribe «>99%». Solo el 0 y el 100 exactos se muestran como «0%» y «100%».
+ */
 export function formatPercent(value: number): string {
+  if (value > 0 && value < 1) return '<1%';
+  if (value > 99 && value < 100) return '>99%';
   return `${Math.round(value)}%`;
 }
 
