@@ -103,6 +103,11 @@ ul {
 }
 
 .shell__main {
+  padding-bottom: calc(var(--nav-h) + env(safe-area-inset-bottom));
+}
+
+/* Solo en las pestañas con botón «+» (64 px + 16 de margen); .page ya suma 24 px debajo. */
+.shell__main--fab {
   padding-bottom: calc(var(--nav-h) + var(--fab-clearance) + env(safe-area-inset-bottom));
 }
 

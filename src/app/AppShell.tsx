@@ -18,7 +18,7 @@ export function AppShell() {
     <div className="shell">
       {/* Oculto (no display:none, para no perder el alto real) hasta reubicar el scroll: evita
           el salto de "aparece arriba y luego baja" mientras cargan los datos de la lista. */}
-      <main className={cx('shell__main', !scrollReady && 'shell__main--pending')}>
+      <main className={cx('shell__main', showFab && 'shell__main--fab', !scrollReady && 'shell__main--pending')}>
         {/* Con `key`, cada pestaña reinicia la animación de entrada. */}
         <PageTransition key={pathname} slide>
           <Outlet />
