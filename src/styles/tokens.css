@@ -61,7 +61,6 @@
   --neutral-tile: #7a6f66;
   --status-paid: #2a9d8f;
   --status-pending: #f5b301;
-  --hero-cta-ink: #0e3a33;
 
   /* Tintes de la marca y del acento (los de la marca se derivan de --primary, así siguen al tema) */
   --primary-tint: color-mix(in srgb, var(--primary) 12%, transparent);
@@ -97,7 +96,7 @@
   --radius-l: 24px;
   --radius-pill: 999px;
   --nav-h: 64px;
-  --fab-clearance: 104px;
+  --fab-clearance: 72px;
   --tap: 48px;
   --content-max: 560px;
 

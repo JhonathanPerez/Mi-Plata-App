@@ -58,10 +58,11 @@ number-flow-react {
   color: var(--hero-ink-2);
 }
 
+/* Sin presupuesto: el mismo pie de una línea que con presupuesto, sin botón blanco que le quite protagonismo a la cifra. */
 .hero__cta {
-  background: var(--hero-ink);
-  color: var(--hero-cta-ink);
-  border-color: transparent;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
 }
 
 .tiles {

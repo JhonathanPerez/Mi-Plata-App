@@ -5,7 +5,6 @@ import { BudgetStrip } from '@/components/charts/BudgetStrip';
 import { CategoryBars } from '@/components/charts/CategoryBars';
 import { BudgetSheet } from '@/components/expenses/BudgetSheet';
 import { ExpenseRow } from '@/components/expenses/ExpenseRow';
-import { Button } from '@/components/ui/Button';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { Icon } from '@/components/ui/Icon';
 import { Money } from '@/components/ui/Money';
@@ -56,6 +55,8 @@ export function HomePage() {
 
   const { budget } = data;
   const hasSpending = data.monthCount > 0;
+  // Si todos los gastos visibles son del mismo método, repetirlo en cada fila es ruido.
+  const showMethod = new Set(data.recent.map((expense) => expense.paymentMethodId)).size > 1;
 
   return (
     <div className="page">
@@ -97,9 +98,13 @@ export function HomePage() {
             </span>
           </button>
         ) : (
-          <Button variant="secondary" className="hero__cta" onClick={() => setBudgetOpen(true)} icon="target">
-            Definir presupuesto mensual
-          </Button>
+          <button type="button" className="hero__foot" onClick={() => setBudgetOpen(true)}>
+            <span className="hero__cta">
+              <Icon name="target" size={20} />
+              Definir presupuesto mensual
+            </span>
+            <Icon name="chevronRight" size={20} />
+          </button>
         )}
 
         {budget.level === 'over' && (
@@ -124,7 +129,12 @@ export function HomePage() {
           <Stat size="sm" label="Gastos del mes" value={<Money value={data.monthTotal} />} />
         </div>
       ) : (
-        <Stat size="sm" className="stat--inline" label="Hoy" value={<Money value={data.todayTotal} />} />
+        <Stat
+          size="sm"
+          className={data.todayTotal === 0 ? 'stat--inline stat--quiet' : 'stat--inline'}
+          label="Hoy"
+          value={data.todayTotal === 0 ? 'Sin gastos' : <Money value={data.todayTotal} />}
+        />
       )}
 
       {!hasSpending ? (
@@ -146,7 +156,7 @@ export function HomePage() {
             </div>
             <div className="card card--flush">
               {data.recent.map((expense) => (
-                <ExpenseRow key={expense.id} expense={expense} showDate showStatus={false} onSelect={(id) => navigate(`/gasto/${id}`)} />
+                <ExpenseRow key={expense.id} expense={expense} showDate showStatus={false} compact showMethod={showMethod} onSelect={(id) => navigate(`/gasto/${id}`)} />
               ))}
             </div>
           </section>
@@ -161,7 +171,7 @@ export function HomePage() {
               )}
             </div>
             <div className="card">
-              <CategoryBars items={data.byCategory} limit={3} highlightFirst />
+              <CategoryBars items={data.byCategory} limit={3} highlightFirst compact />
             </div>
           </section>
         </>
