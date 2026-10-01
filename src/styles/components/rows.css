@@ -110,11 +110,12 @@
   overflow-wrap: anywhere;
 }
 
-/* Variante de Inicio: título de una línea (con puntos suspensivos) y meta pequeña debajo. */
+/* Variante de Inicio: título de hasta dos renglones (solo crece la fila que lo necesita) y meta pequeña debajo. */
 .row--compact .row__title {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
   overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }
 
 .row--compact .row__detail {
