@@ -3,6 +3,7 @@ import { Icon } from '@/components/ui/Icon';
 import { PageTransition } from '@/components/ui/PageTransition';
 import { cx } from '@/lib/cx';
 import { haptics } from '@/lib/haptics';
+import { useHideOnScroll } from '@/hooks/useHideOnScroll';
 import { useScrollRestoration } from '@/hooks/useScrollRestoration';
 import { BottomNav } from './BottomNav';
 
@@ -11,6 +12,8 @@ export function AppShell() {
   const { pathname } = useLocation();
   const scrollReady = useScrollRestoration();
   const showFab = pathname === '/' || pathname === '/gastos';
+  // Al bajar por la lista el «+» se esconde para no tapar montos; reaparece al subir.
+  const fabHidden = useHideOnScroll(pathname);
   return (
     <div className="shell">
       {/* Oculto (no display:none, para no perder el alto real) hasta reubicar el scroll: evita
@@ -22,7 +25,7 @@ export function AppShell() {
         </PageTransition>
       </main>
       {showFab && (
-        <Link to="/gasto/nuevo" className="fab" aria-label="Agregar gasto" onClick={() => void haptics.tap()}>
+        <Link to="/gasto/nuevo" className={cx('fab', fabHidden && 'fab--hidden')} aria-label="Agregar gasto" onClick={() => void haptics.tap()}>
           <Icon name="plus" size={30} />
         </Link>
       )}

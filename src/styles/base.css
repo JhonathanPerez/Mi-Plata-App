@@ -231,8 +231,9 @@ ul {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  gap: var(--space-0);
+  justify-content: flex-start;
+  gap: var(--space-1);
+  padding-top: var(--space-2);
   font-size: var(--fs-xs);
   font-weight: 500;
   color: var(--ink-2);
@@ -248,10 +249,10 @@ ul {
 /* Indicador que se desliza entre pestañas (motion lo anima; ver BottomNav.tsx). */
 .bottom-nav__indicator {
   position: absolute;
-  top: 7px;
-  left: calc(50% - 30px);
-  width: 60px;
-  height: 34px;
+  top: var(--space-2);
+  left: calc(50% - 32px);
+  width: 64px;
+  height: 32px;
   border-radius: var(--radius-m);
   background: var(--nav-indicator);
 }
@@ -260,6 +261,11 @@ ul {
 .bottom-nav__item > span:not(.bottom-nav__indicator) {
   position: relative;
   z-index: 1;
+}
+
+/* El icono (24 px) queda centrado en la píldora (32 px) y la etiqueta debajo, sin pisarla. */
+.bottom-nav__item > svg {
+  margin-block: var(--space-1);
 }
 
 .fab {
@@ -276,10 +282,19 @@ ul {
   color: var(--on-accent);
   box-shadow: var(--shadow-accent);
   text-decoration: none;
+  transition: transform 0.2s var(--ease-out), opacity 0.2s, visibility 0.2s;
 }
 
 .fab:active {
   transform: scale(0.96);
+}
+
+/* Escondido al bajar por la lista: sin visibility no se podría enfocar ni tocar. */
+.fab--hidden {
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(var(--space-5)) scale(0.9);
+  pointer-events: none;
 }
 
 @media (min-width: 640px) {
