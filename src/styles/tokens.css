@@ -112,11 +112,11 @@
  */
 :root[data-theme='dark'] {
   --bg: #0b1719;
-  --surface: #132428;
+  --surface: #152a2f;
   --surface-2: #1b3136;
   --ink: #e8f1ee;
   --ink-2: #9db4b0;
-  --line: #24393d;
+  --line: #2f484d;
   --line-strong: #5f7b76;
   --warning-text: #f5b301;
   --primary: #3ccba6;
@@ -135,11 +135,11 @@
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme='light']) {
     --bg: #0b1719;
-    --surface: #132428;
+    --surface: #152a2f;
     --surface-2: #1b3136;
     --ink: #e8f1ee;
     --ink-2: #9db4b0;
-    --line: #24393d;
+    --line: #2f484d;
     --line-strong: #5f7b76;
     --warning-text: #f5b301;
     --primary: #3ccba6;
