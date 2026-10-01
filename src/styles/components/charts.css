@@ -74,6 +74,21 @@
   font-weight: 650;
 }
 
+.bars__row--top .bars__name {
+  font-weight: 800;
+}
+
+.bars__tag {
+  margin-left: var(--space-2);
+  padding: var(--space-0) var(--space-2);
+  border-radius: var(--radius-pill);
+  background: var(--primary-tint);
+  color: var(--primary);
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  white-space: nowrap;
+}
+
 .bars__value {
   font-variant-numeric: tabular-nums;
   font-family: var(--font-display);
