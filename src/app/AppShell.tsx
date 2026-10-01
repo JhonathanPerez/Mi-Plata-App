@@ -6,10 +6,11 @@ import { haptics } from '@/lib/haptics';
 import { useScrollRestoration } from '@/hooks/useScrollRestoration';
 import { BottomNav } from './BottomNav';
 
-/** Marco de las 4 pestañas: contenido + navegación inferior + botón flotante "+". */
+/** Marco de las 4 pestañas: contenido + navegación inferior + botón flotante "+" (solo en Inicio y Gastos). */
 export function AppShell() {
   const { pathname } = useLocation();
   const scrollReady = useScrollRestoration();
+  const showFab = pathname === '/' || pathname === '/gastos';
   return (
     <div className="shell">
       {/* Oculto (no display:none, para no perder el alto real) hasta reubicar el scroll: evita
@@ -20,9 +21,11 @@ export function AppShell() {
           <Outlet />
         </PageTransition>
       </main>
-      <Link to="/gasto/nuevo" className="fab" aria-label="Agregar gasto" onClick={() => void haptics.tap()}>
-        <Icon name="plus" size={30} />
-      </Link>
+      {showFab && (
+        <Link to="/gasto/nuevo" className="fab" aria-label="Agregar gasto" onClick={() => void haptics.tap()}>
+          <Icon name="plus" size={30} />
+        </Link>
+      )}
       <BottomNav />
     </div>
   );
