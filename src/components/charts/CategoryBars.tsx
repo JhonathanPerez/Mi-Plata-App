@@ -8,7 +8,7 @@ import type { CategoryTotal } from '@/types/models';
 interface CategoryBarsProps {
   items: CategoryTotal[];
   limit?: number;
-  /** Marca la primera barra como «Mayor gasto» (la lista llega ordenada de mayor a menor). */
+  /** Marca la primera barra como «Mayor gasto» (la lista llega ordenada de mayor a menor). Con una sola categoría no se marca: sería obvio. */
   highlightFirst?: boolean;
   /**
    * Versión de Inicio: el porcentaje va al final de la barra (una línea menos por fila) y, si `limit` recorta la lista,
@@ -23,17 +23,22 @@ export function CategoryBars({ items, limit, highlightFirst = false, compact = f
   const restTotal = rest.reduce((sum, item) => sum + item.total, 0);
   const restPercent = rest.reduce((sum, item) => sum + item.percent, 0);
   const max = Math.max(...shown.map((item) => item.total), restTotal, 1);
+  // Inicio: el largo de la barra es el porcentaje real sobre el total del mes (coincide con la cifra y con el texto de ayuda).
+  // Estadísticas: se escala contra la categoría mayor para comparar entre ellas.
+  // En Inicio una categoría con gasto nunca queda con la barra invisible: mínimo 2 % de carril.
+  const fillOf = (total: number, percent: number) => `${compact ? (percent > 0 ? Math.max(percent, 2) : 0) : (total / max) * 100}%`;
+  const markTop = highlightFirst && items.length > 1;
 
   return (
     <ul className="bars">
       {shown.map((item, index) => (
-        <li key={item.categoryId} className={cx('bars__row', highlightFirst && index === 0 && 'bars__row--top')}>
+        <li key={item.categoryId} className={cx('bars__row', markTop && index === 0 && 'bars__row--top')}>
           <EmojiTile emoji={item.icon} color={item.color} size="sm" />
           <div className="bars__main">
             <div className="bars__line">
               <span className="bars__name">
                 {item.name}
-                {highlightFirst && index === 0 && <span className="bars__tag">Mayor gasto</span>}
+                {markTop && index === 0 && <span className="bars__tag">Mayor gasto</span>}
               </span>
               <span className="bars__value">
                 <Amount value={item.total} />
@@ -42,14 +47,14 @@ export function CategoryBars({ items, limit, highlightFirst = false, compact = f
             {compact ? (
               <div className="bars__meter">
                 <div className="bars__track" aria-hidden="true">
-                  <span className="bars__fill" style={cssVars({ '--fill': `${(item.total / max) * 100}%`, '--swatch': item.color })} />
+                  <span className="bars__fill" style={cssVars({ '--fill': fillOf(item.total, item.percent), '--swatch': item.color })} />
                 </div>
                 <span className="bars__percent bars__percent--inline">{formatPercent(item.percent)}</span>
               </div>
             ) : (
               <>
                 <div className="bars__track" aria-hidden="true">
-                  <span className="bars__fill" style={cssVars({ '--fill': `${(item.total / max) * 100}%`, '--swatch': item.color })} />
+                  <span className="bars__fill" style={cssVars({ '--fill': fillOf(item.total, item.percent), '--swatch': item.color })} />
                 </div>
                 <span className="bars__percent">{formatPercent(item.percent)} del mes</span>
               </>
@@ -69,7 +74,7 @@ export function CategoryBars({ items, limit, highlightFirst = false, compact = f
             </div>
             <div className="bars__meter">
               <div className="bars__track" aria-hidden="true">
-                <span className="bars__fill" style={cssVars({ '--fill': `${(restTotal / max) * 100}%`, '--swatch': 'var(--neutral-tile)' })} />
+                <span className="bars__fill" style={cssVars({ '--fill': fillOf(restTotal, restPercent), '--swatch': 'var(--neutral-tile)' })} />
               </div>
               <span className="bars__percent bars__percent--inline">{formatPercent(restPercent)}</span>
             </div>
