@@ -81,7 +81,7 @@ export function DueSummaryCard({ summary, onPay }: DueSummaryCardProps) {
           info
         )}
       </div>
-      {infoOpen && <Notice>Ya está incluido en «Gastos del mes»: pagar no cambia tu presupuesto.</Notice>}
+      {infoOpen && <Notice>Ya está incluido en «Gastado este mes»: pagar no cambia tu presupuesto.</Notice>}
 
       <div className="due-summary__list">
         {summary.cards.map((card) => {
