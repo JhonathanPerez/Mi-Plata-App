@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { dueLabel, formatDayMonth, periodMonthName, relativeDays, shadeColor } from './statementText';
+import { dueLabel, dueShortLabel, formatDayMonth, periodMonthName, relativeDays, shadeColor } from './statementText';
 
 describe('textos de extractos', () => {
   it('día de la semana, día y mes', () => {
@@ -22,6 +22,12 @@ describe('textos de extractos', () => {
     expect(dueLabel('2026-09-17', -3)).toBe('Vencido hace 3 días');
     expect(dueLabel('2026-09-19', -1)).toBe('Vencido hace 1 día');
     expect(dueLabel('2026-10-20', 10)).toBe('Hasta el mar 20 oct · en 10 días');
+  });
+  it('etiqueta corta de vencimiento para Inicio', () => {
+    expect(dueShortLabel('2026-10-06', 6)).toBe('Vence mar 6 oct · en 6 días');
+    expect(dueShortLabel('2026-10-01', 1)).toBe('Vence jue 1 oct · mañana');
+    expect(dueShortLabel('2026-09-30', 0)).toBe('Vence hoy');
+    expect(dueShortLabel('2026-09-27', -3)).toBe('Vencido hace 3 días');
   });
   it('oscurece colores y respeta entradas inválidas', () => {
     expect(shadeColor('#FFFFFF', 0.5)).toBe('#808080');

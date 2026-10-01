@@ -27,6 +27,12 @@ export function dueLabel(dueDate: IsoDate, daysLeft: number): string {
   return `Hasta el ${formatDayMonth(dueDate)} · ${relativeDays(daysLeft)}`;
 }
 
+/** Versión para la tarjeta «Por pagar» de Inicio: "Vence mar 6 oct · en 6 días" (vencido y hoy se dicen igual que en `dueLabel`). */
+export function dueShortLabel(dueDate: IsoDate, daysLeft: number): string {
+  if (daysLeft <= 0) return dueLabel(dueDate, daysLeft);
+  return `Vence ${formatDayMonth(dueDate)} · ${relativeDays(daysLeft)}`;
+}
+
 /** Oscurece un color #RRGGBB (factor 0..1) para armar el degradado de una tarjeta. */
 export function shadeColor(hex: string, factor: number): string {
   const value = hex.replace('#', '');
