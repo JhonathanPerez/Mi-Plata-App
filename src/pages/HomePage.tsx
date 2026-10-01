@@ -162,7 +162,10 @@ export function HomePage() {
 
           <section className="section">
             <div className="section__head">
-              <h2 className="section__title">Por categoría</h2>
+              <div className="section__heading">
+                <h2 className="section__title">Por categoría</h2>
+                <p className="section__hint">Porcentaje sobre el total del mes</p>
+              </div>
               {data.byCategory.length > 3 && (
                 <Link className="link" to="/estadisticas">
                   Ver todas

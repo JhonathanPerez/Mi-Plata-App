@@ -155,6 +155,18 @@ ul {
   letter-spacing: -0.01em;
 }
 
+/* Título con una línea de ayuda debajo (qué significan las cifras de la sección). */
+.section__heading {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-0);
+}
+
+.section__hint {
+  font-size: var(--fs-xs);
+  color: var(--ink-2);
+}
+
 .card {
   background: var(--surface);
   border: 1px solid var(--line);
