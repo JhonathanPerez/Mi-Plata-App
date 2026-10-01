@@ -1,15 +1,19 @@
 import { useMemo, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { ExpenseList } from '@/components/expenses/ExpenseList';
+import { ExpenseListSkeleton } from '@/components/expenses/ExpenseListSkeleton';
 import { EMPTY_FILTERS, FilterSheet, type HistoryFilters } from '@/components/expenses/FilterSheet';
+import { ActionSheet, type SheetAction } from '@/components/ui/ActionSheet';
 import { Button, IconButton } from '@/components/ui/Button';
 import { EmptyState } from '@/components/ui/EmptyState';
+import { ErrorState } from '@/components/ui/ErrorState';
 import { Icon } from '@/components/ui/Icon';
 import { MonthNavigator } from '@/components/ui/MonthNavigator';
 import { Amount } from '@/components/ui/Money';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { PrivacyToggle } from '@/components/ui/PrivacyToggle';
 import { Segmented } from '@/components/ui/Segmented';
+import { Skeleton } from '@/components/ui/Skeleton';
 import { useConfirm } from '@/app/providers/ConfirmProvider';
 import { useToast } from '@/app/providers/ToastProvider';
 import { errorMessage } from '@/lib/errors';
@@ -34,6 +38,9 @@ export function HistoryPage() {
   const [filters, setFilters] = useState<HistoryFilters>({ mode: 'month', from: '', to: '', ...EMPTY_FILTERS });
   const [search, setSearch] = useState('');
   const [sheetOpen, setSheetOpen] = useState(false);
+  // Menú ⋮ de una fila. El gasto se conserva al cerrar para que la hoja no se vacíe mientras se anima su salida.
+  const [menuExpense, setMenuExpense] = useState<ExpenseWithRefs | null>(null);
+  const [menuOpen, setMenuOpen] = useState(false);
   const debouncedSearch = useDebounced(search);
 
   const refs = useQuery(async () => ({
@@ -63,7 +70,7 @@ export function HistoryPage() {
     return result;
   }, [filters, yearMonth, debouncedSearch, status]);
 
-  const { data: expenses, loading } = useQuery(() => expenseService.list(sqlFilters), [JSON.stringify(sqlFilters)]);
+  const { data: expenses, loading, error: loadError, retry } = useQuery(() => expenseService.list(sqlFilters), [JSON.stringify(sqlFilters)]);
 
   const activeCount =
     (filters.mode === 'month' ? 0 : 1) +
@@ -111,6 +118,20 @@ export function HistoryPage() {
     }
   };
 
+  const menuActions: SheetAction[] = menuExpense
+    ? [
+        {
+          icon: menuExpense.paidAt === null ? 'check' : 'refresh',
+          label: menuExpense.paidAt === null ? 'Marcar como pagado' : 'Marcar como por pagar',
+          onSelect: () => void togglePaid(menuExpense),
+        },
+        { icon: 'edit', label: 'Editar gasto', onSelect: () => navigate(`/gasto/${menuExpense.id}`) },
+        { icon: 'trash', label: 'Eliminar gasto', tone: 'danger', onSelect: () => void removeExpense(menuExpense) },
+      ]
+    : [];
+
+  const hasSearch = search.trim() !== '';
+
   const clearAll = () => {
     setFilters({ mode: 'month', from: '', to: '', ...EMPTY_FILTERS });
     setSearch('');
@@ -141,14 +162,21 @@ export function HistoryPage() {
 
       <div className="toolbar">
         {periodText === null ? <MonthNavigator value={yearMonth} onChange={setYearMonth} /> : <p className="period-pill">{periodText}</p>}
-        <p className="toolbar__summary" aria-live="polite">
-          <span className="toolbar__count">
-            {count} {status === 'due' ? 'por pagar' : pluralize(count, 'gasto', 'gastos')}
-          </span>
-          <strong className="toolbar__total">
-            <Amount value={total} />
-          </strong>
-        </p>
+        {expenses ? (
+          <p className="toolbar__summary" aria-live="polite">
+            <span className="toolbar__count">
+              {count} {status === 'due' ? 'por pagar' : pluralize(count, 'gasto', 'gastos')}
+            </span>
+            <strong className="toolbar__total">
+              <Amount value={total} />
+            </strong>
+          </p>
+        ) : loading ? (
+          <div className="toolbar__summary" aria-hidden="true">
+            <Skeleton height={13} width="64px" />
+            <Skeleton height={18} width="96px" />
+          </div>
+        ) : null}
       </div>
 
       <Segmented<StatusView>
@@ -162,32 +190,36 @@ export function HistoryPage() {
         ]}
       />
 
-      {loading && !expenses ? (
-        <p className="muted">Cargando…</p>
+      {loadError && !expenses ? (
+        <div className="card">
+          <ErrorState description="No pudimos leer tus gastos. Inténtalo de nuevo." onRetry={retry} />
+        </div>
+      ) : loading && !expenses ? (
+        <ExpenseListSkeleton />
       ) : count === 0 ? (
         <div className="card">
-          <EmptyState
-            icon={status === 'due' ? 'check' : 'search'}
-            title={status === 'due' ? 'Nada por pagar' : activeCount > 0 || search ? 'Sin resultados' : 'No hay gastos en este periodo'}
-            description={
-              status === 'due'
-                ? 'Los gastos con tarjeta de crédito quedan aquí hasta que le pagues el extracto al banco.'
-                : activeCount > 0 || search
-                  ? 'Prueba cambiando o limpiando los filtros.'
-                  : 'Cuando registres gastos aparecerán aquí.'
-            }
-            action={
-              activeCount > 0 || search ? (
+          {activeCount > 0 || hasSearch ? (
+            <EmptyState
+              icon="search"
+              title="Sin resultados"
+              description="Prueba cambiando o limpiando los filtros."
+              action={
                 <Button variant="secondary" onClick={clearAll}>
                   Limpiar filtros
                 </Button>
-              ) : (
-                <Button icon="plus" onClick={() => navigate('/gasto/nuevo')}>
-                  Agregar gasto
-                </Button>
-              )
-            }
-          />
+              }
+            />
+          ) : status === 'due' ? (
+            <EmptyState
+              icon="check"
+              title="Nada por pagar"
+              description="Los gastos con tarjeta de crédito quedan aquí hasta que le pagues el extracto al banco."
+            />
+          ) : status === 'paid' ? (
+            <EmptyState icon="check" title="Sin gastos pagados" description="Aquí verás los gastos que ya pagaste en este periodo." />
+          ) : (
+            <EmptyState icon="list" title="No hay gastos en este periodo" description="Toca el botón + para registrar uno." />
+          )}
         </div>
       ) : (
         <ExpenseList
@@ -195,8 +227,14 @@ export function HistoryPage() {
           onSelect={(id) => navigate(`/gasto/${id}`)}
           onTogglePaid={togglePaid}
           onDelete={removeExpense}
+          onMore={(expense) => {
+            setMenuExpense(expense);
+            setMenuOpen(true);
+          }}
         />
       )}
+
+      <ActionSheet open={menuOpen} title="Opciones del gasto" actions={menuActions} onClose={() => setMenuOpen(false)} />
 
       <FilterSheet
         open={sheetOpen}

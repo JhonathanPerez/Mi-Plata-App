@@ -171,6 +171,7 @@ number-flow-react {
   flex-direction: column;
   align-items: flex-end;
   margin-left: auto;
+  gap: var(--space-0);
   text-align: right;
   line-height: 1.25;
 }
