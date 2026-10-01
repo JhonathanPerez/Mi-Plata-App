@@ -14,7 +14,12 @@ describe('statusHint', () => {
     expect(statusHint(false, 'credit_card')).toBe('Por pagar hasta que pagues el extracto');
     expect(statusHint(true, 'credit_card')).toBe('Ya pagado: no sale en «Pagar tarjeta»');
     expect(statusHint(true, 'cash')).toBe('Pagado. Cámbialo si fue fiado');
-    expect(statusHint(false, null)).toBe('Pendiente hasta que lo marques pagado');
+    expect(statusHint(true, null)).toBe('Pagado. Cámbialo si fue fiado');
+  });
+  it('«Por pagar» solo habla del extracto con tarjeta de crédito', () => {
+    expect(statusHint(false, 'cash')).toBe('Por pagar hasta que lo marques como pagado');
+    expect(statusHint(false, 'debit_card')).toBe('Por pagar hasta que lo marques como pagado');
+    expect(statusHint(false, null)).toBe('Por pagar hasta que lo marques como pagado');
   });
   it('nunca pasa de 70 caracteres', () => {
     for (const paid of [true, false]) {

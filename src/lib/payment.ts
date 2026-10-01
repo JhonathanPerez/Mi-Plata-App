@@ -12,9 +12,9 @@ export function describePaymentMethod(type: PaymentMethodType, last4: string | n
 
 /**
  * Pista de una línea bajo el selector de estado del gasto (máx. 70 caracteres; a 360 dp caben unos 35 sin saltar de renglón).
- * Con tarjeta de crédito explica cuándo deja de estar por pagar; con otros métodos, qué significa el estado elegido.
+ * Con tarjeta de crédito el gasto sale de «Por pagar» al pagar el extracto; con cualquier otro método, al marcarlo como pagado.
  */
 export function statusHint(paid: boolean, type: PaymentMethodType | null): string {
   if (type === 'credit_card') return paid ? 'Ya pagado: no sale en «Pagar tarjeta»' : 'Por pagar hasta que pagues el extracto';
-  return paid ? 'Pagado. Cámbialo si fue fiado' : 'Pendiente hasta que lo marques pagado';
+  return paid ? 'Pagado. Cámbialo si fue fiado' : 'Por pagar hasta que lo marques como pagado';
 }
