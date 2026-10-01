@@ -15,10 +15,10 @@ import { PrivacyToggle } from '@/components/ui/PrivacyToggle';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { Stat } from '@/components/ui/Stat';
 import { useQuery } from '@/hooks/useQuery';
-import { formatLongDate, formatMonthTitle } from '@/lib/dates';
+import { formatMonthTitle, formatWeekdayDate } from '@/lib/dates';
 import { formatPercent } from '@/lib/money';
 import { useAmountFormat } from '@/app/providers/PrivacyProvider';
-import { pluralize } from '@/lib/text';
+import { capitalize, pluralize } from '@/lib/text';
 import { DueSummaryCard } from '@/components/cards/DueSummaryCard';
 import { cardService } from '@/services/cardService';
 import { captureService } from '@/services/captureService';
@@ -61,7 +61,7 @@ export function HomePage() {
     <div className="page">
       <PageHeader
         title={formatMonthTitle(data.yearMonth)}
-        subtitle={`Hoy es ${formatLongDate(data.today)}`}
+        subtitle={capitalize(formatWeekdayDate(data.today))}
         actions={<PrivacyToggle />}
       />
 
@@ -146,7 +146,7 @@ export function HomePage() {
             </div>
             <div className="card card--flush">
               {data.recent.map((expense) => (
-                <ExpenseRow key={expense.id} expense={expense} showDate onSelect={(id) => navigate(`/gasto/${id}`)} />
+                <ExpenseRow key={expense.id} expense={expense} showDate showStatus={false} onSelect={(id) => navigate(`/gasto/${id}`)} />
               ))}
             </div>
           </section>

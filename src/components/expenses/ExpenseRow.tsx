@@ -15,9 +15,11 @@ interface ExpenseRowProps {
   onSelect: (id: string) => void;
   /** Muestra la fecha (útil cuando la lista no está agrupada por día). */
   showDate?: boolean;
+  /** Muestra la insignia «Por pagar» (por defecto sí). En Inicio se oculta: la tarjeta «Por pagar» ya lo dice. */
+  showStatus?: boolean;
 }
 
-export function ExpenseRow({ expense, onSelect, showDate }: ExpenseRowProps) {
+export function ExpenseRow({ expense, onSelect, showDate, showStatus = true }: ExpenseRowProps) {
   const { hidden } = usePrivacy();
   const [previewing, setPreviewing] = useState(false);
   const longPress = useLongPress({
@@ -48,7 +50,7 @@ export function ExpenseRow({ expense, onSelect, showDate }: ExpenseRowProps) {
         {expense.note && <span className="row__note">{expense.note}</span>}
         <span className="row__detail">
           {meta}
-          {expense.paidAt === null && <span className="payment-badge">Por pagar</span>}
+          {showStatus && expense.paidAt === null && <span className="payment-badge">Por pagar</span>}
         </span>
       </Row>
       {/* Fuera del <button>: un portal renderiza su contenido en otro punto del DOM, pero en React
