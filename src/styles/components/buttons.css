@@ -65,6 +65,7 @@
 }
 
 .icon-btn {
+  position: relative;
   width: var(--tap);
   height: var(--tap);
   display: grid;
@@ -79,4 +80,25 @@
 
 .icon-btn:active {
   background: var(--surface-2);
+}
+
+.icon-btn--active {
+  color: var(--primary);
+}
+
+.icon-btn__badge {
+  position: absolute;
+  top: var(--space-1);
+  right: var(--space-1);
+  display: grid;
+  place-items: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 var(--space-1);
+  border-radius: var(--radius-pill);
+  background: var(--primary);
+  color: var(--on-primary);
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  line-height: 1;
 }

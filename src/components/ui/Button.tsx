@@ -50,12 +50,20 @@ export function LinkButton({ tone = 'default', className, ...rest }: LinkButtonP
 interface IconButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   icon: IconName;
   label: string;
+  /** Número sobre el icono (p. ej. los filtros activos). Con 0 o sin valor no se muestra. */
+  badge?: number;
 }
 
-export function IconButton({ icon, label, className, ...rest }: IconButtonProps) {
+export function IconButton({ icon, label, badge, className, ...rest }: IconButtonProps) {
+  const count = badge ?? 0;
   return (
-    <button type="button" className={cx('icon-btn', className)} aria-label={label} title={label} {...rest}>
+    <button type="button" className={cx('icon-btn', count > 0 && 'icon-btn--active', className)} aria-label={label} title={label} {...rest}>
       <Icon name={icon} size={22} />
+      {count > 0 && (
+        <span className="icon-btn__badge" aria-hidden="true">
+          {count}
+        </span>
+      )}
     </button>
   );
 }
