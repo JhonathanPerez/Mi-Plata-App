@@ -137,6 +137,11 @@ ul {
   gap: var(--space-3);
 }
 
+/* Destino de un salto desde otra pantalla: queda un respiro bajo el borde superior (y la barra de estado). */
+.section--anchor {
+  scroll-margin-top: calc(var(--space-3) + env(safe-area-inset-top));
+}
+
 .section__head {
   display: flex;
   align-items: baseline;

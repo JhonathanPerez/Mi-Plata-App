@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { useLocation } from 'react-router-dom';
 import { CategoryBars } from '@/components/charts/CategoryBars';
 import { DailyBars } from '@/components/charts/DailyBars';
 import { DonutChart } from '@/components/charts/DonutChart';
@@ -39,6 +40,22 @@ function ComparisonLine({ summary }: { summary: MonthlySummary }) {
 export function StatsPage() {
   const [yearMonth, setYearMonth] = useState(currentYearMonth());
   const { data, loading } = useQuery(() => statsService.getMonthlySummary(yearMonth), [yearMonth]);
+
+  // Inicio puede mandar aquí con `state.scrollTo` (HashRouter no admite anclas #): se baja a esa sección una sola vez, cuando ya hay datos.
+  const scrollTo = (useLocation().state as { scrollTo?: string } | null)?.scrollTo;
+  const hasSections = Boolean(data && data.transactions > 0);
+  const scrolled = useRef(false);
+  useEffect(() => {
+    if (!scrollTo || !hasSections || scrolled.current) return;
+    let frame = requestAnimationFrame(() => {
+      // Dos cuadros: deja que la pantalla pinte (y que useScrollRestoration termine) antes de bajar.
+      frame = requestAnimationFrame(() => {
+        scrolled.current = true;
+        document.getElementById(scrollTo)?.scrollIntoView({ block: 'start' });
+      });
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [scrollTo, hasSections]);
 
   return (
     <div className="page">
@@ -85,7 +102,7 @@ export function StatsPage() {
             </div>
           </section>
 
-          <section className="section">
+          <section className="section section--anchor" id="por-categoria">
             <h2 className="section__title">Por categoría</h2>
             <div className="card">
               <CategoryBars items={data.byCategory} />

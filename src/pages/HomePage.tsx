@@ -85,7 +85,7 @@ export function HomePage() {
           <Stat tone="hero" size="lg" label="Gastado este mes" value={<Money value={data.monthTotal} />} />
         )}
 
-        <Link to="/estadisticas" className="hero__strip" aria-label="Ver estadísticas del mes">
+        <Link to="/estadisticas" state={{ scrollTo: 'por-categoria' }} className="hero__strip" aria-label="Ver gastos por categoría en Estadísticas">
           <BudgetStrip segments={data.byCategory} budget={budget.budget} spent={budget.spent} />
         </Link>
 

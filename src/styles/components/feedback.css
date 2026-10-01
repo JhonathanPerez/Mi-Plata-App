@@ -291,17 +291,10 @@
   padding-block: var(--space-3);
 }
 
-/* Hoy sin gastos: «Hoy · Sin gastos» pegado a la izquierda (lejos del «+») en una fila baja; con monto vuelve a ir a la derecha. */
+/* Hoy sin gastos: una fila baja y tranquila que crece sola cuando hay un monto. */
 .stat--quiet {
   min-height: 0;
   padding-block: var(--space-3);
-  justify-content: flex-start;
-  gap: var(--space-2);
-}
-
-.stat--quiet .stat__label::after {
-  content: '·';
-  margin-inline-start: var(--space-2);
 }
 
 .stat--quiet .stat__value {
