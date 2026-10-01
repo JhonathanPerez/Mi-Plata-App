@@ -30,7 +30,7 @@ export function BottomNav() {
                   transition={{ type: 'spring', stiffness: 520, damping: 40 }}
                 />
               )}
-              <Icon name={item.icon} size={26} weight={isActive ? 'fill' : 'regular'} />
+              <Icon name={item.icon} size={24} weight={isActive ? 'fill' : 'regular'} />
               <span>{item.label}</span>
             </>
           )}
