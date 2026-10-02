@@ -14,7 +14,7 @@ import { Skeleton } from '@/components/ui/Skeleton';
 import { Stat } from '@/components/ui/Stat';
 import { useQuery } from '@/hooks/useQuery';
 import { cx } from '@/lib/cx';
-import { statementDates } from '@/lib/cycles';
+import { describeCut, describeDue, statementDates } from '@/lib/cycles';
 import { diffDays, todayIso } from '@/lib/dates';
 import { statementStatus, type StatementTone } from '@/lib/statementStatus';
 import { formatDayMonth, periodMonthName, relativeDays, statementDatesLabel } from '@/lib/statementText';
@@ -84,12 +84,14 @@ export function StatementsPage() {
 
       {loading && !overview ? (
         <div className="page-skeleton" role="status" aria-label="Cargando extractos">
-          <Skeleton height={150} radius="l" />
+          <Skeleton height={184} radius="l" />
+          <Skeleton height={22} width="45%" />
           <div className="card card--flush">
             {[0, 1, 2].map((n) => (
               <div key={n} className="skeleton-row skeleton-row--expense">
                 <div className="skeleton-row__body">
-                  <Skeleton height={16} width="55%" />
+                  <Skeleton height={16} width="45%" />
+                  <Skeleton height={22} width="60%" />
                   <Skeleton height={13} width="85%" />
                 </div>
                 <Skeleton height={18} width="72px" />
@@ -131,67 +133,84 @@ export function StatementsPage() {
             </Stat>
           )}
 
-          <div className="card card--flush">
-            {shown.length === 0 ? (
+          {closed.length === 0 ? (
+            <div className="card card--flush">
               <EmptyState
                 icon="list"
                 title="Aún no hay extractos cerrados"
                 description="Cuando llegue el corte de tu ciclo, aparecerá aquí con su monto y su fecha de pago."
               />
-            ) : (
-              shown.map((statement) => {
-                const status = statementStatus(statement, today);
-                const normal = statementDates(rules, statement.period);
-                const adjusted = statement.fixed && (normal.cut !== statement.cutDate || normal.due !== statement.dueDate);
-                const year = statement.period.slice(0, 4);
-                const title = `${capitalize(periodMonthName(statement.period))}${year !== today.slice(0, 4) ? ` ${year}` : ''}`;
-                const dates = statementDatesLabel(statement.cutDate, statement.dueDate);
-                return (
-                  <Row
-                    key={statement.period}
-                    onClick={() => setEditing(statement)}
-                    aria-label={[
-                      title,
-                      status.label,
-                      dates,
-                      status.partialUnpaid !== null ? `quedan ${spokenAmount(status.partialUnpaid)} sin pagar` : null,
-                      `total ${spokenAmount(statement.total)}`,
-                      adjusted ? 'fechas ajustadas' : null,
-                      'toca para ajustar sus fechas',
-                    ]
-                      .filter(Boolean)
-                      .join(', ')}
-                    title={
-                      <span className="statement-title">
-                        {title}
+            </div>
+          ) : (
+            <section className="section">
+              <div className="section__heading">
+                <h2 className="section__title">Extractos cerrados</h2>
+                <p className="section__hint">Toca uno para ajustar sus fechas</p>
+              </div>
+              <div className="card card--flush">
+                {shown.map((statement) => {
+                  const status = statementStatus(statement, today);
+                  const normal = statementDates(rules, statement.period);
+                  const adjusted = statement.fixed && (normal.cut !== statement.cutDate || normal.due !== statement.dueDate);
+                  const year = statement.period.slice(0, 4);
+                  const title = `${capitalize(periodMonthName(statement.period))}${year !== today.slice(0, 4) ? ` ${year}` : ''}`;
+                  const dates = statementDatesLabel(statement.cutDate, statement.dueDate);
+                  return (
+                    <Row
+                      key={statement.period}
+                      onClick={() => setEditing(statement)}
+                      aria-label={[
+                        title,
+                        status.label,
+                        dates,
+                        status.partialUnpaid !== null ? `quedan ${spokenAmount(status.partialUnpaid)} sin pagar` : null,
+                        `total ${spokenAmount(statement.total)}`,
+                        adjusted ? 'fechas ajustadas' : null,
+                        'toca para ajustar sus fechas',
+                      ]
+                        .filter(Boolean)
+                        .join(', ')}
+                      title={
+                        <span className="statement-head">
+                          <span className="statement-head__month">{title}</span>
+                          <span className="row__amount statement-head__amount">
+                            <Amount value={statement.total} />
+                          </span>
+                        </span>
+                      }
+                    >
+                      <span className="statement-flags">
                         <span className={cx('statement-status', `statement-status--${status.tone}`)}>
                           <Icon name={STATUS_ICON[status.tone]} size={16} />
                           {status.label}
                         </span>
                         {adjusted && <span className="statement-tag">Ajustado</span>}
                       </span>
-                    }
-                    detail={dates}
-                    amount={<Amount value={statement.total} />}
-                  >
-                    {status.partialUnpaid !== null && (
-                      <span className="row__detail">
-                        Quedan <Amount value={status.partialUnpaid} /> sin pagar
-                      </span>
-                    )}
-                  </Row>
-                );
-              })
-            )}
+                      {status.partialUnpaid !== null && (
+                        <span className="row__detail">
+                          Quedan <Amount value={status.partialUnpaid} /> sin pagar
+                        </span>
+                      )}
+                      <span className="row__detail statement-dates">{dates}</span>
+                    </Row>
+                  );
+                })}
+              </div>
+              {!showAll && closed.length > VISIBLE && <LinkButton onClick={() => setShowAll(true)}>Ver extractos anteriores</LinkButton>}
+            </section>
+          )}
+
+          <div className="card card--flush">
+            <Row
+              to={`/tarjetas/${id}/fechas`}
+              icon="calendar"
+              title="Reglas de corte y pago"
+              detail={`Corte: ${describeCut(rules).toLowerCase()}`}
+              chevron="chevronRight"
+            >
+              <span className="row__detail">Pago: {describeDue(rules).toLowerCase()}</span>
+            </Row>
           </div>
-
-          {!showAll && closed.length > VISIBLE && <LinkButton onClick={() => setShowAll(true)}>Ver extractos anteriores</LinkButton>}
-
-          <p className="muted statement-footnote">
-            <Icon name="info" size={16} />
-            <span>Toca un extracto para ajustar sus fechas; cada mes guarda las suyas.</span>
-          </p>
-          <LinkButton onClick={goToRules}>Reglas de corte y pago</LinkButton>
         </>
       )}
 

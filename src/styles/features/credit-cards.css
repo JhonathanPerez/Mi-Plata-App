@@ -246,47 +246,30 @@
   color:var(--primary);
 }
 
-.statement-footnote {
-  display:flex;
-  gap:var(--space-2);
-  align-items:flex-start;
-  font-size:var(--fs-sm);
+/* Hoja «Fechas de un extracto»: qué extracto es y cuánto suma, antes de tocar sus fechas. */
+.date-sheet__summary {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding-bottom: var(--space-3);
+  border-bottom: 1px solid var(--line);
 }
 
-.statement-footnote svg {
-  flex:none;
-  margin-top:var(--space-0);
+.date-sheet__kicker {
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  color: var(--ink-2);
 }
 
-.date-impact {
-  padding:var(--space-4);
-  border-radius:var(--radius-m);
-  background:var(--accent-soft);
-  display:flex;
-  flex-direction:column;
-  gap:var(--space-2);
+.date-sheet__amount {
+  font-family: var(--font-display);
+  font-size: var(--fs-xl);
+  font-variant-numeric: tabular-nums;
 }
 
-.date-impact__head {
-  display:flex;
-  gap:var(--space-2);
-  align-items:flex-start;
-  font-weight:700;
-  color:var(--warning-text);
-}
-
-.date-impact__head svg {
-  flex:none;
-  margin-top:var(--space-0);
-}
-
-.date-impact__total {
-  display:flex;
-  justify-content:space-between;
-  font-size:var(--fs-sm);
-  padding-top:var(--space-2);
-  border-top:1px solid var(--warning-line);
-  font-weight:700;
+.date-sheet__rules {
+  border-top: 1px solid var(--line);
 }
 
 /* Ciclo abierto: una cifra destacada con borde punteado, porque todavía no es un extracto. */
@@ -294,12 +277,33 @@
   border-style: dashed;
 }
 
-/* Fila de un extracto: el mes y su estado en la misma línea (la pastilla baja si no cabe). */
-.statement-title {
+/* Fila de un extracto: mes y monto en la primera línea, el estado debajo y las fechas al final, a todo el ancho. */
+.statement-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.statement-head__month {
+  min-width: 0;
+}
+
+.statement-head__amount {
+  flex: none;
+}
+
+.statement-flags {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   gap: var(--space-1) var(--space-2);
+  margin-top: var(--space-1);
+}
+
+.statement-dates {
+  margin-top: var(--space-1);
+  font-size: var(--fs-xs);
 }
 
 .statement-status {
@@ -424,14 +428,6 @@
   font-size:var(--fs-hero);
   min-width:70px;
   text-align:center;
-}
-
-.date-impact--ok {
-  background:var(--primary-tint);
-}
-
-.date-impact--ok .date-impact__head {
-  color:var(--primary);
 }
 
 .rule-panel .picker-link__name {

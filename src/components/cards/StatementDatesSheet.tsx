@@ -1,15 +1,15 @@
 import { useEffect, useState } from 'react';
 import { useConfirm } from '@/app/providers/ConfirmProvider';
 import { useToast } from '@/app/providers/ToastProvider';
-import { LinkButton } from '@/components/ui/Button';
 import { DateField } from '@/components/ui/DateField';
-import { Icon } from '@/components/ui/Icon';
+import { Notice } from '@/components/ui/Notice';
+import { Row } from '@/components/ui/Row';
 import { Sheet } from '@/components/ui/Sheet';
 import { errorMessage } from '@/lib/errors';
 import { Amount } from '@/components/ui/Money';
-import { useAmountFormat } from '@/app/providers/PrivacyProvider';
-import { describeCut, describeDue, statementDates, type CycleRules } from '@/lib/cycles';
+import { statementDates, type CycleRules } from '@/lib/cycles';
 import { formatDayMonth, periodMonthName } from '@/lib/statementText';
+import { pluralize } from '@/lib/text';
 import { cardService, type CardStatement, type DatesPreview } from '@/services/cardService';
 
 interface StatementDatesSheetProps {
@@ -18,7 +18,7 @@ interface StatementDatesSheetProps {
   rules: CycleRules;
   statement: CardStatement | null;
   onClose: () => void;
-  /** Para el atajo "Cambiar la regla de siempre". */
+  /** Para el acceso «Reglas de corte y pago». */
   onEditRules: () => void;
 }
 
@@ -29,7 +29,6 @@ interface StatementDatesSheetProps {
 export function StatementDatesSheet({ open, methodId, rules, statement, onClose, onEditRules }: StatementDatesSheetProps) {
   const toast = useToast();
   const confirm = useConfirm();
-  const { cop } = useAmountFormat();
   const [cut, setCut] = useState('');
   const [due, setDue] = useState('');
   const [preview, setPreview] = useState<DatesPreview | null>(null);
@@ -111,6 +110,9 @@ export function StatementDatesSheet({ open, methodId, rules, statement, onClose,
   };
 
   const movedTotal = preview ? preview.moved.reduce((total, m) => total + m.expense.amount, 0) : 0;
+  const movedCount = preview?.moved.length ?? 0;
+  const differsFromRule = cut !== normal.cut || due !== normal.due;
+  const count = statement.expenses.length;
 
   return (
     <Sheet
@@ -125,51 +127,65 @@ export function StatementDatesSheet({ open, methodId, rules, statement, onClose,
           disabled: !changed || Boolean(preview?.error),
           onClick: () => void save(),
         },
+        // Solo si este mes tiene fechas propias: volver a la regla es un cambio que se guarda al instante.
+        secondary: statement.fixed ? { label: 'Volver a las fechas de la regla', icon: 'refresh', disabled: busy, onClick: () => void reset() } : undefined,
       }}
     >
       <div className="stack">
-        <DateField label="Fecha de corte" value={cut} onChange={setCut}>
-          <p className="field__hint">Normalmente: {describeCut(rules).toLowerCase()} ({formatDayMonth(normal.cut)})</p>
-        </DateField>
-        <DateField label="Pagar hasta" value={due} onChange={setDue}>
-          <p className="field__hint">Normalmente: {describeDue(rules).toLowerCase()} ({formatDayMonth(normal.due)})</p>
-        </DateField>
+        <div className="date-sheet__summary">
+          <span className="date-sheet__kicker">
+            {statement.closed ? 'Extracto cerrado' : 'Ciclo abierto'} · {count} {pluralize(count, 'gasto', 'gastos')}
+          </span>
+          <strong className="date-sheet__amount">
+            <Amount value={statement.total} />
+          </strong>
+        </div>
+
+        <div className="inline inline--start">
+          <DateField label="Fecha de corte" value={cut} onChange={setCut} />
+          <DateField label="Pagar hasta" value={due} onChange={setDue} />
+        </div>
+        {differsFromRule && (
+          <p className="field__hint">
+            Según la regla: corte {formatDayMonth(normal.cut)} · pago {formatDayMonth(normal.due)}
+          </p>
+        )}
 
         {preview?.error ? (
-          <p className="field__error" role="alert">
-            <Icon name="warning" size={16} />
-            <span>{preview.error}</span>
-          </p>
+          <Notice tone="danger" role="alert">
+            {preview.error}
+          </Notice>
         ) : (
           preview &&
           changed && (
-            <section className={preview.moved.length > 0 ? 'date-impact' : 'date-impact date-impact--ok'} aria-live="polite">
-              <p className="date-impact__head">
-                <Icon name={preview.moved.length > 0 ? 'warning' : 'check'} size={18} />
-                <span>
-                  {preview.moved.length > 0
-                    ? `Con este corte, ${preview.moved.length} ${preview.moved.length === 1 ? 'gasto cambia' : 'gastos cambian'} de extracto (${cop(movedTotal)})`
-                    : 'Ningún gasto cambia de extracto con este corte'}
-                </span>
-              </p>
-              <div className="date-impact__total">
-                <span>El extracto de {monthName} quedaría en</span>
-                <strong>
-                  <Amount value={preview.totalAfter} />
-                </strong>
-              </div>
-            </section>
+            <Notice
+              tone={movedCount > 0 ? 'warning' : 'info'}
+              icon={movedCount > 0 ? 'warning' : 'check'}
+              role="status"
+              title={
+                movedCount > 0 ? (
+                  <>
+                    {movedCount} {movedCount === 1 ? 'gasto cambia' : 'gastos cambian'} de extracto · <Amount value={movedTotal} />
+                  </>
+                ) : (
+                  'Ningún gasto cambia de extracto'
+                )
+              }
+            >
+              El extracto de {monthName} quedaría en <Amount value={preview.totalAfter} />
+            </Notice>
           )
         )}
 
-        <div className="stack">
-          <LinkButton onClick={onEditRules}>Cambiar la regla de siempre</LinkButton>
-          {statement.fixed && (
-            <LinkButton onClick={() => void reset()} disabled={busy}>
-              Volver a las fechas de la regla
-            </LinkButton>
-          )}
-        </div>
+        <Row
+          variant="flush"
+          className="date-sheet__rules"
+          icon="calendar"
+          title="Reglas de corte y pago"
+          detail="Cambian las fechas de todos los meses"
+          chevron="chevronRight"
+          onClick={onEditRules}
+        />
       </div>
     </Sheet>
   );
