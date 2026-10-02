@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { CategoryBars } from '@/components/charts/CategoryBars';
 import { DailyBars } from '@/components/charts/DailyBars';
 import { DonutChart } from '@/components/charts/DonutChart';
+import { MethodSingle } from '@/components/charts/MethodSingle';
 import { StatsSkeleton } from '@/components/charts/StatsSkeleton';
 import { Button } from '@/components/ui/Button';
 import { EmojiTile } from '@/components/ui/EmojiTile';
@@ -15,7 +16,8 @@ import { PageHeader } from '@/components/ui/PageHeader';
 import { PrivacyToggle } from '@/components/ui/PrivacyToggle';
 import { Stat } from '@/components/ui/Stat';
 import { useQuery } from '@/hooks/useQuery';
-import { MONTH_NAMES, addMonths, currentYearMonth, formatMonthTitle } from '@/lib/dates';
+import { MONTH_NAMES, addMonths, currentYearMonth, elapsedDaysInMonth, formatMonthTitle, todayIso } from '@/lib/dates';
+import { pluralize } from '@/lib/text';
 import { useAmountFormat } from '@/app/providers/PrivacyProvider';
 import { statsService, type MonthlySummary } from '@/services/statsService';
 
@@ -74,12 +76,14 @@ export function StatsPage() {
   }, [scrollTo, hasSections]);
 
   const isCurrentMonth = yearMonth === currentYearMonth();
+  // El promedio se divide entre los días transcurridos (en el mes actual, los que van); el pie lo dice para que a inicio de mes no parezca un error.
+  const elapsedDays = elapsedDaysInMonth(yearMonth);
   const tileAmount = (value: number) => <Amount value={value} compact={Math.abs(value) >= TILE_COMPACT_FROM} />;
 
   return (
     <div className="page">
       <PageHeader title="Estadísticas" actions={<PrivacyToggle />} />
-      <MonthNavigator value={yearMonth} onChange={setYearMonth} />
+      <MonthNavigator value={yearMonth} onChange={setYearMonth} max={currentYearMonth()} />
 
       {!data ? (
         error ? (
@@ -115,7 +119,12 @@ export function StatsPage() {
           </Stat>
 
           <div className="tiles tiles--2x2">
-            <Stat size="sm" label="Promedio diario" value={tileAmount(Math.round(data.dailyAverage))} />
+            <Stat
+              size="sm"
+              label="Promedio diario"
+              value={tileAmount(Math.round(data.dailyAverage))}
+              foot={`en ${elapsedDays} ${pluralize(elapsedDays, 'día', 'días')}`}
+            />
             <Stat size="sm" label="Transacciones" value={data.transactions} />
             <Stat
               size="sm"
@@ -134,7 +143,7 @@ export function StatsPage() {
           <section className="section">
             <h2 className="section__title">Gasto por día</h2>
             <div className="card">
-              <DailyBars days={data.daily} />
+              <DailyBars days={data.daily} today={isCurrentMonth ? todayIso() : undefined} />
             </div>
           </section>
 
@@ -148,7 +157,11 @@ export function StatsPage() {
           <section className="section">
             <h2 className="section__title">Por método de pago</h2>
             <div className="card">
-              <DonutChart items={data.byMethod} total={data.total} />
+              {data.byMethod.length === 1 ? (
+                <MethodSingle item={data.byMethod[0]} />
+              ) : (
+                <DonutChart items={data.byMethod} total={data.total} />
+              )}
             </div>
           </section>
         </>

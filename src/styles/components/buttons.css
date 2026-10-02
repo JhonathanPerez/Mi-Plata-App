@@ -78,8 +78,12 @@
   transition: var(--motion-press);
 }
 
-.icon-btn:active {
+.icon-btn:active:not(:disabled) {
   background: var(--surface-2);
+}
+
+.icon-btn:disabled {
+  opacity: 0.35;
 }
 
 .icon-btn--active {
