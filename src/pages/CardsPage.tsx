@@ -5,9 +5,12 @@ import { Button } from '@/components/ui/Button';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { ErrorState } from '@/components/ui/ErrorState';
 import { PageHeader } from '@/components/ui/PageHeader';
+import { Money } from '@/components/ui/Money';
 import { PrivacyToggle } from '@/components/ui/PrivacyToggle';
 import { Skeleton } from '@/components/ui/Skeleton';
+import { Stat } from '@/components/ui/Stat';
 import { useQuery } from '@/hooks/useQuery';
+import { summarizeCardsDue } from '@/lib/cardDue';
 import { cardService } from '@/services/cardService';
 
 /** Tarjetas de crédito: qué se debe, cuándo corta cada una y cuándo vence el pago. */
@@ -15,6 +18,7 @@ export function CardsPage() {
   const navigate = useNavigate();
   const { data, loading, error, retry } = useQuery(() => cardService.listOverviews());
   const overviews = data ?? [];
+  const due = summarizeCardsDue(overviews);
 
   return (
     <div className="page">
@@ -44,7 +48,19 @@ export function CardsPage() {
         </div>
       ) : (
         <>
+          {/* Con una sola tarjeta por pagar su cifra ya es el total: el resumen solo suma cuando hay varias. */}
+          {due.cardCount > 1 && (
+            <section className="hero" aria-label="Resumen de lo que se debe en tarjetas">
+              <Stat
+                tone="hero"
+                label="Por pagar en tarjetas"
+                value={<Money value={due.total} />}
+                foot={`${due.cardCount} tarjetas con pagos pendientes`}
+              />
+            </section>
+          )}
           <ReminderPrompt />
+          {overviews.length > 1 && <p className="muted">Ordenadas por vencimiento</p>}
           {overviews.map((overview) => (
             <CreditCardTile key={overview.method.id} overview={overview} />
           ))}

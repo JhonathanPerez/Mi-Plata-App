@@ -1,29 +1,89 @@
+import type { ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { usePrivacy } from '@/app/providers/PrivacyProvider';
 import { Button } from '@/components/ui/Button';
-import { Icon } from '@/components/ui/Icon';
+import { Icon, type IconName } from '@/components/ui/Icon';
 import { Amount } from '@/components/ui/Money';
+import { dueSpoken, dueTone, openCycleProgress, type CycleProgress, type DueTone } from '@/lib/cardDue';
 import { cardScrim } from '@/lib/cardColor';
 import { cssVars } from '@/lib/cssVars';
 import { cx } from '@/lib/cx';
+import { formatWeekdayDate, todayIso } from '@/lib/dates';
+import { formatCOP } from '@/lib/money';
 import { cycleDatesLabel, dueShortLabel, periodMonthName, shadeColor } from '@/lib/statementText';
 import type { CardOverview } from '@/services/cardService';
 
 /** Desde mil millones la cifra no cabe en una línea de 32 px en 360 dp: se abrevia. */
 const COMPACT_FROM = 1_000_000_000;
 
+/** Icono de la pastilla de vencimiento: no depende solo del color (calma, atención, urgente). */
+const DUE_ICON: Record<DueTone, IconName> = { neutral: 'calendar', warning: 'clockCountdown', danger: 'warning' };
+
 interface CreditCardTileProps {
   overview: CardOverview;
 }
 
+interface PanelProps {
+  className: string;
+  /** Frase completa para el lector de pantalla (el panel entero abre los extractos). */
+  label: string;
+  onOpen: () => void;
+  children: ReactNode;
+}
+
+/**
+ * Panel de vidrio tocable: todo el panel abre los extractos de la tarjeta. El botón se extiende sobre el panel
+ * (así el contenido sigue siendo texto normal, sin elementos de bloque dentro de un botón) y la flecha avisa que se puede tocar.
+ */
+function TapPanel({ className, label, onOpen, children }: PanelProps) {
+  return (
+    <div className={className}>
+      {children}
+      <button type="button" className="credit-card__hit" aria-label={label} onClick={onOpen} />
+      <Icon name="chevronRight" size={20} className="credit-card__chevron" />
+    </div>
+  );
+}
+
+/** Barra fina de los días transcurridos hasta el corte; el dato también está en la frase del panel para el lector de pantalla. */
+function CycleBar({ progress }: { progress: CycleProgress }) {
+  return (
+    <div className="credit-card__progress" aria-hidden="true">
+      <span className="credit-card__progress-bar" style={cssVars({ '--progress': progress.ratio })} />
+    </div>
+  );
+}
+
 /**
  * Una tarjeta de crédito en la lista: primero cuánto se debe y cuándo vence, después el ciclo abierto,
- * el botón de pagar y dos accesos (extractos y reglas). El texto blanco se mantiene legible sobre cualquier color elegido.
+ * el botón de pagar y un acceso a las reglas. Los paneles abren los extractos. El texto blanco se mantiene legible sobre cualquier color elegido.
  */
 export function CreditCardTile({ overview }: CreditCardTileProps) {
   const navigate = useNavigate();
+  const { hidden } = usePrivacy();
   const { method, payable, open, nextDue } = overview;
+  const today = todayIso();
   const dueTotal = payable.reduce((total, statement) => total + statement.unpaidTotal, 0);
-  const urgent = nextDue !== null && nextDue.daysLeft <= 0;
+  const tone: DueTone = nextDue ? dueTone(nextDue.daysLeft) : 'neutral';
+  const progress = openCycleProgress(overview, today);
+  const upToDate = overview.configured && payable.length === 0 && (open?.unpaidTotal ?? 0) === 0;
+  const openStatements = () => navigate(`/tarjetas/${method.id}/extractos`);
+
+  const spokenAmount = (value: number) => (hidden ? 'valor oculto' : formatCOP(value));
+  const progressSpoken = progress ? `, día ${progress.elapsed} de ${progress.total}` : '';
+  const dueLabel = [
+    payable.length === 1 ? `Por pagar ${spokenAmount(dueTotal)}` : `Por pagar ${spokenAmount(dueTotal)} en ${payable.length} extractos`,
+    nextDue ? dueSpoken(nextDue.date, nextDue.daysLeft) : null,
+  ]
+    .filter(Boolean)
+    .join(', ');
+  const openLabel = open
+    ? upToDate
+      ? `${method.name} al día${progressSpoken}, corta el ${formatWeekdayDate(open.cutDate)}`
+      : `Ciclo de ${periodMonthName(open.period)} abierto ${spokenAmount(open.unpaidTotal)}${progressSpoken}, corta el ${formatWeekdayDate(open.cutDate)}`
+    : '';
+
+  const payLabel = payable.length === 1 ? `Pagar extracto de ${periodMonthName(payable[0].period)}` : 'Pagar tarjeta';
 
   return (
     <section
@@ -48,8 +108,8 @@ export function CreditCardTile({ overview }: CreditCardTileProps) {
         </>
       ) : (
         <>
-          {payable.length > 0 ? (
-            <div className="credit-card__panel credit-card__panel--due">
+          {payable.length > 0 && (
+            <TapPanel className="credit-card__panel credit-card__panel--due" label={`${dueLabel}. Ver extractos de ${method.name}`} onOpen={openStatements}>
               <span className="credit-card__label">
                 {payable.length === 1 ? `Por pagar · extracto de ${periodMonthName(payable[0].period)}` : `Por pagar · ${payable.length} extractos`}
               </span>
@@ -57,8 +117,8 @@ export function CreditCardTile({ overview }: CreditCardTileProps) {
                 <Amount value={dueTotal} compact={dueTotal >= COMPACT_FROM} />
               </strong>
               {nextDue && (
-                <span className={cx('credit-card__chip', urgent && 'credit-card__chip--urgent')}>
-                  <Icon name={urgent ? 'warning' : 'calendar'} size={18} />
+                <span className={cx('credit-card__chip', tone !== 'neutral' && `credit-card__chip--${tone}`)}>
+                  <Icon name={DUE_ICON[tone]} size={18} />
                   {dueShortLabel(nextDue.date, nextDue.daysLeft)}
                 </span>
               )}
@@ -74,35 +134,45 @@ export function CreditCardTile({ overview }: CreditCardTileProps) {
                   ))}
                 </ul>
               )}
-            </div>
-          ) : null}
+            </TapPanel>
+          )}
 
-          {open && (
-            <div className={cx('credit-card__panel', payable.length > 0 && 'credit-card__panel--compact')}>
+          {open && upToDate && (
+            <TapPanel className="credit-card__panel" label={`${openLabel}. Ver extractos de ${method.name}`} onOpen={openStatements}>
+              <span className="credit-card__chip">
+                <Icon name="check" size={18} />
+                Al día
+              </span>
+              {progress && <CycleBar progress={progress} />}
+              <span className="credit-card__note">{cycleDatesLabel(open.cutDate, open.dueDate)}</span>
+            </TapPanel>
+          )}
+
+          {open && !upToDate && (
+            <TapPanel
+              className={cx('credit-card__panel', payable.length > 0 && 'credit-card__panel--compact')}
+              label={`${openLabel}. Ver extractos de ${method.name}`}
+              onOpen={openStatements}
+            >
               <span className="credit-card__label">Ciclo de {periodMonthName(open.period)} · abierto</span>
               <strong className="credit-card__amount">
                 <Amount value={open.unpaidTotal} compact={open.unpaidTotal >= COMPACT_FROM} />
               </strong>
+              {progress && <CycleBar progress={progress} />}
               <span className="credit-card__note">{cycleDatesLabel(open.cutDate, open.dueDate)}</span>
-            </div>
+            </TapPanel>
           )}
 
           {payable.length > 0 && (
             <Button variant="inverse" block icon="check" onClick={() => navigate(`/tarjetas/${method.id}/pagar`)}>
-              {payable.length === 1 ? `Pagar extracto de ${periodMonthName(payable[0].period)}` : 'Pagar tarjeta'}
+              {payLabel} · <Amount value={dueTotal} compact={dueTotal >= COMPACT_FROM} />
             </Button>
           )}
 
-          <div className="credit-card__links">
-            <button type="button" className="credit-card__link" onClick={() => navigate(`/tarjetas/${method.id}/extractos`)}>
-              Ver extractos
-              <Icon name="chevronRight" size={18} />
-            </button>
-            <button type="button" className="credit-card__link" onClick={() => navigate(`/tarjetas/${method.id}/fechas`)}>
-              Reglas de corte y pago
-              <Icon name="chevronRight" size={18} />
-            </button>
-          </div>
+          <button type="button" className="credit-card__link" onClick={() => navigate(`/tarjetas/${method.id}/fechas`)}>
+            Reglas de corte y pago
+            <Icon name="chevronRight" size={18} />
+          </button>
         </>
       )}
     </section>
