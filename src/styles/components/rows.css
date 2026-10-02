@@ -59,6 +59,11 @@
   color: var(--danger);
 }
 
+.row--danger .row__icon {
+  background: color-mix(in srgb, var(--danger) 12%, transparent);
+  color: var(--danger);
+}
+
 /* Contenido arriba: para filas con líneas de texto que pueden ocupar varios renglones. */
 .row--start {
   align-items: flex-start;
