@@ -78,28 +78,43 @@ number-flow-react {
   gap: var(--space-2);
 }
 
-/* Cifras del día y del mes: un panel de vidrio dentro del hero. Una fila (sin presupuesto) o dos columnas con divisor (con presupuesto). */
-.hero__stats {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
+/* Bajo la cifra principal: la pastilla frente al mes anterior y una línea con lo del día. */
+.hero__meta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-2);
+}
+
+.hero__chip {
+  display: inline-flex;
   align-items: center;
-  padding: var(--space-3) var(--space-4);
-  border-radius: var(--radius-m);
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-s);
   background: var(--white-a12);
+  font-size: var(--fs-sm);
+  font-weight: 700;
+  line-height: 1.2;
 }
 
-.hero__stats--pair {
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  column-gap: var(--space-4);
+/* Gastar más que el mes anterior llama la atención (ámbar); gastar menos se lee en menta. */
+.hero__chip--more {
+  background: color-mix(in srgb, var(--accent) 26%, transparent);
 }
 
-.hero__stats--pair > .stat + .stat {
-  padding-left: var(--space-4);
-  border-left: 1px solid var(--white-a24);
+.hero__chip--less {
+  background: color-mix(in srgb, var(--mint-solid) 24%, transparent);
 }
 
-.hero__stats .stat__label {
-  font-size: var(--fs-xs);
+.hero__summary {
+  font-size: var(--fs-sm);
+  color: var(--hero-ink-2);
+}
+
+/* Cada dato va entero en un renglón; si no caben todos, el siguiente baja. */
+.hero__fact {
+  white-space: nowrap;
 }
 
 .tiles {

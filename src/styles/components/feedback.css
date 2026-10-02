@@ -295,27 +295,6 @@
   font-size: var(--fs-md);
 }
 
-/* Una cifra en fila (Hoy en el hero sin presupuesto): etiqueta a la izquierda y valor a la derecha. */
-.stat--inline {
-  flex-direction: row;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--space-3);
-}
-
-/* Hoy sin gastos: el valor se aquieta para no competir con la cifra principal. */
-.stat--quiet .stat__value {
-  font-weight: 600;
-}
-
-.stat--inline.stat--quiet .stat__value {
-  font-size: var(--fs-md);
-}
-
-.stat--hero.stat--quiet .stat__value {
-  color: var(--hero-ink-2);
-}
-
 /* Solo la cifra principal de Inicio. */
 .stat--lg .stat__value {
   font-size: var(--fs-hero);

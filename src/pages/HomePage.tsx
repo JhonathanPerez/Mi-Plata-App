@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { Fragment, useState, type ReactNode } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'motion/react';
 import { BudgetStrip } from '@/components/charts/BudgetStrip';
@@ -7,13 +7,14 @@ import { BudgetSheet } from '@/components/expenses/BudgetSheet';
 import { ExpenseRow } from '@/components/expenses/ExpenseRow';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { Icon } from '@/components/ui/Icon';
-import { Money } from '@/components/ui/Money';
+import { Amount, Money } from '@/components/ui/Money';
 import { Notice } from '@/components/ui/Notice';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { PrivacyToggle } from '@/components/ui/PrivacyToggle';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { Stat } from '@/components/ui/Stat';
 import { useQuery } from '@/hooks/useQuery';
+import { describeChange } from '@/lib/comparison';
 import { cx } from '@/lib/cx';
 import { formatMonthTitle, formatWeekdayDay } from '@/lib/dates';
 import { formatPercent } from '@/lib/money';
@@ -42,7 +43,7 @@ export function HomePage() {
         ) : (
           <div className="page-skeleton" role="status" aria-label="Cargando tus gastos">
             <Skeleton height={34} width="62%" radius="s" />
-            <Skeleton height={232} radius="l" />
+            <Skeleton height={300} radius="l" />
             <Skeleton height={72} radius="l" />
           </div>
         )}
@@ -54,17 +55,13 @@ export function HomePage() {
   const hasSpending = data.monthCount > 0;
   // Si todos los gastos visibles son del mismo método, repetirlo en cada fila es ruido.
   const showMethod = new Set(data.recent.map((expense) => expense.paymentMethodId)).size > 1;
-  // «Hoy» vive al pie del hero: en una fila sin presupuesto, y en columna junto a lo gastado en el mes con presupuesto.
-  const noSpendToday = data.todayTotal === 0;
-  const todayStat = (
-    <Stat
-      tone="hero"
-      size="sm"
-      className={cx(!budget.hasBudget && 'stat--inline', noSpendToday && 'stat--quiet')}
-      label="Hoy"
-      value={noSpendToday ? 'Sin gastos' : <Money value={data.todayTotal} />}
-    />
-  );
+  // Pastilla frente al mes anterior: sin gastos este mes no hay nada que comparar, y sin gastos el mes anterior tampoco.
+  const change = hasSpending ? describeChange(data, cop) : null;
+  // Datos de apoyo bajo la cifra. Con presupuesto la cifra grande es lo disponible, así que lo gastado va aquí.
+  const facts: { key: string; node: ReactNode }[] = [];
+  if (budget.hasBudget && hasSpending) facts.push({ key: 'spent', node: <>Gastado <Amount value={data.monthTotal} /></> });
+  facts.push({ key: 'today', node: data.todayTotal === 0 ? 'Hoy sin gastos' : <>Hoy <Amount value={data.todayTotal} /></> });
+  if (hasSpending) facts.push({ key: 'average', node: <>Prom. diario <Amount value={data.dailyAverage} /></> });
 
   return (
     <div className="page">
@@ -92,6 +89,25 @@ export function HomePage() {
         ) : (
           <Stat tone="hero" size="lg" label="Gastado este mes" value={<Money value={data.monthTotal} />} />
         )}
+
+        <div className="hero__meta">
+          {change && (
+            <p className={cx('hero__chip', `hero__chip--${change.direction}`)}>
+              {(change.direction === 'more' || change.direction === 'less') && (
+                <Icon name={change.direction === 'more' ? 'arrowUp' : 'arrowDown'} size={18} />
+              )}
+              {change.text}
+            </p>
+          )}
+          <p className="hero__summary">
+            {facts.map((fact, index) => (
+              <Fragment key={fact.key}>
+                {index > 0 && ' · '}
+                <span className="hero__fact">{fact.node}</span>
+              </Fragment>
+            ))}
+          </p>
+        </div>
 
         <Link to="/estadisticas" state={{ scrollTo: 'por-categoria' }} className="hero__strip" aria-label="Ver gastos por categoría en Estadísticas">
           <BudgetStrip segments={data.byCategory} budget={budget.budget} spent={budget.spent} />
@@ -125,11 +141,6 @@ export function HomePage() {
             Vas cerca del límite
           </Notice>
         )}
-
-        <div className={cx('hero__stats', budget.hasBudget && 'hero__stats--pair')}>
-          {todayStat}
-          {budget.hasBudget && <Stat tone="hero" size="sm" label="Gastado este mes" value={<Money value={data.monthTotal} />} />}
-        </div>
       </section>
 
       {dueSummary && dueSummary.total + dueSummary.other.total > 0 && (

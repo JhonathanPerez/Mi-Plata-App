@@ -18,11 +18,31 @@
   flex: none;
 }
 
-.strip__caption {
-  display: block;
-  margin-top: var(--space-2);
-  font-size: var(--fs-xs);
+/* Leyenda de la barra: punto de color + nombre de las categorías que más pesan, y «+N» con las demás. */
+.strip__legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1) var(--space-3);
+  margin: var(--space-3) 0 0;
+  padding: 0;
+  list-style: none;
+  font-size: var(--fs-sm);
   color: var(--hero-ink-2);
+}
+
+.strip__item {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  white-space: nowrap;
+}
+
+.strip__dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--swatch);
+  flex: none;
 }
 
 .strip__tick {

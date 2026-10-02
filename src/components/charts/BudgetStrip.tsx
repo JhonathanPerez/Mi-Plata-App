@@ -2,6 +2,9 @@ import type { CategoryTotal } from '@/types/models';
 import { cssVars } from '@/lib/cssVars';
 import { formatPercent } from '@/lib/money';
 
+/** Categorías con nombre en la leyenda; el resto se resume en «+N». */
+const LEGEND_MAX = 4;
+
 interface BudgetStripProps {
   segments: CategoryTotal[];
   budget: number;
@@ -11,6 +14,7 @@ interface BudgetStripProps {
 /**
  * La "regla" del mes: cada tramo de color es una categoría y el largo total es el presupuesto.
  * Si se excede, la escala pasa a ser el gasto y una marca vertical señala dónde estaba el presupuesto.
+ * Debajo, una leyenda con las categorías de mayor gasto (las que más pesan en la barra).
  */
 export function BudgetStrip({ segments, budget, spent }: BudgetStripProps) {
   const hasBudget = budget > 0;
@@ -41,10 +45,16 @@ export function BudgetStrip({ segments, budget, spent }: BudgetStripProps) {
         )}
         {budgetMark !== null && <span className="strip__limit" style={cssVars({ '--limit-left': `${budgetMark}%` })} />}
       </div>
-      {!hasBudget && segments.length > 0 && (
-        <span className="strip__caption" aria-hidden="true">
-          Gastos por categoría
-        </span>
+      {segments.length > 0 && (
+        <ul className="strip__legend" aria-hidden="true">
+          {segments.slice(0, LEGEND_MAX).map((segment) => (
+            <li key={segment.categoryId} className="strip__item" style={cssVars({ '--swatch': segment.color })}>
+              <span className="strip__dot" />
+              {segment.name}
+            </li>
+          ))}
+          {segments.length > LEGEND_MAX && <li className="strip__item">+{segments.length - LEGEND_MAX}</li>}
+        </ul>
       )}
     </div>
   );
