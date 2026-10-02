@@ -340,3 +340,16 @@ number-flow-react {
   flex-direction: column;
   gap: var(--space-3);
 }
+
+/* Por categorizar: la fila ocupa el ancho y el botón ⋮ (48 px) queda a su derecha; el menú evita depender de los gestos. */
+.pending-row__main {
+  flex: 1;
+  min-width: 0;
+  padding-inline-end: var(--space-1);
+}
+
+.pending-row__more {
+  align-self: center;
+  margin-inline-end: var(--space-1);
+  color: var(--ink-2);
+}
