@@ -8,13 +8,14 @@ import { PageHeader } from '@/components/ui/PageHeader';
 import { Row } from '@/components/ui/Row';
 import { Segmented } from '@/components/ui/Segmented';
 import { Toggle } from '@/components/ui/Toggle';
-import { PendingReminderCard } from '@/components/cards/PendingReminderCard';
-import { ReminderSettingsCard } from '@/components/cards/ReminderSettingsCard';
+import { useReminderStatus } from '@/components/cards/useReminderStatus';
 import { APP_AUTHOR, APP_NAME, APP_VERSION } from '@/config/constants';
 import { useQuery } from '@/hooks/useQuery';
 import { authenticate, getBiometricSupport, type BiometricSupport } from '@/lib/biometrics';
 import { currentYearMonth } from '@/lib/dates';
 import { normalizeLockDelay } from '@/lib/lockPolicy';
+import { formatInterval } from '@/lib/pendingReminders';
+import { HOUR_LABELS } from '@/lib/reminders';
 import { errorMessage } from '@/lib/errors';
 import { formatCOP } from '@/lib/money';
 import { pluralize } from '@/lib/text';
@@ -42,6 +43,21 @@ function Group({ title, children, flush = true }: GroupProps) {
   );
 }
 
+/** Línea de estado de «Avisos de pago»: lo que está activo, o por qué no lo está. */
+function paymentRemindersDetail({ active, supported, settings }: ReturnType<typeof useReminderStatus>): string {
+  if (active && settings) {
+    const count = settings.leadDays.length;
+    return `Activados · ${count} ${pluralize(count, 'aviso', 'avisos')} · ${HOUR_LABELS[settings.hour]}`;
+  }
+  return settings?.enabled && supported ? 'Falta el permiso de notificaciones' : 'Desactivados';
+}
+
+/** Línea de estado de «Recordatorio de pendientes». */
+function pendingRemindersDetail({ pendingActive, supported, pendingSettings }: ReturnType<typeof useReminderStatus>): string {
+  if (pendingActive && pendingSettings) return `Activado · cada ${formatInterval(pendingSettings.intervalMinutes)}`;
+  return pendingSettings?.enabled && supported ? 'Falta el permiso de notificaciones' : 'Desactivado';
+}
+
 export function SettingsPage() {
   const toast = useToast();
   const confirm = useConfirm();
@@ -50,6 +66,7 @@ export function SettingsPage() {
   const { data: budget } = useQuery(() => budgetService.getAmount(yearMonth), [yearMonth]);
   const { data: lock } = useQuery(() => lockService.getConfig());
   const { data: pendingCount } = useQuery(() => captureService.countPending());
+  const reminders = useReminderStatus();
   const [support, setSupport] = useState<BiometricSupport | null>(null);
   const [budgetOpen, setBudgetOpen] = useState(false);
   const [busy, setBusy] = useState<string | null>(null);
@@ -189,7 +206,7 @@ export function SettingsPage() {
         )}
       </Group>
 
-      {/* 3 · Captura y avisos: de dónde llegan los gastos y cuándo te avisa el teléfono, todo en una tarjeta con divisores. */}
+      {/* 3 · Captura y avisos: de dónde llegan los gastos y cuándo te avisa el teléfono. Cada aviso se configura en su propia pantalla. */}
       <Group title="Captura y avisos">
         <Row
           to="/pendientes"
@@ -205,8 +222,20 @@ export function SettingsPage() {
           detail="Detectar compras automáticamente"
           chevron="chevronRight"
         />
-        <ReminderSettingsCard />
-        <PendingReminderCard />
+        <Row
+          to="/ajustes/recordatorio-pendientes"
+          icon="clockCountdown"
+          title="Recordatorio de pendientes"
+          detail={pendingRemindersDetail(reminders)}
+          chevron="chevronRight"
+        />
+        <Row
+          to="/ajustes/avisos-pago"
+          icon="bellRinging"
+          title="Avisos de pago"
+          detail={paymentRemindersDetail(reminders)}
+          chevron="chevronRight"
+        />
       </Group>
 
       {/* 4 · Apariencia */}

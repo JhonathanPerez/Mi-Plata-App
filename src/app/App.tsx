@@ -10,8 +10,10 @@ import { ExportPage } from '@/pages/ExportPage';
 import { HistoryPage } from '@/pages/HistoryPage';
 import { HomePage } from '@/pages/HomePage';
 import { PayCardPage } from '@/pages/PayCardPage';
+import { PaymentRemindersPage } from '@/pages/PaymentRemindersPage';
 import { PaymentMethodsPage } from '@/pages/PaymentMethodsPage';
 import { PendingPage } from '@/pages/PendingPage';
+import { PendingRemindersPage } from '@/pages/PendingRemindersPage';
 import { StatementsPage } from '@/pages/StatementsPage';
 import { SettingsPage } from '@/pages/SettingsPage';
 import { StatsPage } from '@/pages/StatsPage';
@@ -58,6 +60,8 @@ export function App() {
                   <Route path="ajustes/metodos" element={<PageTransition><PaymentMethodsPage /></PageTransition>} />
                   <Route path="ajustes/exportar" element={<PageTransition><ExportPage /></PageTransition>} />
                   <Route path="ajustes/captura" element={<PageTransition><CaptureSetupPage /></PageTransition>} />
+                  <Route path="ajustes/avisos-pago" element={<PageTransition><PaymentRemindersPage /></PageTransition>} />
+                  <Route path="ajustes/recordatorio-pendientes" element={<PageTransition><PendingRemindersPage /></PageTransition>} />
                   <Route path="*" element={<HomePage />} />
                 </Routes>
               </HashRouter>

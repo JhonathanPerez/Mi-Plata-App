@@ -207,12 +207,6 @@ number-flow-react {
   font-weight: 650;
 }
 
-/* Bloque con un interruptor y sus opciones dentro de una tarjeta de filas: el divisor lo separa de lo que tiene encima. */
-.settings-panel {
-  padding: var(--space-4);
-  border-top: 1px solid var(--line);
-}
-
 .about {
   display: flex;
   flex-direction: column;
