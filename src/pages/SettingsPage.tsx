@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type ChangeEvent, type ReactNode } from 'react';
+import { useRef, useState, type ChangeEvent, type ReactNode } from 'react';
 import { useConfirm } from '@/app/providers/ConfirmProvider';
 import { useTheme } from '@/app/providers/ThemeProvider';
 import { useToast } from '@/app/providers/ToastProvider';
@@ -7,13 +7,11 @@ import { Icon } from '@/components/ui/Icon';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { Row } from '@/components/ui/Row';
 import { Segmented } from '@/components/ui/Segmented';
-import { Toggle } from '@/components/ui/Toggle';
 import { useReminderStatus } from '@/components/cards/useReminderStatus';
 import { APP_AUTHOR, APP_NAME, APP_VERSION } from '@/config/constants';
 import { useQuery } from '@/hooks/useQuery';
-import { authenticate, getBiometricSupport, type BiometricSupport } from '@/lib/biometrics';
 import { currentYearMonth } from '@/lib/dates';
-import { normalizeLockDelay } from '@/lib/lockPolicy';
+import { describeLockDelay } from '@/lib/lockPolicy';
 import { formatInterval } from '@/lib/pendingReminders';
 import { HOUR_LABELS } from '@/lib/reminders';
 import { errorMessage } from '@/lib/errors';
@@ -67,40 +65,10 @@ export function SettingsPage() {
   const { data: lock } = useQuery(() => lockService.getConfig());
   const { data: pendingCount } = useQuery(() => captureService.countPending());
   const reminders = useReminderStatus();
-  const [support, setSupport] = useState<BiometricSupport | null>(null);
   const [budgetOpen, setBudgetOpen] = useState(false);
   const [busy, setBusy] = useState<string | null>(null);
   const importRef = useRef<HTMLInputElement>(null);
   const restoreRef = useRef<HTMLInputElement>(null);
-
-  useEffect(() => {
-    void getBiometricSupport().then(setSupport);
-  }, []);
-
-  const onToggleLock = async (next: boolean) => {
-    if (support === 'web') {
-      toast.show('El bloqueo funciona en la app instalada en el teléfono.', 'info');
-      return;
-    }
-    if (next && support !== 'available') {
-      toast.show('Primero configura una huella, un rostro o un PIN en los ajustes de tu teléfono.', 'error');
-      return;
-    }
-    // Se confirma la identidad tanto para activar (prueba que funciona) como para desactivar (evita que otro lo apague).
-    if (support === 'available') {
-      const outcome = await authenticate(next ? 'Confirma para activar el bloqueo' : 'Confirma para desactivar el bloqueo');
-      if (!outcome.ok) {
-        if (!outcome.cancelled) toast.show(outcome.message, 'error');
-        return;
-      }
-    }
-    try {
-      await lockService.setEnabled(next);
-      toast.show(next ? 'Bloqueo activado' : 'Bloqueo desactivado');
-    } catch (error) {
-      toast.show(errorMessage(error), 'error');
-    }
-  };
 
   const onImport = async (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -176,34 +144,15 @@ export function SettingsPage() {
         <Row to="/tarjetas" icon="calendar" title="Tarjetas y extractos" detail="Cortes, pagos y qué debes" chevron="chevronRight" />
       </Group>
 
-      {/* 2 · Seguridad */}
-      <Group title="Seguridad" flush={false}>
-        <Toggle
-          checked={lock?.enabled ?? true}
-          onChange={(next) => void onToggleLock(next)}
-          label="Bloqueo con huella o rostro"
-          hint={
-            support === 'none'
-              ? 'Tu teléfono no tiene huella, rostro ni PIN configurado: no se puede proteger la app.'
-              : 'Se pide al abrir la app. Si falla el sensor, usas el PIN del teléfono.'
-          }
+      {/* 2 · Seguridad: el bloqueo se configura en su propia pantalla. */}
+      <Group title="Seguridad">
+        <Row
+          to="/ajustes/bloqueo"
+          icon="lock"
+          title="Bloqueo con huella o rostro"
+          detail={lock ? (lock.enabled ? `Activado · ${describeLockDelay(lock.delaySeconds)}` : 'Desactivado') : undefined}
+          chevron="chevronRight"
         />
-        {lock?.enabled && support !== 'none' && (
-          <div className="field">
-            <span className="field__label">Volver a pedirlo</span>
-            <Segmented<string>
-              label="Cuándo volver a pedir el bloqueo"
-              value={String(lock.delaySeconds)}
-              onChange={(value) => void lockService.setDelay(normalizeLockDelay(value))}
-              options={[
-                { value: '0', label: 'Siempre' },
-                { value: '60', label: '1 min' },
-                { value: '300', label: '5 min' },
-              ]}
-            />
-            <p className="field__hint">«Siempre» lo pide cada vez que vuelves a la app; con un tiempo, solo si pasó más de eso.</p>
-          </div>
-        )}
       </Group>
 
       {/* 3 · Captura y avisos: de dónde llegan los gastos y cuándo te avisa el teléfono. Cada aviso se configura en su propia pantalla. */}

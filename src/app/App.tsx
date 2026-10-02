@@ -9,6 +9,7 @@ import { ExpenseFormPage } from '@/pages/ExpenseFormPage';
 import { ExportPage } from '@/pages/ExportPage';
 import { HistoryPage } from '@/pages/HistoryPage';
 import { HomePage } from '@/pages/HomePage';
+import { LockSettingsPage } from '@/pages/LockSettingsPage';
 import { PayCardPage } from '@/pages/PayCardPage';
 import { PaymentRemindersPage } from '@/pages/PaymentRemindersPage';
 import { PaymentMethodsPage } from '@/pages/PaymentMethodsPage';
@@ -60,6 +61,7 @@ export function App() {
                   <Route path="ajustes/metodos" element={<PageTransition><PaymentMethodsPage /></PageTransition>} />
                   <Route path="ajustes/exportar" element={<PageTransition><ExportPage /></PageTransition>} />
                   <Route path="ajustes/captura" element={<PageTransition><CaptureSetupPage /></PageTransition>} />
+                  <Route path="ajustes/bloqueo" element={<PageTransition><LockSettingsPage /></PageTransition>} />
                   <Route path="ajustes/avisos-pago" element={<PageTransition><PaymentRemindersPage /></PageTransition>} />
                   <Route path="ajustes/recordatorio-pendientes" element={<PageTransition><PendingRemindersPage /></PageTransition>} />
                   <Route path="*" element={<HomePage />} />
