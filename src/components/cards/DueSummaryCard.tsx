@@ -5,16 +5,9 @@ import { Icon } from '@/components/ui/Icon';
 import { Amount } from '@/components/ui/Money';
 import { Notice } from '@/components/ui/Notice';
 import { Row } from '@/components/ui/Row';
+import { dueTone, type DueTone } from '@/lib/cardDue';
 import { formatDayMonth, relativeDays } from '@/lib/statementText';
 import type { DueSummary } from '@/services/cardService';
-
-type DueTone = 'neutral' | 'warning' | 'danger';
-
-/** Urgencia del vencimiento: más de 7 días es calma; 7 o menos pide atención; hoy o vencido es urgente. */
-function dueTone(daysLeft: number): DueTone {
-  if (daysLeft <= 0) return 'danger';
-  return daysLeft <= 7 ? 'warning' : 'neutral';
-}
 
 const LABEL_CLASS: Record<DueTone, string> = {
   neutral: 'due-label due-label--neutral',
