@@ -19,6 +19,7 @@ import { useQuery } from '@/hooks/useQuery';
 import { describeComparison } from '@/lib/comparison';
 import { currentYearMonth, elapsedDaysInMonth, formatMonthTitle, todayIso } from '@/lib/dates';
 import { categoryHistoryPath } from '@/lib/historyLink';
+import { readStatsMonth, statsReturnTarget } from '@/lib/navigationState';
 import { pluralize } from '@/lib/text';
 import { useAmountFormat } from '@/app/providers/PrivacyProvider';
 import { statsService, type MonthlySummary } from '@/services/statsService';
@@ -39,11 +40,13 @@ function ComparisonLine({ summary }: { summary: MonthlySummary }) {
 
 export function StatsPage() {
   const navigate = useNavigate();
-  const [yearMonth, setYearMonth] = useState(currentYearMonth());
+  // Estado de la ubicación: `scrollTo` lo manda Inicio; `yearMonth` lo deja el botón Atrás al volver desde Gastos (se abre en el mes que se veía).
+  const location = useLocation();
+  const [yearMonth, setYearMonth] = useState(() => readStatsMonth(location.state) ?? currentYearMonth());
   const { data, error, retry } = useQuery(() => statsService.getMonthlySummary(yearMonth), [yearMonth]);
 
   // Inicio puede mandar aquí con `state.scrollTo` (HashRouter no admite anclas #): se baja a esa sección una sola vez, cuando ya hay datos.
-  const scrollTo = (useLocation().state as { scrollTo?: string } | null)?.scrollTo;
+  const scrollTo = (location.state as { scrollTo?: string } | null)?.scrollTo;
   const hasSections = Boolean(data && data.transactions > 0);
   const scrolled = useRef(false);
   useEffect(() => {
@@ -139,7 +142,7 @@ export function StatsPage() {
               <p className="section__hint">Toca una categoría para ver sus gastos</p>
             </div>
             <div className="card">
-              <CategoryBars items={data.byCategory} onSelect={(item) => navigate(categoryHistoryPath(item.categoryId, yearMonth))} />
+              <CategoryBars items={data.byCategory} onSelect={(item) => navigate(categoryHistoryPath(item.categoryId, yearMonth), { state: { returnTo: statsReturnTarget(yearMonth) } })} />
             </div>
           </section>
 
