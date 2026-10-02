@@ -38,6 +38,11 @@ export function cycleDatesLabel(cutDate: IsoDate, dueDate: IsoDate): string {
   return `Corta ${formatDayMonth(cutDate)} · pago hasta ${formatDayMonth(dueDate)}`;
 }
 
+/** Fechas de un extracto cerrado en una línea corta: "Corte mié 30 sep · pago hasta dom 20 oct". */
+export function statementDatesLabel(cutDate: IsoDate, dueDate: IsoDate): string {
+  return `Corte ${formatDayMonth(cutDate)} · pago hasta ${formatDayMonth(dueDate)}`;
+}
+
 /** Oscurece un color #RRGGBB (factor 0..1) para armar el degradado de una tarjeta. */
 export function shadeColor(hex: string, factor: number): string {
   const value = hex.replace('#', '');

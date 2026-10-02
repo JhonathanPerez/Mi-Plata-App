@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { cycleDatesLabel, dueLabel, dueShortLabel, formatDayMonth, periodMonthName, relativeDays, shadeColor } from './statementText';
+import { cycleDatesLabel, dueLabel, dueShortLabel, formatDayMonth, periodMonthName, relativeDays, shadeColor, statementDatesLabel } from './statementText';
 
 describe('textos de extractos', () => {
   it('día de la semana, día y mes', () => {
@@ -31,6 +31,9 @@ describe('textos de extractos', () => {
   });
   it('fechas de un ciclo abierto', () => {
     expect(cycleDatesLabel('2026-10-08', '2026-11-03')).toBe('Corta jue 8 oct · pago hasta mar 3 nov');
+  });
+  it('fechas de un extracto cerrado', () => {
+    expect(statementDatesLabel('2026-09-30', '2026-10-20')).toBe('Corte mié 30 sep · pago hasta mar 20 oct');
   });
   it('oscurece colores y respeta entradas inválidas', () => {
     expect(shadeColor('#FFFFFF', 0.5)).toBe('#808080');
