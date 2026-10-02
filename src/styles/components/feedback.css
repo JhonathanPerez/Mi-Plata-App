@@ -275,6 +275,11 @@
   letter-spacing: 0;
 }
 
+/* El nombre puede partirse en dos líneas (letra grande, «Cuidado Personal») en vez de empujar el icono o salirse de la tarjeta. */
+.stat__value--with-icon > span {
+  min-width: 0;
+}
+
 .stat__foot {
   font-size: var(--fs-xs);
   color: var(--ink-2);
