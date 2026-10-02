@@ -109,9 +109,7 @@ export function HomePage() {
           </p>
         </div>
 
-        <Link to="/estadisticas" state={{ scrollTo: 'por-categoria' }} className="hero__strip" aria-label="Ver gastos por categoría en Estadísticas">
-          <BudgetStrip segments={data.byCategory} budget={budget.budget} spent={budget.spent} />
-        </Link>
+        <BudgetStrip segments={data.byCategory} budget={budget.budget} spent={budget.spent} />
 
         {budget.hasBudget ? (
           <button type="button" className="hero__foot" onClick={() => setBudgetOpen(true)}>
