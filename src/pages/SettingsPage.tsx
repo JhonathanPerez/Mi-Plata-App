@@ -47,7 +47,7 @@ function Group({ title, children, flush = true }: GroupProps) {
 function captureAccessDetail({ supported, enabled }: ReturnType<typeof useCaptureAccess>): string | undefined {
   if (!supported) return 'Solo en el teléfono';
   if (enabled === null) return undefined;
-  return enabled ? 'Activadas' : 'Sin activar';
+  return enabled ? 'Activadas' : 'Desactivadas';
 }
 
 /** Línea de estado de «Avisos de pago»: lo que está activo, o por qué no lo está. */
