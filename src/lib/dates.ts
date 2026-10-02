@@ -45,6 +45,11 @@ export function currentYearMonth(now: Date = new Date()): YearMonth {
   return toYearMonth(now);
 }
 
+/** ¿Es un mes con la forma «AAAA-MM» (mes del 01 al 12)? Para valores que vienen de fuera: la dirección o el historial de navegación. */
+export function isYearMonth(value: unknown): value is YearMonth {
+  return typeof value === 'string' && /^\d{4}-(0[1-9]|1[0-2])$/.test(value);
+}
+
 export function addMonths(yearMonth: YearMonth, delta: number): YearMonth {
   const [year, month] = yearMonth.split('-').map(Number);
   return toYearMonth(new Date(year, month - 1 + delta, 1));

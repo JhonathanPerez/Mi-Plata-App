@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   addDays, addMonths, daysInMonth, diffDays, elapsedDaysInMonth, formatDayHeading, formatLongDate,
-  formatMonthTitle, formatShortDate, formatTime, formatWeekdayDate, formatWeekdayDay, isValidIsoDate, monthRange, toIsoDate,
+  formatMonthTitle, formatShortDate, formatTime, formatWeekdayDate, formatWeekdayDay, isValidIsoDate, isYearMonth, monthRange, toIsoDate,
 } from './dates';
 
 describe('fechas locales', () => {
@@ -48,5 +48,21 @@ describe('fechas locales', () => {
     expect(elapsedDaysInMonth('2026-09', now)).toBe(19);
     expect(elapsedDaysInMonth('2026-08', now)).toBe(31);
     expect(elapsedDaysInMonth('2026-10', now)).toBe(1);
+  });
+});
+
+describe('isYearMonth', () => {
+  it('acepta meses con forma AAAA-MM', () => {
+    expect(isYearMonth('2026-01')).toBe(true);
+    expect(isYearMonth('2026-12')).toBe(true);
+  });
+  it('rechaza lo demás', () => {
+    expect(isYearMonth('2026-00')).toBe(false);
+    expect(isYearMonth('2026-13')).toBe(false);
+    expect(isYearMonth('2026-1')).toBe(false);
+    expect(isYearMonth('2026-10-05')).toBe(false);
+    expect(isYearMonth('octubre')).toBe(false);
+    expect(isYearMonth(null)).toBe(false);
+    expect(isYearMonth(202610)).toBe(false);
   });
 });
