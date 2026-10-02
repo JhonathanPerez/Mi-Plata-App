@@ -21,6 +21,7 @@ import { useDebounced } from '@/hooks/useDebounced';
 import { useSwipeHint } from '@/hooks/useSwipeHint';
 import { useQuery } from '@/hooks/useQuery';
 import { currentYearMonth, formatNumericDate, monthRange } from '@/lib/dates';
+import { parseHistoryParams } from '@/lib/historyLink';
 import { pluralize } from '@/lib/text';
 import { categoryService } from '@/services/categoryService';
 import { expenseService } from '@/services/expenseService';
@@ -33,9 +34,18 @@ export function HistoryPage() {
   const navigate = useNavigate();
   const toast = useToast();
   const confirm = useConfirm();
-  const [status, setStatus] = useState<StatusView>(useSearchParams()[0].get('estado') === 'por-pagar' ? 'due' : 'all');
-  const [yearMonth, setYearMonth] = useState(currentYearMonth());
-  const [filters, setFilters] = useState<HistoryFilters>({ mode: 'month', from: '', to: '', ...EMPTY_FILTERS });
+  // Otras pantallas pueden abrir Gastos ya filtrado (Por pagar desde Inicio; una categoría y un mes desde Estadísticas). Se lee una sola vez.
+  const [searchParams] = useSearchParams();
+  const [initial] = useState(() => parseHistoryParams(searchParams));
+  const [status, setStatus] = useState<StatusView>(initial.status);
+  const [yearMonth, setYearMonth] = useState(initial.yearMonth ?? currentYearMonth());
+  const [filters, setFilters] = useState<HistoryFilters>({
+    mode: 'month',
+    from: '',
+    to: '',
+    ...EMPTY_FILTERS,
+    categoryIds: initial.categoryId ? [initial.categoryId] : [],
+  });
   const [search, setSearch] = useState('');
   const [sheetOpen, setSheetOpen] = useState(false);
   const debouncedSearch = useDebounced(search);
