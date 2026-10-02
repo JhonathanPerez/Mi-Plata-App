@@ -232,6 +232,12 @@
   min-height: 2px;
 }
 
+/* Días que aún no llegan (mes en curso): punteados, para no confundirlos con días sin gasto. */
+.daily__bar.is-future {
+  background: transparent;
+  border-bottom: 2px dotted var(--line-strong);
+}
+
 .daily__bar.is-peak {
   background: var(--primary);
 }
