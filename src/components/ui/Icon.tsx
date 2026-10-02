@@ -10,6 +10,7 @@ import {
   CaretRight,
   ChartBar,
   Check,
+  ClipboardText,
   ClockCountdown,
   CreditCard,
   DeviceMobile,
@@ -47,7 +48,7 @@ export type IconName =
   | 'home' | 'list' | 'chart' | 'sliders' | 'plus' | 'back' | 'close' | 'chevronRight' | 'chevronLeft'
   | 'check' | 'trash' | 'edit' | 'search' | 'filter' | 'calendar' | 'download' | 'upload' | 'warning'
   | 'arrowUp' | 'arrowDown' | 'shield' | 'info' | 'moon' | 'tag' | 'card' | 'target' | 'refresh' | 'save'
-  | 'lock' | 'bell' | 'bellRinging' | 'clockCountdown' | 'inbox' | 'apps' | 'phone' | 'eye' | 'eyeOff' | 'flag' | 'user' | 'more';
+  | 'lock' | 'bell' | 'bellRinging' | 'clockCountdown' | 'inbox' | 'apps' | 'phone' | 'eye' | 'eyeOff' | 'flag' | 'user' | 'more' | 'clipboard';
 
 /**
  * Íconos Phosphor. Los de "contenido" (casa, tarjeta, campana…) van en duotono, con un tono suave de relleno;
@@ -94,6 +95,7 @@ const ICONS: Record<IconName, { Component: PhosphorIcon; weight: IconWeight }> =
   flag: { Component: Flag, weight: 'duotone' },
   user: { Component: User, weight: 'duotone' },
   more: { Component: DotsThreeVertical, weight: 'bold' },
+  clipboard: { Component: ClipboardText, weight: 'duotone' },
 };
 
 interface IconProps {
