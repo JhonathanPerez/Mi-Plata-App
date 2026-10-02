@@ -56,7 +56,7 @@ function CycleBar({ progress }: { progress: CycleProgress }) {
 
 /**
  * Una tarjeta de crédito en la lista: primero cuánto se debe y cuándo vence, después el ciclo abierto,
- * el botón de pagar y un acceso a las reglas. Los paneles abren los extractos. El texto blanco se mantiene legible sobre cualquier color elegido.
+ * el botón de pagar y un acceso a las reglas. Los paneles abren los extractos, salvo el ciclo abierto cuando hay un extracto por pagar (solo informa). El texto blanco se mantiene legible sobre cualquier color elegido.
  */
 export function CreditCardTile({ overview }: CreditCardTileProps) {
   const navigate = useNavigate();
@@ -82,6 +82,20 @@ export function CreditCardTile({ overview }: CreditCardTileProps) {
       ? `${method.name} al día${progressSpoken}, corta el ${formatWeekdayDate(open.cutDate)}`
       : `Ciclo de ${periodMonthName(open.period)} abierto ${spokenAmount(open.unpaidTotal)}${progressSpoken}, corta el ${formatWeekdayDate(open.cutDate)}`
     : '';
+
+  // Con un extracto por pagar, ese panel es el que abre los extractos y el ciclo abierto solo informa; sin extractos por pagar, el ciclo abierto sí es tocable.
+  const openPanelClass = cx('credit-card__panel', payable.length > 0 && 'credit-card__panel--compact');
+  const openPanelBody =
+    open && !upToDate ? (
+      <>
+        <span className="credit-card__label">Ciclo de {periodMonthName(open.period)} · abierto</span>
+        <strong className="credit-card__amount">
+          <Amount value={open.unpaidTotal} compact={open.unpaidTotal >= COMPACT_FROM} />
+        </strong>
+        {progress && <CycleBar progress={progress} />}
+        <span className="credit-card__note">{cycleDatesLabel(open.cutDate, open.dueDate)}</span>
+      </>
+    ) : null;
 
   const payLabel = payable.length === 1 ? `Pagar extracto de ${periodMonthName(payable[0].period)}` : 'Pagar tarjeta';
 
@@ -148,20 +162,17 @@ export function CreditCardTile({ overview }: CreditCardTileProps) {
             </TapPanel>
           )}
 
-          {open && !upToDate && (
-            <TapPanel
-              className={cx('credit-card__panel', payable.length > 0 && 'credit-card__panel--compact')}
-              label={`${openLabel}. Ver extractos de ${method.name}`}
-              onOpen={openStatements}
-            >
-              <span className="credit-card__label">Ciclo de {periodMonthName(open.period)} · abierto</span>
-              <strong className="credit-card__amount">
-                <Amount value={open.unpaidTotal} compact={open.unpaidTotal >= COMPACT_FROM} />
-              </strong>
-              {progress && <CycleBar progress={progress} />}
-              <span className="credit-card__note">{cycleDatesLabel(open.cutDate, open.dueDate)}</span>
-            </TapPanel>
-          )}
+          {open &&
+            !upToDate &&
+            (payable.length > 0 ? (
+              <div className={openPanelClass} role="group" aria-label={openLabel}>
+                {openPanelBody}
+              </div>
+            ) : (
+              <TapPanel className={openPanelClass} label={`${openLabel}. Ver extractos de ${method.name}`} onOpen={openStatements}>
+                {openPanelBody}
+              </TapPanel>
+            ))}
 
           {payable.length > 0 && (
             <Button variant="inverse" block icon="check" onClick={() => navigate(`/tarjetas/${method.id}/pagar`)}>
