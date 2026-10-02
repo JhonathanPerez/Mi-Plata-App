@@ -16,7 +16,9 @@ import { PageHeader } from '@/components/ui/PageHeader';
 import { PrivacyToggle } from '@/components/ui/PrivacyToggle';
 import { Stat } from '@/components/ui/Stat';
 import { useQuery } from '@/hooks/useQuery';
-import { MONTH_NAMES, addMonths, currentYearMonth, elapsedDaysInMonth, formatMonthTitle, todayIso } from '@/lib/dates';
+import { describeComparison } from '@/lib/comparison';
+import { currentYearMonth, elapsedDaysInMonth, formatMonthTitle, todayIso } from '@/lib/dates';
+import { categoryHistoryPath } from '@/lib/historyLink';
 import { pluralize } from '@/lib/text';
 import { useAmountFormat } from '@/app/providers/PrivacyProvider';
 import { statsService, type MonthlySummary } from '@/services/statsService';
@@ -24,32 +26,13 @@ import { statsService, type MonthlySummary } from '@/services/statsService';
 /** En los tiles de dos columnas una cifra de siete dígitos o más no cabe (menos aún con la letra grande): se abrevia ($18,7 M). */
 const TILE_COMPACT_FROM = 1_000_000;
 
-/** Con variaciones enormes (de $1.000 a $50.000, +4900 %) el porcentaje solo mete ruido: se omite. */
-const MAX_SHOWN_PERCENT = 999;
-
 function ComparisonLine({ summary }: { summary: MonthlySummary }) {
   const { cop } = useAmountFormat();
-  const previous = addMonths(summary.yearMonth, -1);
-  // El año solo se repite cuando el mes anterior cae en otro año (enero → «diciembre 2025»).
-  const previousLabel =
-    previous.slice(0, 4) === summary.yearMonth.slice(0, 4)
-      ? MONTH_NAMES[Number(previous.slice(5, 7)) - 1]
-      : formatMonthTitle(previous).toLowerCase();
-  if (summary.previousTotal === 0) {
-    return <p className="compare">Sin gastos en {previousLabel} para comparar.</p>;
-  }
-  const more = summary.changeAmount > 0;
-  const same = summary.changeAmount === 0;
-  const percent = Math.abs(Math.round(summary.changePercent ?? 0));
-  const percentText = percent <= MAX_SHOWN_PERCENT ? ` (${percent}%)` : '';
+  const { direction, text } = describeComparison(summary, cop);
   return (
     <p className="compare">
-      {!same && <Icon name={more ? 'arrowUp' : 'arrowDown'} size={18} />}
-      <span>
-        {same
-          ? `Igual que en ${previousLabel}.`
-          : `Gastaste ${cop(Math.abs(summary.changeAmount))} ${more ? 'más' : 'menos'} que en ${previousLabel}${percentText}.`}
-      </span>
+      {(direction === 'more' || direction === 'less') && <Icon name={direction === 'more' ? 'arrowUp' : 'arrowDown'} size={18} />}
+      <span>{text}</span>
     </p>
   );
 }
@@ -141,16 +124,22 @@ export function StatsPage() {
           </div>
 
           <section className="section">
-            <h2 className="section__title">Gasto por día</h2>
+            <div className="section__heading">
+              <h2 className="section__title">Gasto por día</h2>
+              <p className="section__hint">Toca o desliza para ver cada día</p>
+            </div>
             <div className="card">
               <DailyBars days={data.daily} today={isCurrentMonth ? todayIso() : undefined} />
             </div>
           </section>
 
           <section className="section section--anchor" id="por-categoria">
-            <h2 className="section__title">Por categoría</h2>
+            <div className="section__heading">
+              <h2 className="section__title">Por categoría</h2>
+              <p className="section__hint">Toca una categoría para ver sus gastos</p>
+            </div>
             <div className="card">
-              <CategoryBars items={data.byCategory} />
+              <CategoryBars items={data.byCategory} onSelect={(item) => navigate(categoryHistoryPath(item.categoryId, yearMonth))} />
             </div>
           </section>
 
