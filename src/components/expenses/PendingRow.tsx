@@ -1,11 +1,13 @@
 import { useState } from 'react';
+import { usePrivacy } from '@/app/providers/PrivacyProvider';
 import { ActionSheet } from '@/components/ui/ActionSheet';
 import { IconButton } from '@/components/ui/Button';
+import { Amount } from '@/components/ui/Money';
 import { Row } from '@/components/ui/Row';
 import { SwipeRow } from '@/components/ui/SwipeRow';
 import { describeSource } from '@/config/capture';
 import { useLongPress } from '@/hooks/useLongPress';
-import { formatDayHeading, formatTime, todayIso } from '@/lib/dates';
+import { formatTime } from '@/lib/dates';
 import { haptics } from '@/lib/haptics';
 import { formatCOP } from '@/lib/money';
 import type { PendingCapture } from '@/types/models';
@@ -19,32 +21,28 @@ interface PendingRowProps {
   hint?: boolean;
 }
 
-function whenLabel(ms: number): string {
+/** Hora del mensaje ("8:27 p. m."), con espacios duros para que no se parta en dos renglones. El día lo da el grupo de la lista. */
+function timeLabel(ms: number): string {
   const date = new Date(ms);
   const hh = String(date.getHours()).padStart(2, '0');
   const mm = String(date.getMinutes()).padStart(2, '0');
-  // Espacios duros: "6:49 a. m." y "sáb 19 sep" no deben partirse en dos líneas.
-  const NBSP = '\u00a0';
-  const day = formatDayHeading(todayIso(date)).replace(/ /g, NBSP);
-  const time = formatTime(`${hh}:${mm}`).replace(/ /g, NBSP);
-  return `${day} · ${time}`;
+  return formatTime(`${hh}:${mm}`).replace(/ /g, '\u00a0');
 }
 
 /**
  * Un gasto detectado que espera categoría. Tocar la fila lo abre; deslizarla a la izquierda lo descarta
  * (con confirmación, así un roce accidental no borra nada). El botón ⋮ —y mantener la fila presionada— abre un menú con
- * "Reportar como publicidad" y "Descartar", así no hace falta conocer los gestos. Para lector de pantalla y teclado
- * hay botones equivalentes.
+ * "Reportar como publicidad" y "Descartar", así no hace falta conocer los gestos.
  */
 export function PendingRow({ item, onOpen, onDismiss, onReportSpam, hint }: PendingRowProps) {
+  const { hidden } = usePrivacy();
   const title = item.merchant ?? 'Comercio sin identificar';
   const [menuOpen, setMenuOpen] = useState(false);
-  const longPress = useLongPress({
-    onLongPress: () => {
-      setMenuOpen(true);
-      void haptics.tap();
-    },
-  });
+  const openMenu = () => {
+    setMenuOpen(true);
+    void haptics.tap();
+  };
+  const longPress = useLongPress({ onLongPress: openMenu });
 
   return (
     <>
@@ -60,29 +58,21 @@ export function PendingRow({ item, onOpen, onDismiss, onReportSpam, hint }: Pend
         }}
       >
         <Row
-          className="pending-row__main"
-          align="start"
+          className="row--compact pending-row__main"
           holdable
           onClick={() => onOpen(item.id)}
-          aria-label={`${title}, ${formatCOP(item.amount)}. Categorizar`}
+          aria-label={`${title}${hidden ? '' : `, ${formatCOP(item.amount)}`}. Categorizar`}
           {...longPress}
+          icon="tag"
           title={title}
-          amount={formatCOP(item.amount)}
+          amount={<Amount value={item.amount} />}
         >
-          <span className="row__detail">
-            {describeSource(item.source)} · {whenLabel(item.occurredAt)}
+          <span className="row__detail row__detail--truncate">
+            {describeSource(item.source)} · {timeLabel(item.occurredAt)}
           </span>
-          <span className="row__detail row__detail--clamp">{item.rawText}</span>
+          <span className="row__detail row__detail--truncate">{item.rawText}</span>
         </Row>
-        <IconButton
-          className="pending-row__more"
-          icon="more"
-          label={`Más opciones de ${title}`}
-          onClick={() => {
-            setMenuOpen(true);
-            void haptics.tap();
-          }}
-        />
+        <IconButton className="pending-row__more" icon="more" label={`Más opciones de ${title}`} onClick={openMenu} />
       </SwipeRow>
 
       <ActionSheet

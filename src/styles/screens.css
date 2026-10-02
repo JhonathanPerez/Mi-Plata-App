@@ -344,7 +344,9 @@ number-flow-react {
 /* Por categorizar: la fila ocupa el ancho y el botón ⋮ (48 px) queda a su derecha; el menú evita depender de los gestos. */
 .pending-row__main {
   flex: 1;
+  width: auto;
   min-width: 0;
+  gap: var(--space-3);
   padding-inline-end: var(--space-1);
 }
 
