@@ -11,7 +11,7 @@ import { reminderService } from '@/services/reminderService';
 import { disableReminders, enableReminders, sendTestReminder, syncReminders } from '@/services/reminderSync';
 import { useReminderStatus } from './useReminderStatus';
 
-/** Avisos del teléfono antes de que venza el pago de una tarjeta. Es un bloque de Ajustes: va dentro de la tarjeta «Captura y avisos». */
+/** Contenido de la pantalla «Avisos de pago»: interruptor y opciones de los avisos del teléfono antes de que venza el pago de una tarjeta. */
 export function ReminderSettingsCard() {
   const toast = useToast();
   const { settings, permission, supported, refresh, active } = useReminderStatus();
@@ -78,43 +78,53 @@ export function ReminderSettingsCard() {
       : 'El teléfono te avisa antes de que venza el pago de cada tarjeta, aunque la app esté cerrada.';
 
   return (
-    <div className="settings-panel stack">
-      <Toggle checked={active} onChange={(next) => void onToggle(next)} label="Avisar antes de que venza un pago" hint={hint} />
+    <>
+      <div className="card">
+        <Toggle checked={active} onChange={(next) => void onToggle(next)} label="Avisar antes de que venza un pago" hint={hint} />
+      </div>
 
       {active && settings && (
         <>
-          <div className="field">
-            <span className="field__label">Avisar</span>
-            <div className="chip-row" role="group" aria-label="Cuándo avisar">
-              {LEAD_DAY_OPTIONS.map((days) => {
-                const on = settings.leadDays.includes(days);
-                return (
-                  <Chip key={days} selected={on} onClick={() => void toggleLead(days)}>
-                    {LEAD_LABELS[days]}
-                  </Chip>
-                );
-              })}
+          <section className="section">
+            <h2 className="section__title">Cuándo avisar</h2>
+            <div className="card stack">
+              <div className="field">
+                <span className="field__label">Avisarme</span>
+                <div className="chip-row" role="group" aria-label="Cuándo avisar">
+                  {LEAD_DAY_OPTIONS.map((days) => {
+                    const on = settings.leadDays.includes(days);
+                    return (
+                      <Chip key={days} selected={on} onClick={() => void toggleLead(days)}>
+                        {LEAD_LABELS[days]}
+                      </Chip>
+                    );
+                  })}
+                </div>
+                <p className="field__hint">Puedes elegir más de uno.</p>
+              </div>
+
+              <div className="field">
+                <span className="field__label">A las</span>
+                <Segmented<string>
+                  label="Hora del aviso"
+                  value={String(settings.hour)}
+                  onChange={(value) => void setHour(value)}
+                  options={HOUR_OPTIONS.map((hour) => ({ value: String(hour), label: HOUR_LABELS[hour] }))}
+                />
+              </div>
             </div>
-          </div>
+          </section>
 
-          <div className="field">
-            <span className="field__label">A las</span>
-            <Segmented<string>
-              label="Hora del aviso"
-              value={String(settings.hour)}
-              onChange={(value) => void setHour(value)}
-              options={HOUR_OPTIONS.map((hour) => ({ value: String(hour), label: HOUR_LABELS[hour] }))}
-            />
+          <div className="stack">
+            <Button variant="secondary" block icon="bell" onClick={() => void test()}>
+              Enviar aviso de prueba
+            </Button>
+            <Notice tone="info">
+              Si pagas un extracto, sus avisos se cancelan solos. En Xiaomi, Samsung u Oppo, deja Mi Plata «sin restricciones» en Batería para que los avisos no se retrasen.
+            </Notice>
           </div>
-
-          <Button variant="secondary" block icon="bell" onClick={() => void test()}>
-            Enviar aviso de prueba
-          </Button>
-          <Notice tone="info">
-            Si pagas un extracto, sus avisos se cancelan solos. En Xiaomi, Samsung u Oppo, deja Mi Plata «sin restricciones» en Batería para que los avisos no se retrasen.
-          </Notice>
         </>
       )}
-    </div>
+    </>
   );
 }
