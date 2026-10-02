@@ -152,13 +152,28 @@ export function CreditCardTile({ overview }: CreditCardTileProps) {
           )}
 
           {open && upToDate && (
-            <TapPanel className="credit-card__panel" label={`${openLabel}. Ver extractos de ${method.name}`} onOpen={openStatements}>
-              <span className="credit-card__chip">
-                <Icon name="check" size={18} />
-                Al día
-              </span>
-              {progress && <CycleBar progress={progress} />}
-              <span className="credit-card__note">{cycleDatesLabel(open.cutDate, open.dueDate)}</span>
+            <TapPanel
+              className="credit-card__panel credit-card__panel--ok"
+              label={`${openLabel}. Ver extractos de ${method.name}`}
+              onOpen={openStatements}
+            >
+              <div className="credit-card__status">
+                <span className="credit-card__badge" aria-hidden="true">
+                  <Icon name="check" size={24} />
+                </span>
+                <span className="credit-card__status-body">
+                  <strong className="credit-card__status-title">Estás al día</strong>
+                  <span className="credit-card__status-text">Sin pagos pendientes</span>
+                </span>
+              </div>
+              <div className="credit-card__cycle">
+                <span className="credit-card__label">
+                  Ciclo de {periodMonthName(open.period)}
+                  {progress ? ` · día ${progress.elapsed} de ${progress.total}` : ''}
+                </span>
+                {progress && <CycleBar progress={progress} />}
+                <span className="credit-card__note">{cycleDatesLabel(open.cutDate, open.dueDate)}</span>
+              </div>
             </TapPanel>
           )}
 

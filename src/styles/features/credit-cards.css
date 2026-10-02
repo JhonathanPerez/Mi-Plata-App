@@ -149,6 +149,55 @@
   font-size: var(--fs-xl);
 }
 
+/* Tarjeta al día: un estado de calma, no una alerta. La flecha del panel tocable queda en su propia franja a la derecha para no pisar la barra de avance. */
+.credit-card__panel--ok {
+  gap: var(--space-3);
+  padding-inline-end: calc(var(--space-6) + var(--space-2));
+}
+
+.credit-card__status {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.credit-card__badge {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--white-a24);
+}
+
+.credit-card__status-body {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.credit-card__status-title {
+  font-family: var(--font-display);
+  font-size: var(--fs-xl);
+  font-weight: 750;
+  line-height: 1.15;
+}
+
+.credit-card__status-text {
+  font-size: var(--fs-sm);
+}
+
+/* Avance del ciclo en curso, separado del estado por una línea fina. */
+.credit-card__cycle {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--white-a24);
+}
+
 /* Vencimiento en tres niveles (igual que «Por pagar» en Inicio): vidrio si falta más de una semana, ámbar de 1 a 7 días y blanca si es hoy o ya pasó. */
 .credit-card__chip {
   display: inline-flex;
