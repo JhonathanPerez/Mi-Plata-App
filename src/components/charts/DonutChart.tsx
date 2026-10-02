@@ -11,6 +11,8 @@ interface DonutChartProps {
 /** Dona con leyenda: cada método muestra nombre, porcentaje y valor (no depende solo del color). */
 export function DonutChart({ items, total }: DonutChartProps) {
   let offset = 25; // arranca arriba
+  // Entre segmentos queda una rendija; con un solo método el anillo se cierra sin muesca arriba.
+  const gap = items.length > 1 ? 0.6 : 0;
   return (
     <div className="donut">
       <div className="donut__chart">
@@ -18,6 +20,7 @@ export function DonutChart({ items, total }: DonutChartProps) {
           <circle cx="21" cy="21" r="15.9155" fill="none" stroke="var(--line)" strokeWidth="5" />
           {items.map((item) => {
             const length = Math.max(item.percent, 0);
+            const drawn = Math.max(length - gap, 0);
             const circle = (
               <circle
                 key={item.paymentMethodId}
@@ -27,7 +30,7 @@ export function DonutChart({ items, total }: DonutChartProps) {
                 fill="none"
                 stroke={item.color}
                 strokeWidth="5"
-                strokeDasharray={`${Math.max(length - 0.6, 0)} ${100 - Math.max(length - 0.6, 0)}`}
+                strokeDasharray={`${drawn} ${100 - drawn}`}
                 strokeDashoffset={offset}
               />
             );
