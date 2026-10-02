@@ -14,7 +14,7 @@ import { Skeleton } from '@/components/ui/Skeleton';
 import { Stat } from '@/components/ui/Stat';
 import { useQuery } from '@/hooks/useQuery';
 import { cx } from '@/lib/cx';
-import { describeCut, describeDue, statementDates } from '@/lib/cycles';
+import { statementDates } from '@/lib/cycles';
 import { diffDays, todayIso } from '@/lib/dates';
 import { statementStatus, type StatementTone } from '@/lib/statementStatus';
 import { formatDayMonth, periodMonthName, relativeDays, statementDatesLabel } from '@/lib/statementText';
@@ -126,10 +126,6 @@ export function StatementsPage() {
               <span className="stat__foot">
                 {open.expenses.length} {pluralize(open.expenses.length, 'gasto', 'gastos')} · pago hasta {formatDayMonth(open.dueDate)}
               </span>
-              <LinkButton onClick={() => setEditing(open)}>
-                <Icon name="edit" size={16} />
-                Cambiar fechas de este mes
-              </LinkButton>
             </Stat>
           )}
 
@@ -199,18 +195,6 @@ export function StatementsPage() {
               {!showAll && closed.length > VISIBLE && <LinkButton onClick={() => setShowAll(true)}>Ver extractos anteriores</LinkButton>}
             </section>
           )}
-
-          <div className="card card--flush">
-            <Row
-              to={`/tarjetas/${id}/fechas`}
-              icon="calendar"
-              title="Reglas de corte y pago"
-              detail={`Corte: ${describeCut(rules).toLowerCase()}`}
-              chevron="chevronRight"
-            >
-              <span className="row__detail">Pago: {describeDue(rules).toLowerCase()}</span>
-            </Row>
-          </div>
         </>
       )}
 
