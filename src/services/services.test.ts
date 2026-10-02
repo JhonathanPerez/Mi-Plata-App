@@ -131,6 +131,11 @@ suite('servicios con SQLite real', () => {
     expect(dash.topCategory?.name).toBe('Alimentación');
     expect(dash.budget.available).toBe(3000000 - 52000);
     expect(dash.recent.length).toBeGreaterThan(0);
+    // Comparación con agosto y promedio por día, calculados de los gastos (19 días transcurridos).
+    expect(dash.previousTotal).toBe(250000);
+    expect(dash.changeAmount).toBe(52000 - 250000);
+    expect(Math.round(dash.changePercent ?? 0)).toBe(-79);
+    expect(Math.round(dash.dailyAverage)).toBe(Math.round(52000 / 19));
 
     const summary = await statsService.getMonthlySummary('2026-09', now);
     expect(summary.transactions).toBe(2);

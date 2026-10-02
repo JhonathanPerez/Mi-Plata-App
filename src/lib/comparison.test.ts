@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { MAX_SHOWN_PERCENT, describeComparison, previousMonthLabel } from './comparison';
+import { MAX_SHOWN_PERCENT, describeChange, describeComparison, previousMonthLabel } from './comparison';
 
 const money = (value: number) => `$${value}`;
 const base = { yearMonth: '2026-10', previousTotal: 100, changeAmount: 50, changePercent: 50 };
@@ -63,5 +63,25 @@ describe('describeComparison', () => {
 
   it('usa el formato recibido (modo privacidad)', () => {
     expect(describeComparison(base, () => '$ ••••').text).toBe('Gastaste $ •••• más que en septiembre (50%).');
+  });
+});
+
+describe('describeChange', () => {
+  it('sin gastos el mes anterior no hay pastilla', () => {
+    expect(describeChange({ ...base, previousTotal: 0, changePercent: null }, money)).toBeNull();
+  });
+
+  it('gasto igual', () => {
+    expect(describeChange({ ...base, changeAmount: 0, changePercent: 0 }, money)).toEqual({ direction: 'same', text: 'Igual que septiembre' });
+  });
+
+  it('gastó más o menos: porcentaje redondeado y sin signo', () => {
+    expect(describeChange({ ...base, changePercent: 12.6 }, money)).toEqual({ direction: 'more', text: '13% vs septiembre' });
+    expect(describeChange({ ...base, changeAmount: -40, changePercent: -40 }, money)).toEqual({ direction: 'less', text: '40% vs septiembre' });
+  });
+
+  it('con variaciones enormes o diminutas muestra el monto en vez del porcentaje', () => {
+    expect(describeChange({ ...base, changeAmount: 5000, changePercent: MAX_SHOWN_PERCENT + 1 }, money)?.text).toBe('$5000 vs septiembre');
+    expect(describeChange({ ...base, changeAmount: 3, changePercent: 0.3 }, money)?.text).toBe('$3 vs septiembre');
   });
 });

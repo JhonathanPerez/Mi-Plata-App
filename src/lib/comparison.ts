@@ -42,3 +42,15 @@ export function describeComparison(input: ComparisonInput, formatAmount: (value:
     text: `Gastaste ${formatAmount(Math.abs(input.changeAmount))} ${more ? 'más' : 'menos'} que en ${label}${percentText}.`,
   };
 }
+
+/** La versión corta de la comparación, para la pastilla del hero de Inicio (`null` cuando no hay con qué comparar). */
+export function describeChange(input: ComparisonInput, formatAmount: (value: number) => string): Comparison | null {
+  if (input.previousTotal === 0) return null;
+  const label = previousMonthLabel(input.yearMonth);
+  if (input.changeAmount === 0) return { direction: 'same', text: `Igual que ${label}` };
+
+  const percent = Math.abs(Math.round(input.changePercent ?? 0));
+  // Mismo criterio que `describeComparison`: menos de 1 % o más de 999 % no informan, así que va el monto.
+  const size = percent >= 1 && percent <= MAX_SHOWN_PERCENT ? `${percent}%` : formatAmount(Math.abs(input.changeAmount));
+  return { direction: input.changeAmount > 0 ? 'more' : 'less', text: `${size} vs ${label}` };
+}

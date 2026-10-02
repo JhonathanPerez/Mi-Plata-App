@@ -26,6 +26,13 @@ export interface DashboardData {
   todayTotal: number;
   monthTotal: number;
   monthCount: number;
+  /** Lo gastado en el mes dividido entre los días transcurridos. */
+  dailyAverage: number;
+  /** Lo gastado en todo el mes anterior. */
+  previousTotal: number;
+  changeAmount: number;
+  /** null cuando el mes anterior no tiene gastos. */
+  changePercent: number | null;
   budget: BudgetStatus;
   byCategory: CategoryTotal[];
   topCategory: CategoryTotal | null;
@@ -49,6 +56,19 @@ export interface MonthlySummary {
   changeAmount: number;
   /** null cuando el mes anterior no tiene gastos. */
   changePercent: number | null;
+}
+
+/** Promedio por día: el mes en curso se divide entre los días que van; uno pasado, entre todos los suyos. */
+export function averagePerDay(yearMonth: YearMonth, total: number, now: Date = new Date()): number {
+  return total / Math.max(1, elapsedDaysInMonth(yearMonth, now));
+}
+
+/** Cuánto cambió el gasto frente al mes anterior; el porcentaje es null cuando el anterior no tuvo gastos. */
+export function changeBetween(total: number, previousTotal: number): { changeAmount: number; changePercent: number | null } {
+  return {
+    changeAmount: total - previousTotal,
+    changePercent: previousTotal > 0 ? ((total - previousTotal) / previousTotal) * 100 : null,
+  };
 }
 
 export function withCategoryPercents(items: CategoryTotal[], total: number): CategoryTotal[] {
@@ -83,10 +103,12 @@ export const statsService = {
     const yearMonth = currentYearMonth(now);
     const today = todayIso(now);
     const { from, to } = monthRange(yearMonth);
+    const previous = monthRange(addMonths(yearMonth, -1));
 
-    const [todayTotals, monthTotals, byCategory, byMethod, recent, budgetAmount] = await Promise.all([
+    const [todayTotals, monthTotals, previousTotals, byCategory, byMethod, recent, budgetAmount] = await Promise.all([
       expenseRepository.sumBetween(today, today),
       expenseRepository.sumBetween(from, to),
+      expenseRepository.sumBetween(previous.from, previous.to),
       expenseRepository.totalsByCategory(from, to),
       expenseRepository.totalsByMethod(from, to),
       expenseRepository.query({ limit: 5 }),
@@ -100,6 +122,9 @@ export const statsService = {
       todayTotal: todayTotals.total,
       monthTotal: monthTotals.total,
       monthCount: monthTotals.count,
+      dailyAverage: averagePerDay(yearMonth, monthTotals.total, now),
+      previousTotal: previousTotals.total,
+      ...changeBetween(monthTotals.total, previousTotals.total),
       budget: computeBudgetStatus(yearMonth, budgetAmount, monthTotals.total),
       byCategory: categories,
       topCategory: categories[0] ?? null,
@@ -122,13 +147,12 @@ export const statsService = {
 
     const categories = withCategoryPercents(byCategory, totals.total);
     const methods = withMethodPercents(byMethod, totals.total);
-    const days = elapsedDaysInMonth(yearMonth, now);
 
     return {
       yearMonth,
       total: totals.total,
       transactions: totals.count,
-      dailyAverage: totals.total / Math.max(1, days),
+      dailyAverage: averagePerDay(yearMonth, totals.total, now),
       topCategory: categories[0] ?? null,
       topMethod: pickMostUsedMethod(methods),
       byCategory: categories,
@@ -136,9 +160,7 @@ export const statsService = {
       daily: fillDailyTotals(yearMonth, daily),
       previousTotal: previousTotals.total,
       previousTransactions: previousTotals.count,
-      changeAmount: totals.total - previousTotals.total,
-      changePercent:
-        previousTotals.total > 0 ? ((totals.total - previousTotals.total) / previousTotals.total) * 100 : null,
+      ...changeBetween(totals.total, previousTotals.total),
     };
   },
 };
