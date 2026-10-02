@@ -47,7 +47,7 @@ export function LockSettingsPage() {
 
   return (
     <div className="page">
-      <PageHeader title="Bloqueo con huella o rostro" back />
+      <PageHeader title="Bloqueo" back />
 
       <div className="card">
         <Toggle

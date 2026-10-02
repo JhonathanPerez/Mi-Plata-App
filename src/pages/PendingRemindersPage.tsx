@@ -5,7 +5,7 @@ import { PageHeader } from '@/components/ui/PageHeader';
 export function PendingRemindersPage() {
   return (
     <div className="page">
-      <PageHeader title="Recordatorio de pendientes" back />
+      <PageHeader title="Recordatorios" back />
       <PendingReminderCard />
     </div>
   );
