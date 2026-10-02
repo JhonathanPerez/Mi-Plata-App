@@ -69,6 +69,7 @@ export const BANK_KEYWORDS: Array<{ bank: BankKey; pattern: RegExp }> = [
   { bank: 'rappi', pattern: /\b(rappicard|rappipay)\b/ },
 ];
 
+/** Origen de los avisos que se pegaron a mano en versiones anteriores: ya no se crean, pero los que quedan guardados se siguen mostrando. */
 export const MANUAL_SOURCE = 'manual';
 
 /** Nombre legible de un origen (paquete o 'manual'). */
@@ -84,7 +85,5 @@ export function describeSource(source: string): string {
 export const CAPTURE_MAX_LAG_MS = 6 * 60 * 60 * 1000;
 /** Misma notificación publicada de nuevo (actualización) dentro de esta ventana = duplicado. */
 export const CAPTURE_DEDUPE_WINDOW_MS = 2 * 60 * 1000;
-/** Al pegar un mensaje a mano, si ya se vio el mismo texto en este lapso se avisa en vez de duplicar. */
-export const CAPTURE_MANUAL_DEDUPE_MS = 24 * 60 * 60 * 1000;
 /** Cuánto tiempo se conserva la huella de un pendiente ya resuelto (evita re-detectar el mismo aviso). */
 export const CAPTURE_KEEP_RESOLVED_DAYS = 60;

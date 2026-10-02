@@ -28,7 +28,7 @@ export function CaptureSetupPage() {
           <p className="capture-status__title">
             {!supported ? 'Solo disponible en el teléfono' : enabled === null ? 'Comprobando…' : enabled ? 'Activadas' : 'Desactivadas'}
           </p>
-          {!supported && <p className="muted">En el navegador no se pueden leer notificaciones. Puedes probar el lector pegando un mensaje.</p>}
+          {!supported && <p className="muted">En el navegador no se pueden leer notificaciones. Abre Mi Plata en tu teléfono para activar la captura automática.</p>}
           {supported && enabled === false && <p className="muted">Dale acceso a las notificaciones para que Mi Plata te mantenga informado.</p>}
         </div>
       </section>

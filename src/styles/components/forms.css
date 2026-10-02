@@ -161,10 +161,3 @@
 .money--hero .money__input::placeholder {
   color: var(--line);
 }
-
-.input--area {
-  padding: var(--space-3) var(--space-4);
-  min-height: 120px;
-  resize: vertical;
-  line-height: 1.4;
-}
