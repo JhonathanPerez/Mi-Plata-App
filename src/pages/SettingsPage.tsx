@@ -19,6 +19,7 @@ import { formatCOP } from '@/lib/money';
 import { pluralize } from '@/lib/text';
 import { backupService, parseBackup } from '@/services/backupService';
 import { budgetService } from '@/services/budgetService';
+import { captureAppsService } from '@/services/captureAppsService';
 import { captureService } from '@/services/captureService';
 import { importService } from '@/services/importService';
 import { lockService } from '@/services/lockService';
@@ -44,16 +45,15 @@ function Group({ title, children, flush = true }: GroupProps) {
 /** Línea de estado de «Avisos de pago»: lo que está activo, o por qué no lo está. */
 function paymentRemindersDetail({ active, supported, settings }: ReturnType<typeof useReminderStatus>): string {
   if (active && settings) {
-    const count = settings.leadDays.length;
-    return `Activados · ${count} ${pluralize(count, 'aviso', 'avisos')} · ${HOUR_LABELS[settings.hour]}`;
+    return `Activados · ${HOUR_LABELS[settings.hour]}`;
   }
-  return settings?.enabled && supported ? 'Falta el permiso de notificaciones' : 'Desactivados';
+  return settings?.enabled && supported ? 'Falta el permiso' : 'Desactivados';
 }
 
 /** Línea de estado de «Recordatorio de pendientes». */
 function pendingRemindersDetail({ pendingActive, supported, pendingSettings }: ReturnType<typeof useReminderStatus>): string {
   if (pendingActive && pendingSettings) return `Activado · cada ${formatInterval(pendingSettings.intervalMinutes)}`;
-  return pendingSettings?.enabled && supported ? 'Falta el permiso de notificaciones' : 'Desactivado';
+  return pendingSettings?.enabled && supported ? 'Falta el permiso' : 'Desactivado';
 }
 
 export function SettingsPage() {
@@ -64,6 +64,7 @@ export function SettingsPage() {
   const { data: budget } = useQuery(() => budgetService.getAmount(yearMonth), [yearMonth]);
   const { data: lock } = useQuery(() => lockService.getConfig());
   const { data: pendingCount } = useQuery(() => captureService.countPending());
+  const { data: trackedApps } = useQuery(() => captureAppsService.getSelected());
   const reminders = useReminderStatus();
   const [budgetOpen, setBudgetOpen] = useState(false);
   const [busy, setBusy] = useState<string | null>(null);
@@ -155,8 +156,15 @@ export function SettingsPage() {
         />
       </Group>
 
-      {/* 3 · Captura y avisos: de dónde llegan los gastos y cuándo te avisa el teléfono. Cada aviso se configura en su propia pantalla. */}
-      <Group title="Captura y avisos">
+      {/* 3 · Seguimiento de apps: de qué apps se leen las compras y dónde caen. */}
+      <Group title="Seguimiento de apps">
+        <Row
+          to="/ajustes/captura"
+          icon="apps"
+          title="Apps que se siguen"
+          detail={trackedApps ? `${trackedApps.length} ${pluralize(trackedApps.length, 'app', 'apps')}` : undefined}
+          chevron="chevronRight"
+        />
         <Row
           to="/pendientes"
           icon="inbox"
@@ -164,11 +172,15 @@ export function SettingsPage() {
           detail={pendingCount ? `${pendingCount} ${pluralize(pendingCount, 'pendiente', 'pendientes')}` : 'Ninguno por ahora'}
           chevron="chevronRight"
         />
+      </Group>
+
+      {/* 4 · Notificaciones: lo que te avisa el teléfono. Cada aviso se configura en su propia pantalla. */}
+      <Group title="Notificaciones">
         <Row
-          to="/ajustes/captura"
-          icon="bell"
-          title="Notificaciones y SMS del banco"
-          detail="Detectar compras automáticamente"
+          to="/ajustes/avisos-pago"
+          icon="bellRinging"
+          title="Avisos de pago"
+          detail={paymentRemindersDetail(reminders)}
           chevron="chevronRight"
         />
         <Row
@@ -178,16 +190,9 @@ export function SettingsPage() {
           detail={pendingRemindersDetail(reminders)}
           chevron="chevronRight"
         />
-        <Row
-          to="/ajustes/avisos-pago"
-          icon="bellRinging"
-          title="Avisos de pago"
-          detail={paymentRemindersDetail(reminders)}
-          chevron="chevronRight"
-        />
       </Group>
 
-      {/* 4 · Apariencia */}
+      {/* 5 · Apariencia */}
       <Group title="Apariencia" flush={false}>
         <div className="setting-theme">
           <Icon name="moon" size={22} />
@@ -205,7 +210,7 @@ export function SettingsPage() {
         />
       </Group>
 
-      {/* 5 · Datos y Acerca de. Importar, copia y restaurar abren el selector de archivos, por eso no llevan flecha. */}
+      {/* 6 · Datos y Acerca de. Importar, copia y restaurar abren el selector de archivos, por eso no llevan flecha. */}
       <section className="section">
         <h2 className="section__title">Datos y acerca de</h2>
         <div className="card card--flush">
@@ -217,11 +222,11 @@ export function SettingsPage() {
             onClick={() => importRef.current?.click()}
             disabled={busy !== null}
           />
-          <Row icon="save" title="Crear copia de seguridad" detail="Un archivo para guardar o compartir" onClick={() => void onBackup()} disabled={busy !== null} />
+          <Row icon="save" title="Crear copia de seguridad" detail="Para guardar o compartir" onClick={() => void onBackup()} disabled={busy !== null} />
           <Row
             icon="refresh"
             title="Restaurar copia de seguridad"
-            detail="Reemplaza todos tus datos actuales"
+            detail="Reemplaza todos tus datos"
             tone="danger"
             onClick={() => restoreRef.current?.click()}
             disabled={busy !== null}
