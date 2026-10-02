@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { ActionSheet } from '@/components/ui/ActionSheet';
+import { IconButton } from '@/components/ui/Button';
 import { Row } from '@/components/ui/Row';
 import { SwipeRow } from '@/components/ui/SwipeRow';
 import { describeSource } from '@/config/capture';
@@ -14,6 +15,8 @@ interface PendingRowProps {
   onOpen: (id: string) => void;
   onDismiss: (id: string) => void;
   onReportSpam: (id: string) => void;
+  /** La fila «asoma» el fondo de descartar para enseñar que se desliza (solo la primera de la lista). */
+  hint?: boolean;
 }
 
 function whenLabel(ms: number): string {
@@ -29,10 +32,11 @@ function whenLabel(ms: number): string {
 
 /**
  * Un gasto detectado que espera categoría. Tocar la fila lo abre; deslizarla a la izquierda lo descarta
- * (con confirmación, así un roce accidental no borra nada). Mantenerla presionada abre un menú con
- * "Descartar" y "Reportar como publicidad". Para lector de pantalla y teclado hay botones equivalentes.
+ * (con confirmación, así un roce accidental no borra nada). El botón ⋮ —y mantener la fila presionada— abre un menú con
+ * "Reportar como publicidad" y "Descartar", así no hace falta conocer los gestos. Para lector de pantalla y teclado
+ * hay botones equivalentes.
  */
-export function PendingRow({ item, onOpen, onDismiss, onReportSpam }: PendingRowProps) {
+export function PendingRow({ item, onOpen, onDismiss, onReportSpam, hint }: PendingRowProps) {
   const title = item.merchant ?? 'Comercio sin identificar';
   const [menuOpen, setMenuOpen] = useState(false);
   const longPress = useLongPress({
@@ -46,6 +50,7 @@ export function PendingRow({ item, onOpen, onDismiss, onReportSpam }: PendingRow
     <>
       <SwipeRow
         collapse
+        hint={hint}
         swipeLeft={{
           label: 'Descartar',
           icon: 'trash',
@@ -55,6 +60,7 @@ export function PendingRow({ item, onOpen, onDismiss, onReportSpam }: PendingRow
         }}
       >
         <Row
+          className="pending-row__main"
           align="start"
           holdable
           onClick={() => onOpen(item.id)}
@@ -68,9 +74,15 @@ export function PendingRow({ item, onOpen, onDismiss, onReportSpam }: PendingRow
           </span>
           <span className="row__detail row__detail--clamp">{item.rawText}</span>
         </Row>
-        <button type="button" className="sr-only" onClick={() => onReportSpam(item.id)}>
-          Reportar {title} como publicidad
-        </button>
+        <IconButton
+          className="pending-row__more"
+          icon="more"
+          label={`Más opciones de ${title}`}
+          onClick={() => {
+            setMenuOpen(true);
+            void haptics.tap();
+          }}
+        />
       </SwipeRow>
 
       <ActionSheet
