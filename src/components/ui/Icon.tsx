@@ -4,11 +4,13 @@ import {
   ArrowUp,
   ArrowsClockwise,
   Bell,
+  BellRinging,
   CalendarBlank,
   CaretLeft,
   CaretRight,
   ChartBar,
   Check,
+  ClockCountdown,
   CreditCard,
   DeviceMobile,
   DotsThreeVertical,
@@ -45,7 +47,7 @@ export type IconName =
   | 'home' | 'list' | 'chart' | 'sliders' | 'plus' | 'back' | 'close' | 'chevronRight' | 'chevronLeft'
   | 'check' | 'trash' | 'edit' | 'search' | 'filter' | 'calendar' | 'download' | 'upload' | 'warning'
   | 'arrowUp' | 'arrowDown' | 'shield' | 'info' | 'moon' | 'tag' | 'card' | 'target' | 'refresh' | 'save'
-  | 'lock' | 'bell' | 'inbox' | 'apps' | 'phone' | 'eye' | 'eyeOff' | 'flag' | 'user' | 'more';
+  | 'lock' | 'bell' | 'bellRinging' | 'clockCountdown' | 'inbox' | 'apps' | 'phone' | 'eye' | 'eyeOff' | 'flag' | 'user' | 'more';
 
 /**
  * Íconos Phosphor. Los de "contenido" (casa, tarjeta, campana…) van en duotono, con un tono suave de relleno;
@@ -82,6 +84,8 @@ const ICONS: Record<IconName, { Component: PhosphorIcon; weight: IconWeight }> =
   save: { Component: FloppyDisk, weight: 'duotone' },
   lock: { Component: Lock, weight: 'duotone' },
   bell: { Component: Bell, weight: 'duotone' },
+  bellRinging: { Component: BellRinging, weight: 'duotone' },
+  clockCountdown: { Component: ClockCountdown, weight: 'duotone' },
   inbox: { Component: Tray, weight: 'duotone' },
   apps: { Component: SquaresFour, weight: 'duotone' },
   phone: { Component: DeviceMobile, weight: 'duotone' },
