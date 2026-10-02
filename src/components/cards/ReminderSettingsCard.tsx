@@ -1,7 +1,7 @@
 import { useToast } from '@/app/providers/ToastProvider';
 import { Button } from '@/components/ui/Button';
 import { Chip } from '@/components/ui/Chip';
-import { Icon } from '@/components/ui/Icon';
+import { Notice } from '@/components/ui/Notice';
 import { Segmented } from '@/components/ui/Segmented';
 import { Toggle } from '@/components/ui/Toggle';
 import { errorMessage } from '@/lib/errors';
@@ -11,7 +11,7 @@ import { reminderService } from '@/services/reminderService';
 import { disableReminders, enableReminders, sendTestReminder, syncReminders } from '@/services/reminderSync';
 import { useReminderStatus } from './useReminderStatus';
 
-/** Ajustes de los avisos del teléfono antes de que venza el pago de una tarjeta. */
+/** Avisos del teléfono antes de que venza el pago de una tarjeta. Es un bloque de Ajustes: va dentro de la tarjeta «Captura y avisos». */
 export function ReminderSettingsCard() {
   const toast = useToast();
   const { settings, permission, supported, refresh, active } = useReminderStatus();
@@ -78,7 +78,7 @@ export function ReminderSettingsCard() {
       : 'El teléfono te avisa antes de que venza el pago de cada tarjeta, aunque la app esté cerrada.';
 
   return (
-    <div className="card stack">
+    <div className="settings-panel stack">
       <Toggle checked={active} onChange={(next) => void onToggle(next)} label="Avisar antes de que venza un pago" hint={hint} />
 
       {active && settings && (
@@ -110,13 +110,9 @@ export function ReminderSettingsCard() {
           <Button variant="secondary" block icon="bell" onClick={() => void test()}>
             Enviar aviso de prueba
           </Button>
-          <p className="field__hint reminder-note">
-            <Icon name="info" size={16} />
-            <span>
-              Si pagas un extracto, sus avisos se cancelan solos. En Xiaomi, Samsung u Oppo, deja Mi Plata «sin restricciones» en Batería para que los avisos no se
-              retrasen.
-            </span>
-          </p>
+          <Notice tone="info">
+            Si pagas un extracto, sus avisos se cancelan solos. En Xiaomi, Samsung u Oppo, deja Mi Plata «sin restricciones» en Batería para que los avisos no se retrasen.
+          </Notice>
         </>
       )}
     </div>

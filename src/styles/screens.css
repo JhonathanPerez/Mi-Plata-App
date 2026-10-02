@@ -199,13 +199,18 @@ number-flow-react {
   font-weight: 650;
 }
 
-/* ---------- Configuración ---------- */
+/* ---------- Ajustes ---------- */
 .setting-theme {
   display: flex;
   align-items: center;
   gap: var(--space-3);
-  margin-bottom: var(--space-3);
   font-weight: 650;
+}
+
+/* Bloque con un interruptor y sus opciones dentro de una tarjeta de filas: el divisor lo separa de lo que tiene encima. */
+.settings-panel {
+  padding: var(--space-4);
+  border-top: 1px solid var(--line);
 }
 
 .about {

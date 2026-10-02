@@ -128,15 +128,3 @@
 .pay-link {
   white-space:nowrap;
 }
-
-.reminder-note {
-  display: flex;
-  gap: var(--space-2);
-  align-items: flex-start;
-}
-
-.reminder-note svg {
-  flex: none;
-  margin-top: var(--space-0);
-}
-

@@ -19,7 +19,7 @@ function toFieldValue(minutes: number): { unit: Unit; text: string } {
   return minutes % 60 === 0 ? { unit: 'hours', text: String(minutes / 60) } : { unit: 'minutes', text: String(minutes) };
 }
 
-/** Ajustes del recordatorio periódico de gastos capturados automáticamente que siguen sin categoría. */
+/** Recordatorio periódico de gastos capturados que siguen sin categoría. Es un bloque de Ajustes: va dentro de la tarjeta «Captura y avisos». */
 export function PendingReminderCard() {
   const toast = useToast();
   const { pendingSettings, permission, exactAlarm, supported, refresh, pendingActive } = useReminderStatus();
@@ -88,10 +88,10 @@ export function PendingReminderCard() {
     ? 'Solo funciona en la app instalada en el teléfono.'
     : permission === 'denied'
       ? 'El permiso de notificaciones está bloqueado. Actívalo en Ajustes del teléfono ▸ Apps ▸ Mi Plata ▸ Notificaciones.'
-      : undefined;
+      : 'Un aviso cada cierto tiempo mientras haya gastos sin categoría.';
 
   return (
-    <div className="card stack">
+    <div className="settings-panel stack">
       <Toggle checked={pendingActive} onChange={(next) => void onToggle(next)} label="Recordarme los gastos por categorizar" hint={hint} />
 
       {pendingActive && pendingSettings && (
@@ -155,11 +155,9 @@ export function PendingReminderCard() {
           )}
 
           {exactAlarm === 'denied' && (
-            <div className="stack">
-              <Button variant="secondary" onClick={() => void exactAlarmBridge.openSettings()}>
-                Permitir alarmas exactas
-              </Button>
-            </div>
+            <Button variant="secondary" block onClick={() => void exactAlarmBridge.openSettings()}>
+              Permitir alarmas exactas
+            </Button>
           )}
         </>
       )}
