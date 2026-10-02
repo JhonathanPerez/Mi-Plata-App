@@ -16,7 +16,7 @@ interface RowProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'title'
   detail?: ReactNode;
   /**
    * Más líneas bajo el título y el detalle, en el orden en que se pasen. Cada una se arma con
-   * `<span className="row__detail">` (o `row__note`, `row__status`) para heredar el estilo de la fila.
+   * `<span className="row__detail">` (o `row__note`) para heredar el estilo de la fila.
    */
   children?: ReactNode;
   /** Ícono dentro de un cuadro a la izquierda (ajustes). */

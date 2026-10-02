@@ -158,20 +158,6 @@
   white-space: nowrap;
 }
 
-.row__status {
-  font-size: var(--fs-sm);
-  font-weight: 700;
-  color: var(--primary);
-}
-
-.row__status--due {
-  color: var(--warning-text);
-}
-
-.row__status--late {
-  color: var(--danger);
-}
-
 .row__side {
   flex: none;
   display: flex;

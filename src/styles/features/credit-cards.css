@@ -58,6 +58,7 @@
 
 /* Panel de vidrio: lo que se debe (cifra grande), o el ciclo abierto cuando no hay nada cerrado por pagar. */
 .credit-card__panel {
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -69,6 +70,53 @@
 
 .credit-card__panel--due {
   background: var(--white-a24);
+}
+
+/* Todo el panel abre los extractos: un botón transparente lo cubre y la flecha avisa que se puede tocar. */
+.credit-card__hit {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  border: 0;
+  border-radius: inherit;
+  background: transparent;
+  color: inherit;
+}
+
+.credit-card__hit:active {
+  background: var(--white-a12);
+}
+
+/* El anillo de enfoque normal (verde) no se ve sobre el color de la tarjeta. */
+.credit-card__hit:focus-visible {
+  outline: 3px solid var(--white);
+  outline-offset: -3px;
+}
+
+.credit-card__chevron {
+  position: absolute;
+  top: 50%;
+  inset-inline-end: var(--space-3);
+  translate: 0 -50%;
+  opacity: 0.8;
+  pointer-events: none;
+}
+
+/* Avance del ciclo abierto: días transcurridos hasta el corte. */
+.credit-card__progress {
+  width: 100%;
+  height: 6px;
+  border-radius: var(--radius-pill);
+  background: var(--white-a24);
+  overflow: hidden;
+}
+
+.credit-card__progress-bar {
+  display: block;
+  width: calc(var(--progress, 0) * 100%);
+  height: 100%;
+  border-radius: inherit;
+  background: var(--white);
 }
 
 .credit-card__label {
@@ -101,7 +149,7 @@
   font-size: var(--fs-xl);
 }
 
-/* Vencimiento: pastilla de vidrio; si es hoy o ya pasó, se vuelve blanca para que sea lo primero que se vea. */
+/* Vencimiento en tres niveles (igual que «Por pagar» en Inicio): vidrio si falta más de una semana, ámbar de 1 a 7 días y blanca si es hoy o ya pasó. */
 .credit-card__chip {
   display: inline-flex;
   align-items: center;
@@ -113,7 +161,12 @@
   font-weight: 700;
 }
 
-.credit-card__chip--urgent {
+.credit-card__chip--warning {
+  background: var(--accent);
+  color: var(--on-white);
+}
+
+.credit-card__chip--danger {
   background: var(--white);
   color: var(--on-white);
 }
@@ -135,12 +188,7 @@
   font-variant-numeric: tabular-nums;
 }
 
-/* Dos accesos, uno bajo otro, con separador y flecha: cada uno de 48 px de alto. */
-.credit-card__links {
-  display: flex;
-  flex-direction: column;
-}
-
+/* Un solo acceso, con separador y flecha, de 48 px de alto. */
 .credit-card__link {
   display: flex;
   align-items: center;
@@ -149,6 +197,7 @@
   min-height: var(--tap);
   padding: 0 var(--space-1);
   border: 0;
+  border-top: 1px solid var(--white-a12);
   background: transparent;
   color: inherit;
   font-size: var(--fs-sm);
@@ -156,12 +205,13 @@
   text-align: start;
 }
 
-.credit-card__link + .credit-card__link {
-  border-top: 1px solid var(--white-a12);
-}
-
 .credit-card__link:active {
   opacity: 0.8;
+}
+
+/* «Pagar extracto de septiembre · $664.600» puede partirse en dos renglones en 360 dp: que respire. */
+.credit-card .btn {
+  padding-block: var(--space-2);
 }
 
 .rule-panel {
@@ -239,34 +289,59 @@
   font-weight:700;
 }
 
+/* Ciclo abierto: una cifra destacada con borde punteado, porque todavía no es un extracto. */
 .statement-open {
-  display:flex;
-  flex-direction:column;
-  gap:var(--space-0);
-  padding:var(--space-4);
-  border-radius:var(--radius-m);
-  background:var(--surface);
-  border:1px dashed var(--line);
+  border-style: dashed;
 }
 
-.statement-open strong {
-  font-family:var(--font-display);
-  font-size:var(--fs-2xl);
+/* Fila de un extracto: el mes y su estado en la misma línea (la pastilla baja si no cabe). */
+.statement-title {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-1) var(--space-2);
 }
 
-.statement-open small {
-  color:var(--ink-2);
+.statement-status {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: var(--space-0) var(--space-2);
+  border-radius: var(--radius-pill);
+  background: var(--surface-2);
+  color: var(--ink-2);
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+.statement-status svg {
+  flex: none;
+}
+
+.statement-status--paid {
+  background: var(--primary-tint);
+  /* --primary solo llega a 4.47:1 sobre su tinte en claro; mezclado con la tinta pasa de 5.9:1 en los dos temas. */
+  color: color-mix(in srgb, var(--primary) 75%, var(--ink));
+}
+
+.statement-status--warning {
+  background: var(--accent-soft);
+  color: var(--warning-text);
+}
+
+.statement-status--danger {
+  background: color-mix(in srgb, var(--danger) 12%, transparent);
+  color: var(--danger);
 }
 
 .statement-tag {
-  margin-left:var(--space-2);
-  padding:var(--space-0) var(--space-2);
-  border-radius:var(--radius-pill);
-  background:var(--surface-2);
-  color:var(--ink-2);
-  font-size:var(--fs-xs);
-  font-weight:800;
-  vertical-align:1px;
+  padding: var(--space-0) var(--space-2);
+  border-radius: var(--radius-pill);
+  background: var(--surface-2);
+  color: var(--ink-2);
+  font-size: var(--fs-xs);
+  font-weight: 800;
 }
 
 .upcoming-statements {
