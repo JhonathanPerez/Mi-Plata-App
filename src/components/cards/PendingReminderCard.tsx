@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useToast } from '@/app/providers/ToastProvider';
 import { Button } from '@/components/ui/Button';
 import { Chip } from '@/components/ui/Chip';
+import { Notice } from '@/components/ui/Notice';
 import { Segmented } from '@/components/ui/Segmented';
 import { Toggle } from '@/components/ui/Toggle';
 import { errorMessage } from '@/lib/errors';
@@ -19,7 +20,7 @@ function toFieldValue(minutes: number): { unit: Unit; text: string } {
   return minutes % 60 === 0 ? { unit: 'hours', text: String(minutes / 60) } : { unit: 'minutes', text: String(minutes) };
 }
 
-/** Recordatorio periódico de gastos capturados que siguen sin categoría. Es un bloque de Ajustes: va dentro de la tarjeta «Captura y avisos». */
+/** Contenido de la pantalla «Recordatorio de pendientes»: interruptor y opciones del aviso periódico de gastos capturados que siguen sin categoría. */
 export function PendingReminderCard() {
   const toast = useToast();
   const { pendingSettings, permission, exactAlarm, supported, refresh, pendingActive } = useReminderStatus();
@@ -91,76 +92,91 @@ export function PendingReminderCard() {
       : 'Un aviso cada cierto tiempo mientras haya gastos sin categoría.';
 
   return (
-    <div className="settings-panel stack">
-      <Toggle checked={pendingActive} onChange={(next) => void onToggle(next)} label="Recordarme los gastos por categorizar" hint={hint} />
+    <>
+      <div className="card">
+        <Toggle checked={pendingActive} onChange={(next) => void onToggle(next)} label="Recordarme los gastos por categorizar" hint={hint} />
+      </div>
 
       {pendingActive && pendingSettings && (
         <>
-          <div className="field">
-            <span className="field__label">Recordar cada</span>
-            <div className="chip-row" role="group" aria-label="Cada cuánto recordar">
-              {INTERVAL_PRESETS.map((value) => (
-                <Chip
-                  key={value}
-                  selected={minutes === value}
-                  onClick={() => {
-                    setCustomOpen(false);
-                    void choose(value);
-                  }}
-                >
-                  {formatInterval(value)}
+          <section className="section">
+            <h2 className="section__title">Cada cuánto</h2>
+            <div className="card stack">
+              <div className="chip-row" role="group" aria-label="Cada cuánto recordar">
+                {INTERVAL_PRESETS.map((value) => (
+                  <Chip
+                    key={value}
+                    selected={minutes === value}
+                    onClick={() => {
+                      setCustomOpen(false);
+                      void choose(value);
+                    }}
+                  >
+                    {formatInterval(value)}
+                  </Chip>
+                ))}
+                <Chip selected={customOpen || !isPreset} onClick={() => setCustomOpen(true)}>
+                  Otro
                 </Chip>
-              ))}
-              <Chip selected={customOpen || !isPreset} onClick={() => setCustomOpen(true)}>
-                Otro
-              </Chip>
-            </div>
-          </div>
+              </div>
 
-          {(customOpen || !isPreset) && (
-            <div className="field">
-              <label className="field__label" htmlFor="pending-reminder-value">
-                Otro tiempo
-              </label>
-              <input
-                id="pending-reminder-value"
-                className="input"
-                type="number"
-                inputMode="numeric"
-                min={1}
-                step={1}
-                value={valueText}
-                onChange={(event) => setValueText(event.target.value)}
-                onBlur={() => void commitCustom()}
-                onKeyDown={(event) => {
-                  if (event.key === 'Enter') event.currentTarget.blur();
-                }}
-              />
-              <Segmented<Unit>
-                label="Unidad de tiempo"
-                value={unit}
-                onChange={(next) => {
-                  setUnit(next);
-                  void commitCustom(next, valueText);
-                }}
-                options={[
-                  { value: 'minutes', label: 'Minutos' },
-                  { value: 'hours', label: 'Horas' },
-                ]}
-              />
-              <p className="field__hint">
-                Desde {formatInterval(MIN_INTERVAL_MINUTES)} hasta {formatInterval(MAX_INTERVAL_MINUTES)}
-              </p>
+              {(customOpen || !isPreset) && (
+                <div className="field">
+                  <label className="field__label" htmlFor="pending-reminder-value">
+                    Otro tiempo
+                  </label>
+                  <input
+                    id="pending-reminder-value"
+                    className="input"
+                    type="number"
+                    inputMode="numeric"
+                    min={1}
+                    step={1}
+                    value={valueText}
+                    onChange={(event) => setValueText(event.target.value)}
+                    onBlur={() => void commitCustom()}
+                    onKeyDown={(event) => {
+                      if (event.key === 'Enter') event.currentTarget.blur();
+                    }}
+                  />
+                  <Segmented<Unit>
+                    label="Unidad de tiempo"
+                    value={unit}
+                    onChange={(next) => {
+                      setUnit(next);
+                      void commitCustom(next, valueText);
+                    }}
+                    options={[
+                      { value: 'minutes', label: 'Minutos' },
+                      { value: 'hours', label: 'Horas' },
+                    ]}
+                  />
+                  <p className="field__hint">
+                    Desde {formatInterval(MIN_INTERVAL_MINUTES)} hasta {formatInterval(MAX_INTERVAL_MINUTES)}
+                  </p>
+                </div>
+              )}
             </div>
-          )}
+          </section>
 
           {exactAlarm === 'denied' && (
-            <Button variant="secondary" block onClick={() => void exactAlarmBridge.openSettings()}>
-              Permitir alarmas exactas
-            </Button>
+            <Notice
+              tone="warning"
+              title="Android puede retrasar los recordatorios"
+              action={
+                <Button variant="secondary" onClick={() => void exactAlarmBridge.openSettings()}>
+                  Permitir alarmas exactas
+                </Button>
+              }
+            >
+              Activa «Alarmas y recordatorios» para Mi Plata y lleguen a su hora.
+            </Notice>
           )}
+
+          {/* Mismas horas de silencio que QUIET_FROM_HOUR y QUIET_UNTIL_HOUR en lib/pendingReminders. */}
+          <Notice tone="info">No se avisa de 10 p. m. a 8 a. m.: lo que caiga en ese rato llega a las 8 a. m.</Notice>
         </>
       )}
-    </div>
+    </>
   );
 }
