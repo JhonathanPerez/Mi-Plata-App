@@ -81,6 +81,28 @@
   font-weight: 650;
 }
 
+/* Fila de Estadísticas que lleva a Gastos: sin aspecto de botón, con un resalte al tocar y una flecha al final. */
+.bars__row--button {
+  /* El relleno y el margen negativo se compensan: el texto no se mueve, solo el resalte sale un poco de la fila. */
+  width: calc(100% + 2 * var(--space-2));
+  margin: calc(-1 * var(--space-1)) calc(-1 * var(--space-2));
+  padding: var(--space-1) var(--space-2);
+  border: 0;
+  border-radius: var(--radius-s);
+  background: transparent;
+  text-align: left;
+}
+
+.bars__row--button:active {
+  background: var(--surface-2);
+}
+
+.bars__chevron {
+  flex: none;
+  align-self: center;
+  color: var(--ink-2);
+}
+
 .bars__row--top .bars__name {
   font-weight: 800;
 }
@@ -213,6 +235,12 @@
 }
 
 .daily {
+  /* Se desliza el dedo en horizontal para elegir un día; el desplazamiento vertical de la página sigue funcionando. */
+  touch-action: pan-y;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  cursor: pointer;
   display: flex;
   align-items: flex-end;
   gap: var(--space-0);
@@ -242,6 +270,12 @@
   background: var(--primary);
 }
 
+/* Va al final: la selección gana a vacío, futuro y pico. */
+.daily__bar.is-selected {
+  background: var(--accent);
+  border-bottom-color: var(--accent);
+}
+
 .daily__axis {
   display: flex;
   justify-content: space-between;
@@ -250,7 +284,7 @@
   margin-top: var(--space-1);
 }
 
-.daily__peak {
+.daily__readout {
   margin-top: var(--space-3);
   font-size: var(--fs-sm);
   color: var(--ink-2);

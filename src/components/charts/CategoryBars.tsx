@@ -1,4 +1,5 @@
 import { EmojiTile } from '@/components/ui/EmojiTile';
+import { Icon } from '@/components/ui/Icon';
 import { Amount } from '@/components/ui/Money';
 import { cssVars } from '@/lib/cssVars';
 import { cx } from '@/lib/cx';
@@ -15,9 +16,11 @@ interface CategoryBarsProps {
    * una fila «Otras» suma el resto para que los porcentajes cierren en 100 %.
    */
   compact?: boolean;
+  /** Con esto cada categoría es un botón (con flecha) que llama aquí; sin esto las filas son solo informativas. */
+  onSelect?: (item: CategoryTotal) => void;
 }
 
-export function CategoryBars({ items, limit, highlightFirst = false, compact = false }: CategoryBarsProps) {
+export function CategoryBars({ items, limit, highlightFirst = false, compact = false, onSelect }: CategoryBarsProps) {
   const shown = limit ? items.slice(0, limit) : items;
   const rest = compact && limit ? items.slice(limit) : [];
   const restTotal = rest.reduce((sum, item) => sum + item.total, 0);
@@ -31,53 +34,71 @@ export function CategoryBars({ items, limit, highlightFirst = false, compact = f
 
   return (
     <ul className="bars">
-      {shown.map((item, index) => (
-        <li key={item.categoryId} className={cx('bars__row', markTop && index === 0 && 'bars__row--top')}>
-          <EmojiTile emoji={item.icon} color={item.color} size="sm" />
-          <div className="bars__main">
-            <div className="bars__line">
-              <span className="bars__name">
-                {item.name}
-                {markTop && index === 0 && <span className="bars__tag">Mayor gasto</span>}
+      {shown.map((item, index) => {
+        const top = markTop && index === 0;
+        // Todo el contenido son <span>: dentro de un <button> solo es válido contenido en línea.
+        const content = (
+          <>
+            <EmojiTile emoji={item.icon} color={item.color} size="sm" />
+            <span className="bars__main">
+              <span className="bars__line">
+                <span className="bars__name">
+                  {item.name}
+                  {top && <span className="bars__tag">Mayor gasto</span>}
+                </span>
+                <span className="bars__value">
+                  <Amount value={item.total} />
+                </span>
               </span>
-              <span className="bars__value">
-                <Amount value={item.total} />
-              </span>
-            </div>
-            {compact ? (
-              <div className="bars__meter">
-                <div className="bars__track" aria-hidden="true">
-                  <span className="bars__fill" style={cssVars({ '--fill': fillOf(item.total, item.percent), '--swatch': item.color })} />
-                </div>
-                <span className="bars__percent bars__percent--inline">{formatPercent(item.percent)}</span>
-              </div>
+              {compact ? (
+                <span className="bars__meter">
+                  <span className="bars__track" aria-hidden="true">
+                    <span className="bars__fill" style={cssVars({ '--fill': fillOf(item.total, item.percent), '--swatch': item.color })} />
+                  </span>
+                  <span className="bars__percent bars__percent--inline">{formatPercent(item.percent)}</span>
+                </span>
+              ) : (
+                <>
+                  <span className="bars__track" aria-hidden="true">
+                    <span className="bars__fill" style={cssVars({ '--fill': fillOf(item.total, item.percent), '--swatch': item.color })} />
+                  </span>
+                  <span className="bars__percent">{formatPercent(item.percent)} del mes</span>
+                </>
+              )}
+            </span>
+          </>
+        );
+        return (
+          <li key={item.categoryId}>
+            {onSelect ? (
+              <button type="button" className={cx('bars__row', 'bars__row--button', top && 'bars__row--top')} onClick={() => onSelect(item)}>
+                {content}
+                <Icon name="chevronRight" size={20} className="bars__chevron" />
+              </button>
             ) : (
-              <>
-                <div className="bars__track" aria-hidden="true">
-                  <span className="bars__fill" style={cssVars({ '--fill': fillOf(item.total, item.percent), '--swatch': item.color })} />
-                </div>
-                <span className="bars__percent">{formatPercent(item.percent)} del mes</span>
-              </>
+              <div className={cx('bars__row', top && 'bars__row--top')}>{content}</div>
             )}
-          </div>
-        </li>
-      ))}
+          </li>
+        );
+      })}
       {restTotal > 0 && (
-        <li className="bars__row">
-          <EmojiTile emoji="📦" color="var(--neutral-tile)" size="sm" />
-          <div className="bars__main">
-            <div className="bars__line">
-              <span className="bars__name">Otras</span>
-              <span className="bars__value">
-                <Amount value={restTotal} />
+        <li>
+          <div className="bars__row">
+            <EmojiTile emoji="📦" color="var(--neutral-tile)" size="sm" />
+            <span className="bars__main">
+              <span className="bars__line">
+                <span className="bars__name">Otras</span>
+                <span className="bars__value">
+                  <Amount value={restTotal} />
+                </span>
               </span>
-            </div>
-            <div className="bars__meter">
-              <div className="bars__track" aria-hidden="true">
-                <span className="bars__fill" style={cssVars({ '--fill': fillOf(restTotal, restPercent), '--swatch': 'var(--neutral-tile)' })} />
-              </div>
-              <span className="bars__percent bars__percent--inline">{formatPercent(restPercent)}</span>
-            </div>
+              <span className="bars__meter">
+                <span className="bars__track" aria-hidden="true">
+                  <span className="bars__fill" style={cssVars({ '--fill': fillOf(restTotal, restPercent), '--swatch': 'var(--neutral-tile)' })} />
+                </span>
+                <span className="bars__percent bars__percent--inline">{formatPercent(restPercent)}</span>
+              </span>
+            </span>
           </div>
         </li>
       )}
