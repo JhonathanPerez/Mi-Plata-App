@@ -9,6 +9,7 @@ import { Row } from '@/components/ui/Row';
 import { Segmented } from '@/components/ui/Segmented';
 import { useReminderStatus } from '@/components/cards/useReminderStatus';
 import { APP_AUTHOR, APP_NAME, APP_VERSION } from '@/config/constants';
+import { useCaptureAccess } from '@/hooks/useCaptureAccess';
 import { useQuery } from '@/hooks/useQuery';
 import { currentYearMonth } from '@/lib/dates';
 import { describeLockDelay } from '@/lib/lockPolicy';
@@ -42,6 +43,13 @@ function Group({ title, children, flush = true }: GroupProps) {
   );
 }
 
+/** Línea de estado de «Activar notificaciones»: si Mi Plata puede leer las notificaciones del banco. */
+function captureAccessDetail({ supported, enabled }: ReturnType<typeof useCaptureAccess>): string | undefined {
+  if (!supported) return 'Solo en el teléfono';
+  if (enabled === null) return undefined;
+  return enabled ? 'Activadas' : 'Sin activar';
+}
+
 /** Línea de estado de «Avisos de pago»: lo que está activo, o por qué no lo está. */
 function paymentRemindersDetail({ active, supported, settings }: ReturnType<typeof useReminderStatus>): string {
   if (active && settings) {
@@ -66,6 +74,7 @@ export function SettingsPage() {
   const { data: pendingCount } = useQuery(() => captureService.countPending());
   const { data: trackedApps } = useQuery(() => captureAppsService.getSelected());
   const reminders = useReminderStatus();
+  const captureAccess = useCaptureAccess();
   const [budgetOpen, setBudgetOpen] = useState(false);
   const [busy, setBusy] = useState<string | null>(null);
   const importRef = useRef<HTMLInputElement>(null);
@@ -156,10 +165,10 @@ export function SettingsPage() {
         />
       </Group>
 
-      {/* 3 · Seguimiento de apps: de qué apps se leen las compras y dónde caen. */}
+      {/* 3 · Seguimiento de apps: de qué apps se leen las compras y dónde caen. El permiso para leer notificaciones va aparte, en «Notificaciones». */}
       <Group title="Seguimiento de apps">
         <Row
-          to="/ajustes/captura"
+          to="/ajustes/apps"
           icon="apps"
           title="Apps que se siguen"
           detail={trackedApps ? `${trackedApps.length} ${pluralize(trackedApps.length, 'app', 'apps')}` : undefined}
@@ -174,8 +183,15 @@ export function SettingsPage() {
         />
       </Group>
 
-      {/* 4 · Notificaciones: lo que te avisa el teléfono. Cada aviso se configura en su propia pantalla. */}
+      {/* 4 · Notificaciones: el permiso para leer las del banco y lo que te avisa el teléfono. Cada cosa se configura en su propia pantalla. */}
       <Group title="Notificaciones">
+        <Row
+          to="/ajustes/captura"
+          icon="bell"
+          title="Activar notificaciones"
+          detail={captureAccessDetail(captureAccess)}
+          chevron="chevronRight"
+        />
         <Row
           to="/ajustes/avisos-pago"
           icon="bellRinging"

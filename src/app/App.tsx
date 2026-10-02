@@ -16,6 +16,7 @@ import { PaymentMethodsPage } from '@/pages/PaymentMethodsPage';
 import { PendingPage } from '@/pages/PendingPage';
 import { PendingRemindersPage } from '@/pages/PendingRemindersPage';
 import { StatementsPage } from '@/pages/StatementsPage';
+import { TrackedAppsPage } from '@/pages/TrackedAppsPage';
 import { SettingsPage } from '@/pages/SettingsPage';
 import { StatsPage } from '@/pages/StatsPage';
 import { AppShell } from './AppShell';
@@ -61,6 +62,7 @@ export function App() {
                   <Route path="ajustes/metodos" element={<PageTransition><PaymentMethodsPage /></PageTransition>} />
                   <Route path="ajustes/exportar" element={<PageTransition><ExportPage /></PageTransition>} />
                   <Route path="ajustes/captura" element={<PageTransition><CaptureSetupPage /></PageTransition>} />
+                  <Route path="ajustes/apps" element={<PageTransition><TrackedAppsPage /></PageTransition>} />
                   <Route path="ajustes/bloqueo" element={<PageTransition><LockSettingsPage /></PageTransition>} />
                   <Route path="ajustes/avisos-pago" element={<PageTransition><PaymentRemindersPage /></PageTransition>} />
                   <Route path="ajustes/recordatorio-pendientes" element={<PageTransition><PendingRemindersPage /></PageTransition>} />
