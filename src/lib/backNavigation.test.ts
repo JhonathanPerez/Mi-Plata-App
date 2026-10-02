@@ -28,6 +28,21 @@ describe('decideBackAction', () => {
   });
 });
 
+describe('decideBackAction con destino de regreso', () => {
+  it('vuelve al destino con su estado, haya o no historial', () => {
+    const returnTo = { to: '/estadisticas', state: { yearMonth: '2026-09' } };
+    const expected = { type: 'goto', to: '/estadisticas', state: { yearMonth: '2026-09' } };
+    expect(decideBackAction('/gastos', true, returnTo)).toEqual(expected);
+    expect(decideBackAction('/gastos', false, returnTo)).toEqual(expected);
+  });
+  it('sin estado, solo va a la ruta', () => {
+    expect(decideBackAction('/gastos', true, { to: '/estadisticas' })).toEqual({ type: 'goto', to: '/estadisticas' });
+  });
+  it('sin destino de regreso todo sigue igual', () => {
+    expect(decideBackAction('/gastos', true, undefined)).toEqual({ type: 'goto', to: '/' });
+  });
+});
+
 describe('pila de Atrás', () => {
   it('cierra primero lo último que se abrió', () => {
     const calls: string[] = [];
