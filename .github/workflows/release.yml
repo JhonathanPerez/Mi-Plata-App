@@ -48,15 +48,15 @@ jobs:
       new_release_version: ${{ steps.semrel.outputs.new_release_version }}
     steps:
       - name: Descargar el código (con historial completo)
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
           persist-credentials: true
 
       - name: Configurar Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
-          node-version: 20
+          node-version-file: .nvmrc
           cache: npm
 
       - name: Instalar dependencias
@@ -92,14 +92,14 @@ jobs:
       TAG: ${{ github.event_name == 'workflow_dispatch' && inputs.tag || format('v{0}', needs.release.outputs.new_release_version) }}
     steps:
       - name: Descargar el código en el tag
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           ref: ${{ env.TAG }}
 
       - name: Configurar Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
-          node-version: 20
+          node-version-file: .nvmrc
           cache: npm
 
       # Capacitor 7 requiere JDK 21.
@@ -161,7 +161,7 @@ jobs:
           cp android/app/build/outputs/apk/release/app-release.apk "dist-android/mi-plata-${TAG}.apk"
 
       - name: Guardar el APK como artefacto
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: mi-plata-${{ env.TAG }}
           path: dist-android/*.apk
