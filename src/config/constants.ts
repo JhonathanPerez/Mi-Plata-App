@@ -5,6 +5,11 @@ export const APP_VERSION = __APP_VERSION__;
 export const APP_AUTHOR = '@Jperez.Ortega';
 export const DB_NAME = 'miplata';
 
+/** Repositorio de GitHub donde `semantic-release` publica cada versión con su APK (ver README ▸ Actualizaciones). */
+export const UPDATE_REPO = 'JhonathanPerez/Mi-Plata-App';
+/** Al abrir la app, la búsqueda automática no se repite antes de este tiempo (GitHub limita las consultas sin cuenta). */
+export const UPDATE_CHECK_INTERVAL_MS = 6 * 60 * 60 * 1000;
+
 /**
  * Tiempo mínimo que se ve la pantalla de arranque (logo y spinner) al abrir la app.
  * Es lo que tarda el anillo del logo en dibujarse; la huella o el PIN se piden recién después.
@@ -37,6 +42,8 @@ export const SETTING_KEYS = {
   captureApps: 'capture_apps',
   hideAmounts: 'hide_amounts',
   swipeHintCount: 'swipe_hint_count',
+  updateLastCheck: 'update_last_check',
+  updateSkippedVersion: 'update_skipped_version',
 } as const;
 
 export const CATEGORY_COLORS = [
