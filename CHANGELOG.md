@@ -1,3 +1,10 @@
+## [1.2.9](https://github.com/JhonathanPerez/Mi-Plata-App/compare/v1.2.8...v1.2.9) (2026-10-03)
+
+
+### Bug Fixes
+
+* **inicio:** limitar los gastos recientes al mes en curso para no mezclar gastos del mes anterior ([#36](https://github.com/JhonathanPerez/Mi-Plata-App/issues/36)) ([3f92086](https://github.com/JhonathanPerez/Mi-Plata-App/commit/3f92086676e83cd8995724a2aa33c1f7731562c1))
+
 ## [1.2.8](https://github.com/JhonathanPerez/Mi-Plata-App/compare/v1.2.7...v1.2.8) (2026-10-03)
 
 
