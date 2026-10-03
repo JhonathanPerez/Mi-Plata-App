@@ -7,8 +7,10 @@ import { EmptyState } from '@/components/ui/EmptyState';
 import { ErrorState } from '@/components/ui/ErrorState';
 import { Field } from '@/components/ui/Field';
 import { IconPicker } from '@/components/ui/IconPicker';
+import { ItemPreview } from '@/components/ui/ItemPreview';
 import { ManagedListSkeleton } from '@/components/ui/ManagedListSkeleton';
 import { ManagedRow } from '@/components/ui/ManagedRow';
+import { Notice } from '@/components/ui/Notice';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { Sheet } from '@/components/ui/Sheet';
 import { Toggle } from '@/components/ui/Toggle';
@@ -135,6 +137,8 @@ export function CategoriesPage() {
         }}
       >
         <div className="form">
+          <ItemPreview emoji={draft.icon} color={draft.color} name={draft.name} placeholder="Nombre de la categoría" detail="Así se verá en tu lista" />
+
           <Field label="Nombre" htmlFor="category-name" error={nameError}>
             <input
               id="category-name"
@@ -159,9 +163,9 @@ export function CategoriesPage() {
             onChange={(isActive) => setDraft({ ...draft, isActive })}
           />
           {current && current.expenseCount > 0 && (
-            <p className="field__hint">
-              Tiene {current.expenseCount} {pluralize(current.expenseCount, 'gasto', 'gastos')}, por eso no se puede eliminar. Puedes ocultarla.
-            </p>
+            <Notice>
+              Tiene {current.expenseCount} {pluralize(current.expenseCount, 'gasto', 'gastos')}, por eso no se puede eliminar. Si ya no la usas, apaga «{VISIBLE_TOGGLE_LABEL}».
+            </Notice>
           )}
         </div>
       </Sheet>

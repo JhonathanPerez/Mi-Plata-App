@@ -9,8 +9,10 @@ import { EmptyState } from '@/components/ui/EmptyState';
 import { ErrorState } from '@/components/ui/ErrorState';
 import { Field } from '@/components/ui/Field';
 import { IconPicker } from '@/components/ui/IconPicker';
+import { ItemPreview } from '@/components/ui/ItemPreview';
 import { ManagedListSkeleton } from '@/components/ui/ManagedListSkeleton';
 import { ManagedRow } from '@/components/ui/ManagedRow';
+import { Notice } from '@/components/ui/Notice';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { PickerField } from '@/components/ui/PickerField';
 import { Sheet } from '@/components/ui/Sheet';
@@ -27,7 +29,7 @@ import {
 import { useQuery } from '@/hooks/useQuery';
 import { describeCut, describeDue } from '@/lib/cycles';
 import { errorMessage, ValidationError } from '@/lib/errors';
-import { methodKindLabel } from '@/lib/payment';
+import { defaultIconForType, describePaymentMethod, methodKindLabel } from '@/lib/payment';
 import { pluralize } from '@/lib/text';
 import { paymentMethodService } from '@/services/paymentMethodService';
 import type { PaymentMethodInput, PaymentMethodWithCount } from '@/types/models';
@@ -68,6 +70,15 @@ export function PaymentMethodsPage() {
 
   const close = () => setEditing(null);
   const isCard = draft.type === 'credit_card' || draft.type === 'debit_card';
+
+  // Al cambiar el tipo, el icono acompaña mientras la persona no haya escogido uno propio; sin tarjeta no hay últimos 4 dígitos.
+  const changeType = (type: PaymentMethodInput['type']) =>
+    setDraft((prev) => ({
+      ...prev,
+      type,
+      icon: prev.icon === defaultIconForType(prev.type) ? defaultIconForType(type) : prev.icon,
+      last4: type === 'credit_card' || type === 'debit_card' ? prev.last4 : null,
+    }));
 
   const save = async () => {
     setSaving(true);
@@ -157,6 +168,14 @@ export function PaymentMethodsPage() {
         }}
       >
         <div className="form">
+          <ItemPreview
+            emoji={draft.icon}
+            color={draft.color}
+            name={draft.name}
+            placeholder="Nombre del método"
+            detail={describePaymentMethod(draft.type, isCard ? draft.last4 : null)}
+          />
+
           <Field label="Nombre" htmlFor="pm-name" error={errors.name}>
             <input
               id="pm-name"
@@ -173,7 +192,7 @@ export function PaymentMethodsPage() {
             <legend className="field__label">Tipo</legend>
             <div className="chip-row" role="radiogroup" aria-label="Tipo de método de pago">
               {PAYMENT_TYPES.map((type) => (
-                <Chip key={type} role="radio" selected={draft.type === type} onClick={() => setDraft({ ...draft, type })}>
+                <Chip key={type} role="radio" selected={draft.type === type} onClick={() => changeType(type)}>
                   {PAYMENT_TYPE_LABELS[type]}
                 </Chip>
               ))}
@@ -195,18 +214,6 @@ export function PaymentMethodsPage() {
             </Field>
           )}
 
-          <Field label="Icono" error={errors.icon}>
-            <IconPicker label="Icono del método de pago" icons={PAYMENT_ICONS} value={draft.icon} onChange={(icon) => setDraft({ ...draft, icon })} allowCustom />
-          </Field>
-          <Field label="Color">
-            <ColorPicker label="Color del método de pago" colors={CATEGORY_COLORS} value={draft.color} onChange={(color) => setDraft({ ...draft, color })} />
-          </Field>
-          <Toggle
-            label={VISIBLE_TOGGLE_LABEL}
-            hint={VISIBLE_TOGGLE_HINT}
-            checked={draft.isActive}
-            onChange={(isActive) => setDraft({ ...draft, isActive })}
-          />
           {current && current.type === 'credit_card' && (
             <PickerField
               label="Reglas de corte y pago"
@@ -223,10 +230,23 @@ export function PaymentMethodsPage() {
               }}
             />
           )}
+
+          <Field label="Icono" error={errors.icon}>
+            <IconPicker label="Icono del método de pago" icons={PAYMENT_ICONS} value={draft.icon} onChange={(icon) => setDraft({ ...draft, icon })} allowCustom />
+          </Field>
+          <Field label="Color">
+            <ColorPicker label="Color del método de pago" colors={CATEGORY_COLORS} value={draft.color} onChange={(color) => setDraft({ ...draft, color })} />
+          </Field>
+          <Toggle
+            label={VISIBLE_TOGGLE_LABEL}
+            hint={VISIBLE_TOGGLE_HINT}
+            checked={draft.isActive}
+            onChange={(isActive) => setDraft({ ...draft, isActive })}
+          />
           {current && current.expenseCount > 0 && (
-            <p className="field__hint">
-              Tiene {current.expenseCount} {pluralize(current.expenseCount, 'gasto', 'gastos')}, por eso no se puede eliminar. Puedes ocultarlo.
-            </p>
+            <Notice>
+              Tiene {current.expenseCount} {pluralize(current.expenseCount, 'gasto', 'gastos')}, por eso no se puede eliminar. Si ya no lo usas, apaga «{VISIBLE_TOGGLE_LABEL}».
+            </Notice>
           )}
         </div>
       </Sheet>
