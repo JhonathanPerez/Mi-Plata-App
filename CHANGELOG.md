@@ -1,3 +1,10 @@
+## [1.1.1](https://github.com/JhonathanPerez/Mi-Plata-App/compare/v1.1.0...v1.1.1) (2026-10-03)
+
+
+### Bug Fixes
+
+* **ui:** invitación a activar los avisos de pago con título Paga a tiempo, icono grande, fichas de cuándo avisa, botón ancho y tono ámbar si el permiso está bloqueado (E2-T06) ([#25](https://github.com/JhonathanPerez/Mi-Plata-App/issues/25)) ([fececf0](https://github.com/JhonathanPerez/Mi-Plata-App/commit/fececf0455d81ba32d65f5f9324ddb2023207bc8))
+
 # [1.1.0](https://github.com/JhonathanPerez/Mi-Plata-App/compare/v1.0.2...v1.1.0) (2026-10-03)
 
 
