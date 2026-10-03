@@ -27,10 +27,10 @@ export function dueLabel(dueDate: IsoDate, daysLeft: number): string {
   return `Hasta el ${formatDayMonth(dueDate)} · ${relativeDays(daysLeft)}`;
 }
 
-/** Versión para la tarjeta «Por pagar» de Inicio: "Vence mar 6 oct · en 6 días" (vencido y hoy se dicen igual que en `dueLabel`). */
+/** Versión para la pastilla de una tarjeta de crédito y de un extracto: "Pago en 6 días · mar 6 oct" o "Pago mañana · jue 1 oct" (hoy y vencido se dicen igual que en `dueLabel`). */
 export function dueShortLabel(dueDate: IsoDate, daysLeft: number): string {
   if (daysLeft <= 0) return dueLabel(dueDate, daysLeft);
-  return `Vence ${formatDayMonth(dueDate)} · ${relativeDays(daysLeft)}`;
+  return `Pago ${relativeDays(daysLeft)} · ${formatDayMonth(dueDate)}`;
 }
 
 /** Fechas de un ciclo abierto en una línea corta: "Corta jue 8 oct · pago hasta mar 3 nov". */
