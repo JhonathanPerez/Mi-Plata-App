@@ -54,13 +54,15 @@ banco se leen como notificaciones de la app de mensajes.
 
 ## Actualizaciones desde la app
 
-Solo en Android. Al abrir la app (ya desbloqueada) y en _Ajustes ▸ Datos y acerca de ▸ Comprobar actualizaciones_, Mi Plata
+Solo en Android. Al abrir la app (ya desbloqueada), al volver a ella desde segundo plano y en _Ajustes ▸ Datos y acerca de ▸ Comprobar actualizaciones_, Mi Plata
 consulta `https://api.github.com/repos/<UPDATE_REPO>/releases/latest` y compara la versión publicada con la instalada
 (`src/lib/appUpdate.ts`). Si hay una nueva aparece el aviso **Descargar / Cancelar**; con _Descargar_ se baja el APK del Release
 (con barra de avance) y se abre el instalador de Android, que pide la confirmación final (Android no permite instalar sin ella).
 
-- **Aviso al abrir:** como mucho una consulta cada 6 h (`UPDATE_CHECK_INTERVAL_MS`: GitHub limita las consultas sin cuenta) y una sola vez por
-  versión: tras _Cancelar_ no se insiste, pero _Comprobar actualizaciones_ la sigue ofreciendo.
+- **Aviso automático:** al abrir la app y al volver a ella, como mucho una consulta por hora (`UPDATE_CHECK_INTERVAL_MS`: GitHub limita a 60 consultas
+  por hora sin cuenta). La hora de la consulta solo se anota si hubo respuesta definitiva: con un error de red o una versión «en preparación»
+  se vuelve a preguntar en la siguiente apertura. Tras _Cancelar_, esa versión descansa un día (`UPDATE_SNOOZE_MS`) y luego vuelve a avisar;
+  _Comprobar actualizaciones_ la ofrece siempre.
 - **Permiso:** la primera vez Android pide _Instalar apps desconocidas_ para Mi Plata; la app abre esa pantalla y, al volver, sigue sola.
 - **Seguridad:** solo se descarga de `https://github.com/<UPDATE_REPO>/releases/download/…`. Antes de instalar, el lado nativo comprueba que
   el archivo sea Mi Plata, de una versión más nueva y **firmado con la misma clave** que la app instalada; si no, lo borra y avisa.

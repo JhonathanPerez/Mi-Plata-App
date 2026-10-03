@@ -21,7 +21,7 @@ interface UpdateApi {
 const UpdateContext = createContext<UpdateApi | null>(null);
 
 /**
- * Busca versiones nuevas al abrir la app y guía la actualización: aviso → descarga → instalador de Android.
+ * Busca versiones nuevas al abrir la app (y al volver a ella) y guía la actualización: aviso → descarga → instalador de Android.
  * Va dentro del bloqueo (no aparece sobre la pantalla de huella) y dentro de los avisos y diálogos.
  */
 export function UpdateProvider({ children }: { children: ReactNode }) {
@@ -43,15 +43,34 @@ export function UpdateProvider({ children }: { children: ReactNode }) {
     setPhase({ name: 'prompt', release });
   }, []);
 
-  // Al entrar a la app: una búsqueda silenciosa (sin Internet no pasa nada).
+  /** Evita dos búsquedas automáticas a la vez (abrir la app y volver a ella casi al mismo tiempo). */
+  const autoCheckingRef = useRef(false);
+
+  // Al entrar a la app y al volver a ella desde segundo plano: una búsqueda silenciosa (sin Internet no pasa nada).
+  // El intervalo mínimo entre consultas lo aplica `updateService`, así que volver a la app seguido no gasta consultas.
   useEffect(() => {
     if (!supported) return undefined;
     let ignore = false;
-    void updateService.checkOnStartup().then((release) => {
-      if (!ignore && release && !phaseRef.current) offer(release);
+
+    const autoCheck = async () => {
+      // Con un aviso o una descarga en marcha no hay nada que buscar.
+      if (autoCheckingRef.current || phaseRef.current || busyRef.current) return;
+      autoCheckingRef.current = true;
+      try {
+        const release = await updateService.checkAutomatically();
+        if (!ignore && release && !phaseRef.current) offer(release);
+      } finally {
+        autoCheckingRef.current = false;
+      }
+    };
+
+    void autoCheck();
+    const handle = CapacitorApp.addListener('appStateChange', ({ isActive }) => {
+      if (isActive) void autoCheck();
     });
     return () => {
       ignore = true;
+      void handle.then((h) => h.remove());
     };
   }, [supported, offer]);
 
@@ -127,7 +146,7 @@ export function UpdateProvider({ children }: { children: ReactNode }) {
       cancelledRef.current = true;
       void updateService.cancelDownload().catch(() => undefined);
     } else if (current.name === 'prompt') {
-      // «Cancelar» en el aviso: no se vuelve a insistir con esta versión al abrir la app.
+      // «Cancelar» en el aviso: el aviso automático de esta versión descansa un día (Ajustes la sigue ofreciendo).
       void updateService.skipVersion(current.release.version).catch(() => undefined);
     }
     setPhase(null);

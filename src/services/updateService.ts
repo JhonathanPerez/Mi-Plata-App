@@ -1,8 +1,9 @@
-import { APP_VERSION, SETTING_KEYS, UPDATE_CHECK_INTERVAL_MS, UPDATE_REPO } from '@/config/constants';
+import { APP_VERSION, SETTING_KEYS, UPDATE_CHECK_INTERVAL_MS, UPDATE_REPO, UPDATE_SNOOZE_MS } from '@/config/constants';
 import {
   decideUpdate,
   fetchLatestRelease,
-  shouldCheckOnStartup,
+  isConclusiveDecision,
+  shouldCheckAutomatically,
   shouldPromptAutomatically,
   type AvailableRelease,
   type UpdateDecision,
@@ -30,28 +31,33 @@ export const updateService = {
   check,
 
   /**
-   * Búsqueda automática al abrir la app. Respeta el intervalo mínimo entre consultas y no insiste con una versión a la que
-   * la persona ya dio «Cancelar». Devuelve la versión a ofrecer, o `null` si no hay nada que mostrar. Nunca lanza errores:
-   * sin Internet la app sigue como si nada.
+   * Búsqueda automática, al abrir la app y al volver a ella. Respeta el intervalo mínimo entre consultas y no insiste con una
+   * versión a la que la persona dio «Cancelar» hace menos de un día. Devuelve la versión a ofrecer, o `null` si no hay nada
+   * que mostrar. Nunca lanza errores: sin Internet la app sigue como si nada.
+   *
+   * La hora de la consulta solo se anota si GitHub dio una respuesta definitiva: con un error o con una versión «en preparación»
+   * (su APK aún se compila) la próxima apertura vuelve a preguntar en vez de esperar todo el intervalo.
    */
-  async checkOnStartup(now: number = Date.now()): Promise<AvailableRelease | null> {
+  async checkAutomatically(now: number = Date.now()): Promise<AvailableRelease | null> {
     if (!updateBridge.isSupported()) return null;
     try {
-      if (!shouldCheckOnStartup(await readNumber(SETTING_KEYS.updateLastCheck), now, UPDATE_CHECK_INTERVAL_MS)) return null;
+      if (!shouldCheckAutomatically(await readNumber(SETTING_KEYS.updateLastCheck), now, UPDATE_CHECK_INTERVAL_MS)) return null;
       const decision = await check();
-      await settingsRepository.set(SETTING_KEYS.updateLastCheck, String(now));
+      if (isConclusiveDecision(decision)) await settingsRepository.set(SETTING_KEYS.updateLastCheck, String(now));
       if (decision.status !== 'available') return null;
       const skipped = await settingsRepository.get(SETTING_KEYS.updateSkippedVersion);
-      return shouldPromptAutomatically(decision.release.version, skipped) ? decision.release : null;
+      const skippedAt = await readNumber(SETTING_KEYS.updateSkippedAt);
+      return shouldPromptAutomatically(decision.release.version, skipped, skippedAt, now, UPDATE_SNOOZE_MS) ? decision.release : null;
     } catch (error) {
-      console.warn('[actualizaciones] No se pudo buscar al abrir', error);
+      console.warn('[actualizaciones] No se pudo buscar automáticamente', error);
       return null;
     }
   },
 
-  /** La persona dio «Cancelar»: no se vuelve a avisar de esta versión al abrir la app (Ajustes sigue ofreciéndola). */
-  async skipVersion(version: string): Promise<void> {
+  /** La persona dio «Cancelar»: el aviso automático de esta versión descansa un día (Ajustes sigue ofreciéndola). */
+  async skipVersion(version: string, now: number = Date.now()): Promise<void> {
     await settingsRepository.set(SETTING_KEYS.updateSkippedVersion, version);
+    await settingsRepository.set(SETTING_KEYS.updateSkippedAt, String(now));
   },
 
   canInstall: () => updateBridge.canInstall(),
