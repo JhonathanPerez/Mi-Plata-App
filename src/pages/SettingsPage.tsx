@@ -2,6 +2,7 @@ import { useRef, useState, type ChangeEvent, type ReactNode } from 'react';
 import { useConfirm } from '@/app/providers/ConfirmProvider';
 import { useTheme } from '@/app/providers/ThemeProvider';
 import { useToast } from '@/app/providers/ToastProvider';
+import { useUpdate } from '@/app/providers/UpdateProvider';
 import { BudgetSheet } from '@/components/expenses/BudgetSheet';
 import { Icon } from '@/components/ui/Icon';
 import { PageHeader } from '@/components/ui/PageHeader';
@@ -64,6 +65,14 @@ function pendingRemindersDetail({ pendingActive, supported, pendingSettings }: R
   return pendingSettings?.enabled && supported ? 'Falta el permiso' : 'Desactivado';
 }
 
+/** Línea de estado de «Comprobar actualizaciones»: la versión instalada, o que ya hay una nueva. */
+function updateDetail({ supported, checking, available }: ReturnType<typeof useUpdate>): string {
+  if (!supported) return 'Solo en el teléfono';
+  if (checking) return 'Comprobando…';
+  if (available) return `Hay una versión nueva: v${available.version}`;
+  return `Versión instalada: v${APP_VERSION}`;
+}
+
 export function SettingsPage() {
   const toast = useToast();
   const confirm = useConfirm();
@@ -75,6 +84,7 @@ export function SettingsPage() {
   const { data: trackedApps } = useQuery(() => captureAppsService.getSelected());
   const reminders = useReminderStatus();
   const captureAccess = useCaptureAccess();
+  const update = useUpdate();
   const [budgetOpen, setBudgetOpen] = useState(false);
   const [busy, setBusy] = useState<string | null>(null);
   const importRef = useRef<HTMLInputElement>(null);
@@ -226,7 +236,7 @@ export function SettingsPage() {
         />
       </Group>
 
-      {/* 6 · Datos y Acerca de. Importar, copia y restaurar abren el selector de archivos, por eso no llevan flecha. */}
+      {/* 6 · Datos y Acerca de. Importar, copia y restaurar abren el selector de archivos, y «Comprobar actualizaciones» un diálogo: por eso no llevan flecha. */}
       <section className="section">
         <h2 className="section__title">Datos y acerca de</h2>
         <div className="card card--flush">
@@ -247,6 +257,13 @@ export function SettingsPage() {
             onClick={() => restoreRef.current?.click()}
             disabled={busy !== null}
           />
+          <Row
+            icon="update"
+            title="Comprobar actualizaciones"
+            detail={updateDetail(update)}
+            onClick={() => void update.checkNow()}
+            disabled={!update.supported || update.checking}
+          />
         </div>
         <p className="section__hint">Para importar, el Excel necesita las columnas Fecha, Categoría, Descripción, Método y Valor. Estado es opcional.</p>
 
@@ -260,7 +277,7 @@ export function SettingsPage() {
           </p>
           <p className="about__line">
             <Icon name="shield" size={18} />
-            <span>Tus datos viven solo en este teléfono y la app funciona sin Internet. No pedimos claves ni números de tarjeta.</span>
+            <span>Tus datos viven solo en este teléfono y la app funciona sin Internet; solo consulta GitHub para buscar versiones nuevas, sin enviar tus datos. No pedimos claves ni números de tarjeta.</span>
           </p>
         </div>
       </section>

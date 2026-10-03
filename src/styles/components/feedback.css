@@ -243,6 +243,23 @@
   margin-top: var(--space-3);
 }
 
+/* Barra de avance (descargas). El componente pasa la fracción de 0 a 1 en --progress. */
+.progress {
+  height: 8px;
+  border-radius: var(--radius-pill);
+  background: var(--surface-2);
+  overflow: hidden;
+}
+
+.progress__bar {
+  display: block;
+  width: calc(var(--progress, 0) * 100%);
+  height: 100%;
+  border-radius: inherit;
+  background: var(--primary);
+  transition: width 0.2s var(--ease-out);
+}
+
 /* Invitación a activar algo (avisos, permisos). Ver components/ui/PromptCard.tsx. */
 .prompt {
   display: flex;

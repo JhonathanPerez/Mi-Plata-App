@@ -1,7 +1,7 @@
 # Mi Plata By Jhonathan Pérez Ortega 💚
 
 Control de gastos personales para Colombia. App para Android hecha con **React + TypeScript + Capacitor + SQLite**.
-100 % offline: tus datos viven solo en el teléfono.
+Funciona 100 % sin Internet: tus datos viven solo en el teléfono (la red solo se usa para buscar versiones nuevas, ver [Actualizaciones](#actualizaciones-desde-la-app)).
 
 - Registro de gastos en pocos toques, en pesos colombianos (guardados como enteros).
 - Dashboard con presupuesto, historial con filtros, estadísticas y modo privacidad (oculta los valores).
@@ -9,6 +9,7 @@ Control de gastos personales para Colombia. App para Android hecha con **React +
 - Bloqueo con huella, rostro o PIN al abrir la app.
 - **Captura automática** de compras desde SMS y notificaciones de las apps que elijas.
 - Pagado / por pagar y extractos de tarjeta de crédito.
+- **Actualizaciones desde la app**: avisa de una versión nueva al abrirla (Descargar / Cancelar) y también desde _Ajustes ▸ Datos y acerca de ▸ Comprobar actualizaciones_.
 
 ## Requisitos
 
@@ -51,6 +52,32 @@ banco se leen como notificaciones de la app de mensajes.
 - Si un mensaje real no se detecta: **Por categorizar ▸ `+` ▸ Pegar un mensaje** explica por qué. Para corregirlo, añade el
   caso a `src/lib/parseNotification.test.ts`, corre `npm test` y ajusta `parseNotification.ts`.
 
+## Actualizaciones desde la app
+
+Solo en Android. Al abrir la app (ya desbloqueada) y en _Ajustes ▸ Datos y acerca de ▸ Comprobar actualizaciones_, Mi Plata
+consulta `https://api.github.com/repos/<UPDATE_REPO>/releases/latest` y compara la versión publicada con la instalada
+(`src/lib/appUpdate.ts`). Si hay una nueva aparece el aviso **Descargar / Cancelar**; con _Descargar_ se baja el APK del Release
+(con barra de avance) y se abre el instalador de Android, que pide la confirmación final (Android no permite instalar sin ella).
+
+- **Aviso al abrir:** como mucho una consulta cada 6 h (`UPDATE_CHECK_INTERVAL_MS`: GitHub limita las consultas sin cuenta) y una sola vez por
+  versión: tras _Cancelar_ no se insiste, pero _Comprobar actualizaciones_ la sigue ofreciendo.
+- **Permiso:** la primera vez Android pide _Instalar apps desconocidas_ para Mi Plata; la app abre esa pantalla y, al volver, sigue sola.
+- **Seguridad:** solo se descarga de `https://github.com/<UPDATE_REPO>/releases/download/…`. Antes de instalar, el lado nativo comprueba que
+  el archivo sea Mi Plata, de una versión más nueva y **firmado con la misma clave** que la app instalada; si no, lo borra y avisa.
+  La parte web nunca pasa rutas de archivo al plugin.
+- **Privacidad:** la consulta solo muestra a GitHub la dirección IP de la conexión; no se envía ningún dato de la app.
+- Código: `native/android/AppUpdatePlugin.java` (descarga, comprobación, instalador), `src/lib/updateBridge.ts` (puente),
+  `src/services/updateService.ts` (consulta y reglas de aviso) y `src/app/providers/UpdateProvider.tsx` (flujo y diálogo).
+
+**Requisitos para que funcione**
+
+- El repositorio debe ser **público** (la consulta no lleva credenciales; con un repo privado GitHub responde 404).
+- Cada Release debe llevar su APK adjunto (`mi-plata-vX.Y.Z.apk`; lo hace `release.yml`). El Release se crea unos minutos antes que el APK:
+  en ese rato _Comprobar actualizaciones_ responde que la versión «se está preparando».
+- Siempre el mismo keystore (ver arriba). Un APK de debug no se actualiza a uno de release (firmas distintas).
+- No compilar con `harden-android.mjs --no-internet`: sin permiso de Internet la app no puede buscar versiones.
+- Cambiar de repositorio: `UPDATE_REPO` en `src/config/constants.ts`.
+
 ## Arquitectura
 
 ```
@@ -64,7 +91,7 @@ UI (pages, components) → hooks (useQuery) → services (reglas de negocio) →
 
 ## Seguridad y privacidad
 
-- Sin servidores, cuentas ni analítica. Todo queda en la base SQLite privada de la app.
+- Sin servidores propios, cuentas ni analítica. Todo queda en la base SQLite privada de la app. La única conexión a Internet es la consulta pública a GitHub para buscar versiones nuevas.
 - No se guardan credenciales bancarias; de las tarjetas solo los últimos 4 dígitos (opcionales).
 - El backup automático de Android está desactivado para que los datos no salgan a la nube de Google.
 - El texto de los mensajes del banco se borra al categorizar o descartar el gasto.

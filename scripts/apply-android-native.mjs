@@ -9,6 +9,8 @@
  *  2. AndroidManifest.xml: declara el servicio CaptureListenerService y el permiso USE_BIOMETRIC.
  *  3. MainActivity.java: registra el plugin NotificationCapture.
  *  4. Avisos de pago: permiso POST_NOTIFICATIONS (Android 13+) e ícono res/drawable/ic_stat_miplata.xml.
+ *  5. Actualizaciones desde la app: permiso REQUEST_INSTALL_PACKAGES, FileProvider «.updates» y res/xml/update_paths.xml
+ *     (los usa AppUpdatePlugin.java para entregarle el APK descargado al instalador de Android).
  */
 import { existsSync, readFileSync, readdirSync, statSync, writeFileSync, mkdirSync } from 'node:fs';
 import { join, resolve } from 'node:path';
@@ -97,6 +99,24 @@ if (!xml.includes('android.permission.POST_NOTIFICATIONS')) {
 if (!xml.includes('android.permission.SCHEDULE_EXACT_ALARM')) {
   xml = xml.replace('</manifest>', '    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />\n</manifest>');
 }
+// Actualizaciones: instalar el APK descargado exige este permiso (en Android 8+ la persona lo concede a la app en «Instalar apps
+// desconocidas»; la app la guía) y un FileProvider propio que solo expone la carpeta cache/updates/.
+if (!xml.includes('android.permission.REQUEST_INSTALL_PACKAGES')) {
+  xml = xml.replace('</manifest>', '    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />\n</manifest>');
+}
+if (!xml.includes('@xml/update_paths')) {
+  const provider = `
+        <!-- Entrega el APK descargado al instalador de Android (ver AppUpdatePlugin.java). Solo comparte cache/updates/. -->
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${appId}.updates"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data android:name="android.support.FILE_PROVIDER_PATHS" android:resource="@xml/update_paths" />
+        </provider>
+`;
+  xml = xml.replace('</application>', `${provider}    </application>`);
+}
 if (xml !== originalXml) {
   writeFileSync(manifestPath, xml);
   changes.push('AndroidManifest.xml actualizado');
@@ -112,7 +132,17 @@ if (!existsSync(iconTarget) || readFileSync(iconTarget, 'utf8') !== iconSource) 
   changes.push('ícono de avisos ic_stat_miplata.xml');
 }
 
-// 3) MainActivity: registrar el plugin propio antes de super.onCreate()
+// 3a) Carpeta compartida del FileProvider de actualizaciones
+const xmlDir = join(androidDir, 'app/src/main/res/xml');
+mkdirSync(xmlDir, { recursive: true });
+const pathsSource = readFileSync(join(sourceDir, 'res/update_paths.xml'), 'utf8');
+const pathsTarget = join(xmlDir, 'update_paths.xml');
+if (!existsSync(pathsTarget) || readFileSync(pathsTarget, 'utf8') !== pathsSource) {
+  writeFileSync(pathsTarget, pathsSource);
+  changes.push('update_paths.xml');
+}
+
+// 3) MainActivity: registrar los plugins propios antes de super.onCreate()
 function findMainActivity(dir) {
   for (const entry of readdirSync(dir)) {
     const full = join(dir, entry);
@@ -126,23 +156,29 @@ function findMainActivity(dir) {
   return null;
 }
 
+const PLUGINS = ['NotificationCapturePlugin', 'AppUpdatePlugin'];
+
 const mainPath = findMainActivity(javaRoot);
 if (!mainPath) {
-  console.warn('[nativo] No encontré MainActivity.java. Agrega registerPlugin(NotificationCapturePlugin.class) antes de super.onCreate().');
+  console.warn(`[nativo] No encontré MainActivity.java. Agrega registerPlugin(X.class) antes de super.onCreate() para: ${PLUGINS.join(', ')}.`);
 } else {
-  const main = readFileSync(mainPath, 'utf8');
-  if (!main.includes('NotificationCapturePlugin')) {
+  let main = readFileSync(mainPath, 'utf8');
+  const missing = PLUGINS.filter((plugin) => !main.includes(plugin));
+  if (missing.length > 0) {
     const isDefault = /public class MainActivity extends BridgeActivity\s*\{\s*\}/.test(main);
     const onCreate = /(public\s+void\s+onCreate\s*\(\s*Bundle\s+\w+\s*\)\s*\{)/;
     if (isDefault) {
-      const template = readFileSync(join(sourceDir, 'MainActivity.java'), 'utf8').replaceAll('__PACKAGE__', appId);
-      writeFileSync(mainPath, template);
-      changes.push('MainActivity.java: plugin registrado');
+      // MainActivity vacía (recién generada): se usa la plantilla, que ya registra todos los plugins.
+      main = readFileSync(join(sourceDir, 'MainActivity.java'), 'utf8').replaceAll('__PACKAGE__', appId);
+      writeFileSync(mainPath, main);
+      changes.push('MainActivity.java: plugins registrados');
     } else if (onCreate.test(main)) {
-      writeFileSync(mainPath, main.replace(onCreate, '$1\n        registerPlugin(NotificationCapturePlugin.class);'));
-      changes.push('MainActivity.java: plugin registrado');
+      // Ya registraba alguno (proyecto android/ de antes): se agregan solo los que faltan.
+      const lines = missing.map((plugin) => `\n        registerPlugin(${plugin}.class);`).join('');
+      writeFileSync(mainPath, main.replace(onCreate, `$1${lines}`));
+      changes.push(`MainActivity.java: registrado ${missing.join(', ')}`);
     } else {
-      console.warn('[nativo] Tu MainActivity.java está personalizada: agrega registerPlugin(NotificationCapturePlugin.class) antes de super.onCreate().');
+      console.warn(`[nativo] Tu MainActivity.java está personalizada: agrega registerPlugin(X.class) antes de super.onCreate() para: ${missing.join(', ')}.`);
     }
   }
 }

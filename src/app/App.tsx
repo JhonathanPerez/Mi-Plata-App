@@ -28,6 +28,7 @@ import { ConfirmProvider } from './providers/ConfirmProvider';
 import { PrivacyProvider } from './providers/PrivacyProvider';
 import { ThemeProvider } from './providers/ThemeProvider';
 import { ToastProvider } from './providers/ToastProvider';
+import { UpdateProvider } from './providers/UpdateProvider';
 
 export function App() {
   return (
@@ -40,6 +41,8 @@ export function App() {
           <PrivacyProvider>
           <ToastProvider>
             <ConfirmProvider>
+              {/* Aviso de versión nueva: dentro del bloqueo y de los diálogos, y fuera del router (no navega). */}
+              <UpdateProvider>
               {/* HashRouter: funciona igual en el navegador y dentro del WebView de Android. */}
               <HashRouter>
                 <BackButtonHandler />
@@ -69,6 +72,7 @@ export function App() {
                   <Route path="*" element={<HomePage />} />
                 </Routes>
               </HashRouter>
+              </UpdateProvider>
             </ConfirmProvider>
           </ToastProvider>
           </PrivacyProvider>

@@ -7,8 +7,9 @@ import com.getcapacitor.BridgeActivity;
 public class MainActivity extends BridgeActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        // Plugin propio: debe registrarse antes de super.onCreate().
+        // Plugins propios: deben registrarse antes de super.onCreate().
         registerPlugin(NotificationCapturePlugin.class);
+        registerPlugin(AppUpdatePlugin.class);
         super.onCreate(savedInstanceState);
     }
 }
