@@ -1,3 +1,10 @@
+## [1.2.6](https://github.com/JhonathanPerez/Mi-Plata-App/compare/v1.2.5...v1.2.6) (2026-10-03)
+
+
+### Bug Fixes
+
+* **ui:** fondo sólido en la barra del botón Guardar gasto para que no se vean los campos por detrás ([#33](https://github.com/JhonathanPerez/Mi-Plata-App/issues/33)) ([ce28c53](https://github.com/JhonathanPerez/Mi-Plata-App/commit/ce28c53133b43e7a0a8ab5a7ad7ae019447e6f0e))
+
 ## [1.2.5](https://github.com/JhonathanPerez/Mi-Plata-App/compare/v1.2.4...v1.2.5) (2026-10-03)
 
 

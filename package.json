@@ -1,7 +1,7 @@
 {
   "name": "mi-plata",
   "private": true,
-  "version": "1.2.5",
+  "version": "1.2.6",
   "description": "Mi Plata: control de gastos personales para Colombia (React + Capacitor + SQLite, 100 % offline).",
   "type": "module",
   "engines": {
