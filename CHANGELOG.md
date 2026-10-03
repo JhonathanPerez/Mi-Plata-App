@@ -1,3 +1,10 @@
+## [1.2.5](https://github.com/JhonathanPerez/Mi-Plata-App/compare/v1.2.4...v1.2.5) (2026-10-03)
+
+
+### Bug Fixes
+
+* **estadisticas:** decir «Has gastado» cuando el gasto es menor o igual al del mes anterior. ([#32](https://github.com/JhonathanPerez/Mi-Plata-App/issues/32)) ([8e4ddac](https://github.com/JhonathanPerez/Mi-Plata-App/commit/8e4ddaccc8f019507cea69aafd8c081be7206328))
+
 ## [1.2.4](https://github.com/JhonathanPerez/Mi-Plata-App/compare/v1.2.3...v1.2.4) (2026-10-03)
 
 
