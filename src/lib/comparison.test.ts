@@ -25,7 +25,7 @@ describe('describeComparison', () => {
   it('gasto igual', () => {
     expect(describeComparison({ ...base, changeAmount: 0 }, money)).toEqual({
       direction: 'same',
-      text: 'Igual que en septiembre.',
+      text: 'Has gastado lo mismo que en septiembre.',
     });
   });
 
