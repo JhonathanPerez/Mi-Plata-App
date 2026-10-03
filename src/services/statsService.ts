@@ -101,7 +101,7 @@ export const statsService = {
       expenseRepository.sumBetween(previous.from, previous.to),
       expenseRepository.totalsByCategory(from, to),
       expenseRepository.totalsByMethod(from, to),
-      expenseRepository.query({ limit: 5 }),
+      expenseRepository.query({ from, to, limit: 5 }),
       budgetRepository.getEffectiveAmount(yearMonth),
     ]);
 
