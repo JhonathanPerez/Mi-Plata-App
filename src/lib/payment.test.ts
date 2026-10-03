@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { describePaymentMethod, methodKindLabel, statusHint } from './payment';
+import { defaultIconForType, describePaymentMethod, methodKindLabel, statusHint } from './payment';
 
 describe('describePaymentMethod', () => {
   it('muestra el tipo y, si existen, los últimos 4 dígitos', () => {
@@ -43,5 +43,14 @@ describe('methodKindLabel', () => {
   });
   it('lo omite para el tipo «Otro»', () => {
     expect(methodKindLabel('Transferencia', 'other')).toBeNull();
+  });
+});
+
+describe('defaultIconForType', () => {
+  it('propone un icono según el tipo', () => {
+    expect(defaultIconForType('cash')).toBe('💵');
+    expect(defaultIconForType('credit_card')).toBe('💳');
+    expect(defaultIconForType('debit_card')).toBe('💳');
+    expect(defaultIconForType('other')).toBe('🏦');
   });
 });

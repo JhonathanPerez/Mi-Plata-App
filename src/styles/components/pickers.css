@@ -1,8 +1,9 @@
 /* Selectores: iconos y colores, campo tipo enlace y lista de opciones (categoría, método de pago). */
 
+/* Cuadrícula de opciones: cada una mide al menos --tap y se reparten el ancho, así ninguna queda por debajo de 48 px. */
 .picker {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(var(--tap), 1fr));
   gap: var(--space-2);
 }
 
@@ -41,8 +42,8 @@
 }
 
 .picker__icon {
-  width: 46px;
-  height: 46px;
+  min-height: var(--tap);
+  aspect-ratio: 1;
   border-radius: var(--radius-s);
   border: 1.5px solid var(--line);
   background: var(--surface);
@@ -52,8 +53,8 @@
 }
 
 .picker__color {
-  width: 46px;
-  height: 46px;
+  min-height: var(--tap);
+  aspect-ratio: 1;
   border-radius: var(--radius-s);
   border: 1.5px solid transparent;
   background: var(--swatch, var(--surface));

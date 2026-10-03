@@ -29,3 +29,10 @@ export function methodKindLabel(name: string, type: PaymentMethodType): string |
   const label = PAYMENT_TYPE_LABELS[type];
   return normalizeText(name) === normalizeText(label) ? null : label;
 }
+
+/** Icono que se propone al elegir el tipo de un método de pago nuevo (los mismos de los métodos que trae la app). */
+export function defaultIconForType(type: PaymentMethodType): string {
+  if (type === 'cash') return '💵';
+  if (type === 'other') return '🏦';
+  return '💳';
+}

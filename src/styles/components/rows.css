@@ -45,7 +45,7 @@
   transition: var(--motion-row);
 }
 
-.row--card:active {
+.row--card:active:not(.row--static) {
   transform: scale(0.985);
 }
 
