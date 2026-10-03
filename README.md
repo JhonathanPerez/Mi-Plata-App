@@ -12,14 +12,14 @@ Control de gastos personales para Colombia. App para Android hecha con **React +
 
 ## Requisitos
 
-Node.js 20+, JDK 21 y Android Studio (con Android SDK).
+Node.js 22.14+ (se recomienda Node 26, ver `.nvmrc`), JDK 21 y Android Studio (con Android SDK).
 
 ## Desarrollo
 
 ```bash
 npm install
 npm run typecheck   # TypeScript sin errores
-npm test            # pruebas (las de base de datos requieren Node 22.5+)
+npm test            # pruebas (las de base de datos usan node:sqlite, Node 22.5+)
 npm run dev         # vista previa en el navegador
 ```
 
