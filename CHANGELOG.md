@@ -1,3 +1,10 @@
+## [1.2.4](https://github.com/JhonathanPerez/Mi-Plata-App/compare/v1.2.3...v1.2.4) (2026-10-03)
+
+
+### Bug Fixes
+
+* **actualizaciones:** avisar de versiones nuevas también al volver a la app y no perder el aviso mientras el APK se compila ([#31](https://github.com/JhonathanPerez/Mi-Plata-App/issues/31)) ([e5b8010](https://github.com/JhonathanPerez/Mi-Plata-App/commit/e5b8010e71f95a4db48ba659e8336fd47b1aebf6))
+
 ## [1.2.3](https://github.com/JhonathanPerez/Mi-Plata-App/compare/v1.2.2...v1.2.3) (2026-10-03)
 
 
