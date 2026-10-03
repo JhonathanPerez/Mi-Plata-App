@@ -16,7 +16,7 @@ import { Stat } from '@/components/ui/Stat';
 import { useQuery } from '@/hooks/useQuery';
 import { describeChange } from '@/lib/comparison';
 import { cx } from '@/lib/cx';
-import { formatMonthTitle, formatWeekdayDay } from '@/lib/dates';
+import { addMonths, formatMonthTitle, formatWeekdayDay } from '@/lib/dates';
 import { formatPercent } from '@/lib/money';
 import { useAmountFormat } from '@/app/providers/PrivacyProvider';
 import { pluralize } from '@/lib/text';
@@ -53,8 +53,10 @@ export function HomePage() {
 
   const { budget } = data;
   const hasSpending = data.monthCount > 0;
+  // Mes sin gastos: se muestran los últimos del mes anterior (si los hay) para no dejar la lista vacía.
+  const recentExpenses = hasSpending ? data.recent : data.previousRecent;
   // Si todos los gastos visibles son del mismo método, repetirlo en cada fila es ruido.
-  const showMethod = new Set(data.recent.map((expense) => expense.paymentMethodId)).size > 1;
+  const showMethod = new Set(recentExpenses.map((expense) => expense.paymentMethodId)).size > 1;
   // Pastilla frente al mes anterior: sin gastos este mes no hay nada que comparar, y sin gastos el mes anterior tampoco.
   const change = hasSpending ? describeChange(data, cop) : null;
   // Datos de apoyo bajo la cifra. Con presupuesto la cifra grande es lo disponible, así que lo gastado va aquí.
@@ -146,13 +148,34 @@ export function HomePage() {
       )}
 
       {!hasSpending ? (
-        <div className="card">
-          <EmptyState
-            icon="list"
-            title="Aún no hay gastos este mes"
-            description="Toca el botón + para registrar el primero. Toma menos de diez segundos."
-          />
-        </div>
+        <>
+          <div className="card">
+            <EmptyState
+              icon="list"
+              title="Aún no hay gastos este mes"
+              description="Toca el botón + para registrar el primero. Toma menos de diez segundos."
+            />
+          </div>
+
+          {recentExpenses.length > 0 && (
+            <section className="section">
+              <div className="section__head">
+                <div className="section__heading">
+                  <h2 className="section__title">Recientes</h2>
+                  <p className="section__hint">Del mes anterior, {formatMonthTitle(addMonths(data.yearMonth, -1))}</p>
+                </div>
+                <Link className="link" to="/gastos">
+                  Ver todos
+                </Link>
+              </div>
+              <div className="card card--flush">
+                {recentExpenses.map((expense) => (
+                  <ExpenseRow key={expense.id} expense={expense} showDate compact showMethod={showMethod} onSelect={(id) => navigate(`/gasto/${id}`)} />
+                ))}
+              </div>
+            </section>
+          )}
+        </>
       ) : (
         <>
           <section className="section">
@@ -163,7 +186,7 @@ export function HomePage() {
               </Link>
             </div>
             <div className="card card--flush">
-              {data.recent.map((expense) => (
+              {recentExpenses.map((expense) => (
                 <ExpenseRow key={expense.id} expense={expense} showDate compact showMethod={showMethod} onSelect={(id) => navigate(`/gasto/${id}`)} />
               ))}
             </div>

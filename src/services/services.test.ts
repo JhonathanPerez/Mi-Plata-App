@@ -142,8 +142,17 @@ suite('servicios con SQLite real', () => {
     // Recientes es una muestra del mes en curso: el gasto de agosto (Zapatos) no se cuela.
     expect(dash.recent).toHaveLength(2);
     expect(dash.recent.every((expense) => expense.date >= '2026-09-01' && expense.date <= '2026-09-30')).toBe(true);
-    // Con el mes vacío no hay recientes, aunque existan gastos de meses anteriores.
-    expect((await statsService.getDashboard(new Date(2026, 9, 3))).recent).toEqual([]);
+    // Con gastos este mes no se piden los del mes anterior.
+    expect(dash.previousRecent).toEqual([]);
+    // Mes vacío: no hay recientes propios, pero sí los últimos del mes anterior (septiembre).
+    const october = await statsService.getDashboard(new Date(2026, 9, 3));
+    expect(october.recent).toEqual([]);
+    expect(october.previousRecent).toHaveLength(2);
+    expect(october.previousRecent.every((expense) => expense.date >= '2026-09-01' && expense.date <= '2026-09-30')).toBe(true);
+    // Mes vacío y mes anterior también vacío: todo sigue igual, sin recientes.
+    const november = await statsService.getDashboard(new Date(2026, 10, 3));
+    expect(november.recent).toEqual([]);
+    expect(november.previousRecent).toEqual([]);
     // Comparación con agosto y promedio por día, calculados de los gastos (19 días transcurridos).
     expect(dash.previousTotal).toBe(250000);
     expect(dash.changeAmount).toBe(52000 - 250000);

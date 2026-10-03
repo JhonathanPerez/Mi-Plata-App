@@ -20,6 +20,9 @@ import type {
 } from '@/types/models';
 import { computeBudgetStatus, type BudgetStatus } from './budgetService';
 
+/** Cuántos gastos del mes anterior se muestran en Inicio mientras el mes en curso está vacío. */
+const PREVIOUS_RECENT_LIMIT = 3;
+
 export interface DashboardData {
   yearMonth: YearMonth;
   today: IsoDate;
@@ -36,7 +39,10 @@ export interface DashboardData {
   byCategory: CategoryTotal[];
   topCategory: CategoryTotal | null;
   byMethod: MethodTotal[];
+  /** Últimos gastos del mes en curso. */
   recent: ExpenseWithRefs[];
+  /** Últimos gastos del mes anterior; solo se llenan cuando este mes aún no tiene gastos. */
+  previousRecent: ExpenseWithRefs[];
 }
 
 export interface MonthlySummary {
@@ -105,6 +111,10 @@ export const statsService = {
       budgetRepository.getEffectiveAmount(yearMonth),
     ]);
 
+    // Mes recién empezado: se muestran los últimos del anterior para no dejar la lista vacía.
+    const previousRecent =
+      monthTotals.count === 0 ? await expenseRepository.query({ from: previous.from, to: previous.to, limit: PREVIOUS_RECENT_LIMIT }) : [];
+
     const categories = withCategoryPercents(byCategory, monthTotals.total);
     return {
       yearMonth,
@@ -120,6 +130,7 @@ export const statsService = {
       topCategory: categories[0] ?? null,
       byMethod: withMethodPercents(byMethod, monthTotals.total),
       recent,
+      previousRecent,
     };
   },
 
