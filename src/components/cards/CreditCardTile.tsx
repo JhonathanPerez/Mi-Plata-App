@@ -45,11 +45,27 @@ function TapPanel({ className, label, onOpen, children }: PanelProps) {
   );
 }
 
-/** Barra fina de los días transcurridos hasta el corte; el dato también está en la frase del panel para el lector de pantalla. */
+/** Día del ciclo en que va la tarjeta: el día siguiente al corte anterior es el 1. */
+const cycleDay = (progress: CycleProgress) => Math.max(1, progress.elapsed);
+
+/**
+ * Avance del ciclo en el TIEMPO, no en dinero: el texto sobre la barra lo dice (icono de calendario, «Día 3 de 30») y cuántos días faltan
+ * para el corte. La barra es decorativa para el lector de pantalla porque esos mismos datos ya están escritos.
+ */
 function CycleBar({ progress }: { progress: CycleProgress }) {
+  const remaining = progress.daysLeft === 0 ? 'Corta hoy' : progress.daysLeft === 1 ? 'Corta mañana' : `Faltan ${progress.daysLeft} días`;
   return (
-    <div className="credit-card__progress" aria-hidden="true">
-      <span className="credit-card__progress-bar" style={cssVars({ '--progress': progress.ratio })} />
+    <div className="credit-card__time">
+      <div className="credit-card__time-head">
+        <span className="credit-card__time-day">
+          <Icon name="calendar" size={16} />
+          Día {cycleDay(progress)} de {progress.total}
+        </span>
+        <span>{remaining}</span>
+      </div>
+      <div className="credit-card__progress" aria-hidden="true">
+        <span className="credit-card__progress-bar" style={cssVars({ '--progress': progress.ratio })} />
+      </div>
     </div>
   );
 }
@@ -70,7 +86,7 @@ export function CreditCardTile({ overview }: CreditCardTileProps) {
   const openStatements = () => navigate(`/tarjetas/${method.id}/extractos`);
 
   const spokenAmount = (value: number) => (hidden ? 'valor oculto' : formatCOP(value));
-  const progressSpoken = progress ? `, día ${progress.elapsed} de ${progress.total}` : '';
+  const progressSpoken = progress ? `, día ${cycleDay(progress)} de ${progress.total}` : '';
   const dueLabel = [
     payable.length === 1 ? `Por pagar ${spokenAmount(dueTotal)}` : `Por pagar ${spokenAmount(dueTotal)} en ${payable.length} extractos`,
     nextDue ? dueSpoken(nextDue.date, nextDue.daysLeft) : null,
@@ -84,7 +100,7 @@ export function CreditCardTile({ overview }: CreditCardTileProps) {
     : '';
 
   // Con un extracto por pagar, ese panel es el que abre los extractos y el ciclo abierto solo informa; sin extractos por pagar, el ciclo abierto sí es tocable.
-  const openPanelClass = cx('credit-card__panel', payable.length > 0 && 'credit-card__panel--compact');
+  const openPanelClass = cx('credit-card__panel', payable.length > 0 ? 'credit-card__panel--compact' : 'credit-card__panel--arrow');
   const openPanelBody =
     open && !upToDate ? (
       <>
@@ -153,7 +169,7 @@ export function CreditCardTile({ overview }: CreditCardTileProps) {
 
           {open && upToDate && (
             <TapPanel
-              className="credit-card__panel credit-card__panel--ok"
+              className="credit-card__panel credit-card__panel--ok credit-card__panel--arrow"
               label={`${openLabel}. Ver extractos de ${method.name}`}
               onOpen={openStatements}
             >
@@ -167,10 +183,7 @@ export function CreditCardTile({ overview }: CreditCardTileProps) {
                 </span>
               </div>
               <div className="credit-card__cycle">
-                <span className="credit-card__label">
-                  Ciclo de {periodMonthName(open.period)}
-                  {progress ? ` · día ${progress.elapsed} de ${progress.total}` : ''}
-                </span>
+                <span className="credit-card__label">Ciclo de {periodMonthName(open.period)}</span>
                 {progress && <CycleBar progress={progress} />}
                 <span className="credit-card__note">{cycleDatesLabel(open.cutDate, open.dueDate)}</span>
               </div>

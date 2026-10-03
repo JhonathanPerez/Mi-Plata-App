@@ -102,10 +102,32 @@
   pointer-events: none;
 }
 
-/* Avance del ciclo abierto: días transcurridos hasta el corte. */
+/* Avance del ciclo abierto en días: la descripción va encima de la barra. */
+.credit-card__time {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.credit-card__time-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  font-size: var(--fs-xs);
+  font-weight: 600;
+}
+
+.credit-card__time-day {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
 .credit-card__progress {
   width: 100%;
-  height: 6px;
+  height: 8px;
   border-radius: var(--radius-pill);
   background: var(--white-a24);
   overflow: hidden;
@@ -149,9 +171,13 @@
   font-size: var(--fs-xl);
 }
 
-/* Tarjeta al día: un estado de calma, no una alerta. La flecha del panel tocable queda en su propia franja a la derecha para no pisar la barra de avance. */
+/* Tarjeta al día: un estado de calma, no una alerta. */
 .credit-card__panel--ok {
   gap: var(--space-3);
+}
+
+/* Panel tocable con barra de avance: la flecha queda en su propia franja a la derecha para no pisar el texto ni la barra. */
+.credit-card__panel--arrow {
   padding-inline-end: calc(var(--space-6) + var(--space-2));
 }
 
