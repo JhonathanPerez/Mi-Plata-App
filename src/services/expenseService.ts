@@ -20,6 +20,11 @@ export interface ValidateExpenseOptions {
    * anteriores a esta regla pueden no tenerla, así que el servicio no la impone por defecto.
    */
   requireNote?: boolean;
+  /**
+   * Fecha más reciente permitida (normalmente hoy). También es una regla del formulario: un gasto no se registra
+   * con fecha futura, pero la importación y los datos existentes no se rechazan por esto.
+   */
+  maxDate?: IsoDate;
 }
 
 /** Validación pura (sin base de datos). La usa el formulario para mostrar errores en línea. */
@@ -42,6 +47,7 @@ export function validateExpenseInput(input: ExpenseInput, options: ValidateExpen
   } else {
     const year = Number(input.date.slice(0, 4));
     if (year < 2000 || year > 2100) errors.date = 'Usa una fecha entre 2000 y 2100.';
+    else if (options.maxDate && input.date > options.maxDate) errors.date = 'La fecha no puede ser futura.';
   }
 
   if (input.time !== null && !isValidTime(input.time)) errors.time = 'La hora no es válida.';

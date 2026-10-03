@@ -20,7 +20,7 @@ import { haptics } from '@/lib/haptics';
 import { useDebounced } from '@/hooks/useDebounced';
 import { useSwipeHint } from '@/hooks/useSwipeHint';
 import { useQuery } from '@/hooks/useQuery';
-import { currentYearMonth, formatNumericDate, monthRange } from '@/lib/dates';
+import { clampYearMonth, currentYearMonth, formatNumericDate, monthRange } from '@/lib/dates';
 import { parseHistoryParams } from '@/lib/historyLink';
 import { pluralize } from '@/lib/text';
 import { categoryService } from '@/services/categoryService';
@@ -38,7 +38,9 @@ export function HistoryPage() {
   const [searchParams] = useSearchParams();
   const [initial] = useState(() => parseHistoryParams(searchParams));
   const [status, setStatus] = useState<StatusView>(initial.status);
-  const [yearMonth, setYearMonth] = useState(initial.yearMonth ?? currentYearMonth());
+  // Gastos no navega a meses que aún no llegan; un enlace con un mes futuro cae en el actual.
+  const maxMonth = currentYearMonth();
+  const [yearMonth, setYearMonth] = useState(() => clampYearMonth(initial.yearMonth ?? maxMonth, maxMonth));
   const [filters, setFilters] = useState<HistoryFilters>({
     mode: 'month',
     from: '',
@@ -160,7 +162,7 @@ export function HistoryPage() {
       </div>
 
       <div className="toolbar">
-        {periodText === null ? <MonthNavigator value={yearMonth} onChange={setYearMonth} /> : <p className="period-pill">{periodText}</p>}
+        {periodText === null ? <MonthNavigator value={yearMonth} onChange={setYearMonth} max={maxMonth} /> : <p className="period-pill">{periodText}</p>}
         {expenses ? (
           <p className="toolbar__summary" aria-live="polite">
             <span className="toolbar__count">
