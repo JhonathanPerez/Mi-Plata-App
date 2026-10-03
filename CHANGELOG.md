@@ -1,3 +1,10 @@
+## [1.2.8](https://github.com/JhonathanPerez/Mi-Plata-App/compare/v1.2.7...v1.2.8) (2026-10-03)
+
+
+### Bug Fixes
+
+* **ui:** quitar el enlace «Configurar captura automática» del estado vacío de Por categorizar ([#35](https://github.com/JhonathanPerez/Mi-Plata-App/issues/35)) ([8d1bd00](https://github.com/JhonathanPerez/Mi-Plata-App/commit/8d1bd005ec9ba1f9aaeadf665450544bb6506bed))
+
 ## [1.2.7](https://github.com/JhonathanPerez/Mi-Plata-App/compare/v1.2.6...v1.2.7) (2026-10-03)
 
 
