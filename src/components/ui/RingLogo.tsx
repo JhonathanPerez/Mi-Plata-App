@@ -1,4 +1,5 @@
 import { LOGO_RING_COLORS } from '@/config/constants';
+import { cx } from '@/lib/cx';
 
 /** Giro de cada tramo. La longitud de trazo y el retraso de la animación de cada uno están en splash.css (.s1 a .s5). */
 const SEGMENTS = [
@@ -9,10 +10,14 @@ const SEGMENTS = [
   { className: 'ring-seg s5', rotation: 217.44 },
 ];
 
-/** Logo de Mi Plata (anillo de cinco tramos y punto amarillo) con su animación de dibujo. Lo usan la pantalla de carga y la de bloqueo. */
-export function RingLogo() {
+/**
+ * Logo de Mi Plata (anillo de cinco tramos y punto amarillo). Lo usan la pantalla de carga y la de bloqueo.
+ * Con `animated={false}` aparece ya dibujado: la pantalla de bloqueo lo usa para continuar la de carga
+ * sin que el anillo vuelva a empezar de cero.
+ */
+export function RingLogo({ animated = true }: { animated?: boolean }) {
   return (
-    <div className="splash__mark" aria-hidden="true">
+    <div className={cx('splash__mark', !animated && 'splash__mark--static')} aria-hidden="true">
       <svg viewBox="0 0 108 108">
         {SEGMENTS.map((segment, index) => (
           <circle

@@ -5,6 +5,12 @@ export const APP_VERSION = __APP_VERSION__;
 export const APP_AUTHOR = '@Jperez.Ortega';
 export const DB_NAME = 'miplata';
 
+/**
+ * Tiempo mínimo que se ve la pantalla de arranque (logo y spinner) al abrir la app.
+ * Es lo que tarda el anillo del logo en dibujarse; la huella o el PIN se piden recién después.
+ */
+export const STARTUP_SPLASH_MS = 1_200;
+
 /** Moneda de la app. Los montos se guardan como enteros en pesos. */
 export const CURRENCY = 'COP';
 /** 12 dígitos: 999.999.999.999 (dentro del rango seguro de enteros de JS). */

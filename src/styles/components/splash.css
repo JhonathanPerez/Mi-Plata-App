@@ -63,6 +63,10 @@
   to { transform: scale(1); opacity: 1; }
 }
 
+/* Logo ya dibujado (pantalla de bloqueo) y con "reducir movimiento": sin animación. */
+.splash__mark--static .ring-seg { animation: none; stroke-dashoffset: 0; }
+.splash__mark--static .center-dot { animation: none; transform: scale(1); opacity: 1; }
+
 @media (prefers-reduced-motion: reduce) {
   .splash__mark .ring-seg { animation: none; stroke-dashoffset: 0; }
   .splash__mark .center-dot { animation: none; transform: scale(1); opacity: 1; }
