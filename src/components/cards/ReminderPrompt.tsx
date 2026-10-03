@@ -1,6 +1,7 @@
 import { useToast } from '@/app/providers/ToastProvider';
 import { Button } from '@/components/ui/Button';
-import { Notice } from '@/components/ui/Notice';
+import { Icon } from '@/components/ui/Icon';
+import { PromptCard } from '@/components/ui/PromptCard';
 import { errorMessage } from '@/lib/errors';
 import { enableReminders } from '@/services/reminderSync';
 import { useReminderStatus } from './useReminderStatus';
@@ -22,19 +23,33 @@ export function ReminderPrompt() {
     }
   };
 
+  const blocked = permission === 'denied';
+
   return (
-    <Notice
-      tone="info"
+    <PromptCard
       icon="bell"
+      tone={blocked ? 'warning' : 'info'}
       aria-label="Avisos de pago"
-      title="No te olvides de pagar a tiempo"
+      title="Paga a tiempo"
+      text={blocked ? 'El permiso de notificaciones está bloqueado en el teléfono.' : 'Te avisamos de cada vencimiento:'}
       action={
-        <Button size="md" icon="bell" onClick={() => void enable()}>
+        <Button block onClick={() => void enable()}>
           Activar avisos
         </Button>
       }
     >
-      {permission === 'denied' ? 'El permiso de notificaciones está bloqueado en el teléfono.' : 'Te avisamos un día antes y el mismo día de cada vencimiento.'}
-    </Notice>
+      {!blocked && (
+        <ul className="prompt__tiles" aria-label="Cuándo te avisamos">
+          <li className="prompt__tile">
+            <Icon name="calendar" size={20} />
+            Un día antes
+          </li>
+          <li className="prompt__tile">
+            <Icon name="clockCountdown" size={20} />
+            El mismo día
+          </li>
+        </ul>
+      )}
+    </PromptCard>
   );
 }
