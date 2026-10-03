@@ -1,6 +1,7 @@
 // Endurece el proyecto Android generado por `cap add android`:
 //  - Desactiva las copias de seguridad automáticas de Android (los datos financieros no salen del teléfono).
-//  - Con --no-internet elimina además el permiso INTERNET (la app queda incapaz de usar la red).
+//  - Con --no-internet elimina además el permiso INTERNET (la app queda incapaz de usar la red). Ojo: sin Internet
+//    «Comprobar actualizaciones» no puede consultar GitHub, así que la app ya no se podría actualizar desde dentro.
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 

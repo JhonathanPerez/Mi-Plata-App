@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Carpeta donde AppUpdatePlugin deja el APK descargado. Solo esa subcarpeta se comparte con el instalador. -->
+<paths>
+    <cache-path name="updates" path="updates/" />
+</paths>
