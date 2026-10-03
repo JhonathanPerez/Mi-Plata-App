@@ -6,10 +6,15 @@
   gap: var(--space-4);
 }
 
-/* Barra del botón de guardar: fondo sólido, para que los campos que pasan por detrás no se vean a través del botón. */
+/*
+ * Barra del botón de guardar: fondo sólido, para que los campos que pasan por detrás no se vean a través del botón.
+ * El z-index la pone por encima de los textos con z-index: 1 de los campos (p. ej. .segmented__label, «Pagado / Por pagar»),
+ * que sin él se pintarían sobre el botón; sigue por debajo de la barra de navegación (20), las hojas y los diálogos.
+ */
 .form__footer {
   position: sticky;
   bottom: 0;
+  z-index: 10;
   margin: 0 calc(-1 * var(--space-4));
   padding: var(--space-4) var(--space-4) calc(var(--space-4) + env(safe-area-inset-bottom));
   background: var(--bg);
