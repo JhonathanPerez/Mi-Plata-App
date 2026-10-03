@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { AnimatePresence } from 'motion/react';
 import { useConfirm } from '@/app/providers/ConfirmProvider';
 import { useToast } from '@/app/providers/ToastProvider';
@@ -117,11 +117,6 @@ export function PendingPage() {
             icon="check"
             title="Todo al día"
             description="Cuando llegue una notificación o un SMS de tu banco con una compra, aparecerá aquí para que le pongas categoría."
-            action={
-              <Link className="link" to="/ajustes/captura">
-                Configurar captura automática
-              </Link>
-            }
           />
         </div>
       ) : (
