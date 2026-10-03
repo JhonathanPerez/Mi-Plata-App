@@ -1,18 +1,18 @@
-import { useState } from 'react';
-import { Button } from '@/components/ui/Button';
-import { EmojiTile } from '@/components/ui/EmojiTile';
-import { Icon } from '@/components/ui/Icon';
-import { Amount } from '@/components/ui/Money';
-import { Notice } from '@/components/ui/Notice';
-import { Row } from '@/components/ui/Row';
-import { dueTone, type DueTone } from '@/lib/cardDue';
-import { formatDayMonth, relativeDays } from '@/lib/statementText';
-import type { DueSummary } from '@/services/cardService';
+import { useState } from "react";
+import { Button } from "@/components/ui/Button";
+import { EmojiTile } from "@/components/ui/EmojiTile";
+import { Icon } from "@/components/ui/Icon";
+import { Amount } from "@/components/ui/Money";
+import { Notice } from "@/components/ui/Notice";
+import { Row } from "@/components/ui/Row";
+import { dueTone, type DueTone } from "@/lib/cardDue";
+import { formatDayMonth, relativeDays } from "@/lib/statementText";
+import type { DueSummary } from "@/services/cardService";
 
 const LABEL_CLASS: Record<DueTone, string> = {
-  neutral: 'due-label due-label--neutral',
-  warning: 'due-label due-label--warning',
-  danger: 'due-label due-label--danger',
+  neutral: "due-label due-label--neutral",
+  warning: "due-label due-label--warning",
+  danger: "due-label due-label--danger",
 };
 
 /**
@@ -20,12 +20,13 @@ const LABEL_CLASS: Record<DueTone, string> = {
  * El texto fluye en línea; el icono viaja pegado a la última palabra para no quedar solo en un renglón.
  */
 function DueLabel({ tone, children }: { tone: DueTone; children: string }) {
-  if (tone === 'neutral') return <span className={LABEL_CLASS[tone]}>{children}</span>;
-  const words = children.split(' ');
+  if (tone === "neutral")
+    return <span className={LABEL_CLASS[tone]}>{children}</span>;
+  const words = children.split(" ");
   const last = words.pop();
   return (
     <span className={LABEL_CLASS[tone]}>
-      {words.join(' ')}{' '}
+      {words.join(" ")}{" "}
       <span className="due-label__tail">
         {last}
         <Icon name="warning" size={16} />
@@ -34,11 +35,12 @@ function DueLabel({ tone, children }: { tone: DueTone; children: string }) {
   );
 }
 
-/** «Vence en 6 días» (la fecha va aparte, bajo el monto): cabe en un renglón. */
+/** «Próximo pago en 6 días» (la fecha va aparte, bajo el monto): cabe en un renglón. Hoy y vencido siguen diciendo «Vence hoy» y «Vencido hace…». */
 function dueText(daysLeft: number): string {
-  if (daysLeft < 0) return `Vencido hace ${-daysLeft} ${-daysLeft === 1 ? 'día' : 'días'}`;
-  if (daysLeft === 0) return 'Vence hoy';
-  return `Vence ${relativeDays(daysLeft)}`;
+  if (daysLeft < 0)
+    return `Vencido hace ${-daysLeft} ${-daysLeft === 1 ? "día" : "días"}`;
+  if (daysLeft === 0) return "Vence hoy";
+  return `Pago ${relativeDays(daysLeft)}`;
 }
 
 interface DueSummaryCardProps {
@@ -52,7 +54,13 @@ export function DueSummaryCard({ summary, onPay }: DueSummaryCardProps) {
   const anyClosed = summary.cards.some((card) => card.hasClosedStatement);
   const [infoOpen, setInfoOpen] = useState(false);
   const info = (
-    <button type="button" className="due-summary__info" aria-expanded={infoOpen} aria-label="¿Esto cuenta en mis gastos del mes?" onClick={() => setInfoOpen((open) => !open)}>
+    <button
+      type="button"
+      className="due-summary__info"
+      aria-expanded={infoOpen}
+      aria-label="¿Esto cuenta en mis gastos del mes?"
+      onClick={() => setInfoOpen((open) => !open)}
+    >
       <Icon name="info" size={20} />
     </button>
   );
@@ -74,24 +82,39 @@ export function DueSummaryCard({ summary, onPay }: DueSummaryCardProps) {
           info
         )}
       </div>
-      {infoOpen && <Notice>Ya está incluido en «Gastado este mes»: pagar no cambia tu presupuesto.</Notice>}
+      {infoOpen && (
+        <Notice>
+          Ya está incluido en «Gastado este mes»: pagar no cambia tu
+          presupuesto.
+        </Notice>
+      )}
 
       <div className="due-summary__list">
         {summary.cards.map((card) => {
           const label = card.nextDue
             ? dueText(card.nextDue.daysLeft)
             : card.configured
-              ? 'Ciclo abierto'
-              : 'Falta configurar las fechas';
+              ? "Ciclo abierto"
+              : "Falta configurar las fechas";
           return (
             <Row
               as="div"
               key={card.methodId}
               leading={<EmojiTile emoji={card.icon} color={card.color} />}
               title={card.name}
-              detail={card.nextDue ? <DueLabel tone={dueTone(card.nextDue.daysLeft)}>{label}</DueLabel> : label}
+              detail={
+                card.nextDue ? (
+                  <DueLabel tone={dueTone(card.nextDue.daysLeft)}>
+                    {label}
+                  </DueLabel>
+                ) : (
+                  label
+                )
+              }
               amount={<Amount value={card.total} />}
-              aside={card.nextDue ? formatDayMonth(card.nextDue.date) : undefined}
+              aside={
+                card.nextDue ? formatDayMonth(card.nextDue.date) : undefined
+              }
             />
           );
         })}
@@ -101,15 +124,15 @@ export function DueSummaryCard({ summary, onPay }: DueSummaryCardProps) {
             to="/gastos?estado=por-pagar"
             leading={<EmojiTile emoji="🧾" color="var(--neutral-tile)" />}
             title="Otros métodos"
-            detail={`${summary.other.count} ${summary.other.count === 1 ? 'gasto pendiente' : 'gastos pendientes'}`}
+            detail={`${summary.other.count} ${summary.other.count === 1 ? "gasto pendiente" : "gastos pendientes"}`}
             amount={<Amount value={summary.other.total} />}
           />
         )}
       </div>
 
       {hasCards && (
-        <Button block icon={anyClosed ? 'check' : 'card'} onClick={onPay}>
-          {anyClosed ? 'Pagar tarjeta' : 'Ver tarjetas'}
+        <Button block icon={anyClosed ? "check" : "card"} onClick={onPay}>
+          {anyClosed ? "Pagar tarjeta" : "Ver tarjetas"}
         </Button>
       )}
     </section>
