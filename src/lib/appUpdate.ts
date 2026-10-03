@@ -195,18 +195,38 @@ export async function fetchLatestRelease(repo: string, fetchImpl: typeof fetch =
 // ---------- Cuándo buscar y cuándo avisar ----------
 
 /**
- * La búsqueda automática al abrir la app no se repite antes de `intervalMs`: GitHub limita las consultas sin cuenta
- * por conexión, y muchas redes móviles comparten una misma dirección. La búsqueda manual no pasa por aquí.
+ * La búsqueda automática (al abrir la app y al volver a ella) no se repite antes de `intervalMs`: GitHub limita las consultas
+ * sin cuenta por conexión, y muchas redes móviles comparten una misma dirección. La búsqueda manual no pasa por aquí.
  */
-export function shouldCheckOnStartup(lastCheckedAt: number | null, now: number, intervalMs: number): boolean {
+export function shouldCheckAutomatically(lastCheckedAt: number | null, now: number, intervalMs: number): boolean {
   if (lastCheckedAt === null || !Number.isFinite(lastCheckedAt)) return true;
   if (lastCheckedAt > now) return true; // el reloj retrocedió: mejor volver a mirar
   return now - lastCheckedAt >= intervalMs;
 }
 
-/** El aviso automático sale una sola vez por versión: si la persona le dio «Cancelar», no se le insiste. */
-export function shouldPromptAutomatically(version: string, skippedVersion: string | null): boolean {
-  return version !== skippedVersion;
+/**
+ * ¿Vale la pena recordar que ya se consultó? Solo si GitHub dio una respuesta definitiva. Con `preparing` (el Release existe
+ * pero su APK aún se compila) hay que volver a mirar pronto: si se anotara la hora, el aviso llegaría horas tarde.
+ */
+export function isConclusiveDecision(decision: UpdateDecision): boolean {
+  return decision.status !== 'preparing';
+}
+
+/**
+ * Tras «Cancelar», el aviso automático de esa versión descansa `snoozeMs` y después vuelve a salir; una versión distinta
+ * avisa de inmediato. Sin hora guardada (un «Cancelar» de una versión anterior de la app) el descanso se da por cumplido.
+ */
+export function shouldPromptAutomatically(
+  version: string,
+  skippedVersion: string | null,
+  skippedAt: number | null,
+  now: number,
+  snoozeMs: number,
+): boolean {
+  if (version !== skippedVersion) return true;
+  if (skippedAt === null || !Number.isFinite(skippedAt)) return true;
+  if (skippedAt > now) return true; // el reloj retrocedió: no dejar la versión silenciada indefinidamente
+  return now - skippedAt >= snoozeMs;
 }
 
 // ---------- Presentación ----------

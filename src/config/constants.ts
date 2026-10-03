@@ -7,8 +7,10 @@ export const DB_NAME = 'miplata';
 
 /** Repositorio de GitHub donde `semantic-release` publica cada versión con su APK (ver README ▸ Actualizaciones). */
 export const UPDATE_REPO = 'JhonathanPerez/Mi-Plata-App';
-/** Al abrir la app, la búsqueda automática no se repite antes de este tiempo (GitHub limita las consultas sin cuenta). */
-export const UPDATE_CHECK_INTERVAL_MS = 6 * 60 * 60 * 1000;
+/** La búsqueda automática (al abrir la app y al volver a ella) no se repite antes de este tiempo: GitHub limita a 60 consultas por hora sin cuenta. */
+export const UPDATE_CHECK_INTERVAL_MS = 60 * 60 * 1000;
+/** Tras «Cancelar», el aviso automático de esa versión no vuelve a salir hasta pasado este tiempo (Ajustes la sigue ofreciendo). */
+export const UPDATE_SNOOZE_MS = 24 * 60 * 60 * 1000;
 
 /**
  * Tiempo mínimo que se ve la pantalla de arranque (logo y spinner) al abrir la app.
@@ -44,6 +46,7 @@ export const SETTING_KEYS = {
   swipeHintCount: 'swipe_hint_count',
   updateLastCheck: 'update_last_check',
   updateSkippedVersion: 'update_skipped_version',
+  updateSkippedAt: 'update_skipped_at',
 } as const;
 
 export const CATEGORY_COLORS = [

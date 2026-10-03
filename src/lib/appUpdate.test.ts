@@ -6,10 +6,11 @@ import {
   downloadPercent,
   fetchLatestRelease,
   formatBytes,
+  isConclusiveDecision,
   isNewerVersion,
   parseLatestRelease,
   parseVersion,
-  shouldCheckOnStartup,
+  shouldCheckAutomatically,
   shouldPromptAutomatically,
 } from './appUpdate';
 
@@ -173,21 +174,40 @@ describe('consulta a GitHub', () => {
 
 describe('cuándo buscar y cuándo avisar', () => {
   const HOUR = 3_600_000;
+  const DAY = 24 * HOUR;
 
-  it('busca al abrir si nunca se buscó o si ya pasó el intervalo', () => {
-    expect(shouldCheckOnStartup(null, 1_000, 6 * HOUR)).toBe(true);
-    expect(shouldCheckOnStartup(0, 5 * HOUR, 6 * HOUR)).toBe(false);
-    expect(shouldCheckOnStartup(0, 6 * HOUR, 6 * HOUR)).toBe(true);
+  it('busca de forma automática si nunca se buscó o si ya pasó el intervalo', () => {
+    expect(shouldCheckAutomatically(null, 1_000, HOUR)).toBe(true);
+    expect(shouldCheckAutomatically(0, HOUR - 1, HOUR)).toBe(false);
+    expect(shouldCheckAutomatically(0, HOUR, HOUR)).toBe(true);
   });
 
   it('si el reloj retrocedió, vuelve a buscar', () => {
-    expect(shouldCheckOnStartup(10 * HOUR, 1 * HOUR, 6 * HOUR)).toBe(true);
+    expect(shouldCheckAutomatically(10 * HOUR, 1 * HOUR, HOUR)).toBe(true);
   });
 
-  it('no insiste con una versión a la que se dio «Cancelar», pero sí avisa de la siguiente', () => {
-    expect(shouldPromptAutomatically('1.2.0', null)).toBe(true);
-    expect(shouldPromptAutomatically('1.2.0', '1.2.0')).toBe(false);
-    expect(shouldPromptAutomatically('1.3.0', '1.2.0')).toBe(true);
+  it('solo anota la hora de la consulta si la respuesta fue definitiva (no con «se está preparando»)', () => {
+    const latest = parseLatestRelease(releaseJson(), REPO)!;
+    const waiting = parseLatestRelease(releaseJson({ assets: [] }), REPO)!;
+    expect(isConclusiveDecision(decideUpdate(latest, '1.1.1'))).toBe(true);
+    expect(isConclusiveDecision(decideUpdate(latest, '1.2.0'))).toBe(true);
+    expect(isConclusiveDecision(decideUpdate(waiting, '1.1.1'))).toBe(false);
+  });
+
+  it('avisa si nunca se dio «Cancelar» o si es una versión distinta a la cancelada', () => {
+    expect(shouldPromptAutomatically('1.2.0', null, null, 5 * DAY, DAY)).toBe(true);
+    expect(shouldPromptAutomatically('1.3.0', '1.2.0', 4 * DAY, 4 * DAY + 1, DAY)).toBe(true);
+  });
+
+  it('no insiste con la versión cancelada durante el descanso, pero vuelve a avisar después', () => {
+    expect(shouldPromptAutomatically('1.2.0', '1.2.0', 0, DAY - 1, DAY)).toBe(false);
+    expect(shouldPromptAutomatically('1.2.0', '1.2.0', 0, DAY, DAY)).toBe(true);
+  });
+
+  it('un «Cancelar» sin hora (de una versión anterior de la app) o con el reloj atrasado no silencia la versión', () => {
+    expect(shouldPromptAutomatically('1.2.0', '1.2.0', null, 1_000, DAY)).toBe(true);
+    expect(shouldPromptAutomatically('1.2.0', '1.2.0', Number.NaN, 1_000, DAY)).toBe(true);
+    expect(shouldPromptAutomatically('1.2.0', '1.2.0', 10 * DAY, 1 * DAY, DAY)).toBe(true);
   });
 });
 
