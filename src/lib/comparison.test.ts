@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
-import { MAX_SHOWN_PERCENT, describeChange, describeComparison, previousMonthLabel } from './comparison';
+import { describeChange, describeComparison, previousMonthLabel } from './comparison';
 
 const money = (value: number) => `$${value}`;
-const base = { yearMonth: '2026-10', previousTotal: 100, changeAmount: 50, changePercent: 50 };
+const base = { yearMonth: '2026-10', previousTotal: 100, changeAmount: 50 };
 
 describe('previousMonthLabel', () => {
   it('es solo el nombre del mes cuando cae en el mismo año', () => {
@@ -16,72 +16,61 @@ describe('previousMonthLabel', () => {
 
 describe('describeComparison', () => {
   it('sin gastos el mes anterior no compara', () => {
-    expect(describeComparison({ ...base, previousTotal: 0, changePercent: null }, money)).toEqual({
+    expect(describeComparison({ ...base, previousTotal: 0 }, money)).toEqual({
       direction: 'none',
       text: 'Sin gastos en septiembre para comparar.',
     });
   });
 
   it('gasto igual', () => {
-    expect(describeComparison({ ...base, changeAmount: 0, changePercent: 0 }, money)).toEqual({
+    expect(describeComparison({ ...base, changeAmount: 0 }, money)).toEqual({
       direction: 'same',
       text: 'Igual que en septiembre.',
     });
   });
 
-  it('gastó más: monto en positivo y porcentaje', () => {
+  it('gastó más: monto en positivo, sin porcentaje', () => {
     expect(describeComparison(base, money)).toEqual({
       direction: 'more',
-      text: 'Gastaste $50 más que en septiembre (50%).',
+      text: 'Gastaste $50 más que en septiembre.',
     });
   });
 
-  it('gastó menos: monto sin signo y porcentaje sin signo', () => {
-    expect(describeComparison({ ...base, changeAmount: -40, changePercent: -40 }, money)).toEqual({
+  it('gastó menos: monto sin signo, sin porcentaje', () => {
+    expect(describeComparison({ ...base, changeAmount: -40 }, money)).toEqual({
       direction: 'less',
-      text: 'Gastaste $40 menos que en septiembre (40%).',
+      text: 'Gastaste $40 menos que en septiembre.',
     });
-  });
-
-  it('redondea el porcentaje', () => {
-    expect(describeComparison({ ...base, changePercent: 12.6 }, money).text).toContain('(13%)');
-    expect(describeComparison({ ...base, changePercent: 12.4 }, money).text).toContain('(12%)');
-  });
-
-  it('omite el porcentaje por encima de 999 %, pero no en el límite', () => {
-    expect(describeComparison({ ...base, changePercent: MAX_SHOWN_PERCENT }, money).text).toContain('(999%)');
-    expect(describeComparison({ ...base, changePercent: 1382 }, money).text).toBe('Gastaste $50 más que en septiembre.');
-  });
-
-  it('omite el porcentaje cuando redondea a 0 %', () => {
-    expect(describeComparison({ ...base, changeAmount: 1, changePercent: 0.3 }, money).text).toBe('Gastaste $1 más que en septiembre.');
   });
 
   it('en enero compara con diciembre del año anterior', () => {
-    expect(describeComparison({ ...base, yearMonth: '2026-01' }, money).text).toBe('Gastaste $50 más que en diciembre 2025 (50%).');
+    expect(describeComparison({ ...base, yearMonth: '2026-01' }, money).text).toBe('Gastaste $50 más que en diciembre 2025.');
   });
 
   it('usa el formato recibido (modo privacidad)', () => {
-    expect(describeComparison(base, () => '$ ••••').text).toBe('Gastaste $ •••• más que en septiembre (50%).');
+    expect(describeComparison(base, () => '$ ••••').text).toBe('Gastaste $ •••• más que en septiembre.');
   });
 });
 
 describe('describeChange', () => {
   it('sin gastos el mes anterior no hay pastilla', () => {
-    expect(describeChange({ ...base, previousTotal: 0, changePercent: null }, money)).toBeNull();
+    expect(describeChange({ ...base, previousTotal: 0 }, money)).toBeNull();
   });
 
   it('gasto igual', () => {
-    expect(describeChange({ ...base, changeAmount: 0, changePercent: 0 }, money)).toEqual({ direction: 'same', text: 'Igual que septiembre' });
+    expect(describeChange({ ...base, changeAmount: 0 }, money)).toEqual({ direction: 'same', text: 'Igual que septiembre' });
   });
 
-  it('gastó más o menos: porcentaje redondeado y sin signo', () => {
-    expect(describeChange({ ...base, changePercent: 12.6 }, money)).toEqual({ direction: 'more', text: '13% vs septiembre' });
-    expect(describeChange({ ...base, changeAmount: -40, changePercent: -40 }, money)).toEqual({ direction: 'less', text: '40% vs septiembre' });
+  it('gastó más o menos: el monto de la diferencia, sin signo', () => {
+    expect(describeChange(base, money)).toEqual({ direction: 'more', text: '$50 vs septiembre' });
+    expect(describeChange({ ...base, changeAmount: -40 }, money)).toEqual({ direction: 'less', text: '$40 vs septiembre' });
   });
 
-  it('con variaciones enormes o diminutas muestra el monto en vez del porcentaje', () => {
-    expect(describeChange({ ...base, changeAmount: 5000, changePercent: MAX_SHOWN_PERCENT + 1 }, money)?.text).toBe('$5000 vs septiembre');
-    expect(describeChange({ ...base, changeAmount: 3, changePercent: 0.3 }, money)?.text).toBe('$3 vs septiembre');
+  it('en enero compara con diciembre del año anterior', () => {
+    expect(describeChange({ ...base, yearMonth: '2026-01' }, money)?.text).toBe('$50 vs diciembre 2025');
+  });
+
+  it('usa el formato recibido (modo privacidad)', () => {
+    expect(describeChange(base, () => '$ ••••')?.text).toBe('$ •••• vs septiembre');
   });
 });
