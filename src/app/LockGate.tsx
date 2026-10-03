@@ -4,6 +4,7 @@ import { Capacitor } from '@capacitor/core';
 import { AnimatePresence, motion } from 'motion/react';
 import { Button } from '@/components/ui/Button';
 import { RingLogo } from '@/components/ui/RingLogo';
+import { SplashLoading } from '@/components/ui/SplashLoading';
 import { APP_NAME } from '@/config/constants';
 import { useQuery } from '@/hooks/useQuery';
 import { authenticate, getBiometricSupport, isBiometricPromptActive, isBiometricPromptOpen } from '@/lib/biometrics';
@@ -19,6 +20,8 @@ const RESUME_PROMPT_DELAY_MS = 250;
 
 /**
  * Pide huella, rostro o el PIN del teléfono al abrir la app y al volver a ella (según el ajuste).
+ *  - La pantalla de arranque (DatabaseGate) se ve el tiempo definido en STARTUP_SPLASH_MS y recién después se pide
+ *    la huella; mientras se lee el ajuste, esta pantalla repite el mismo logo y spinner, sin saltos.
  *  - Mientras esté bloqueada NO se monta la app: no hay datos en pantalla ni en el árbol.
  *  - Una vez desbloqueada, al bloquear de nuevo la app queda montada debajo de la pantalla de bloqueo,
  *    así no pierdes un gasto a medio escribir.
@@ -117,7 +120,7 @@ export function LockGate({ children }: { children: ReactNode }) {
         {status !== 'unlocked' && (
           <motion.div
             key="lock"
-            className="lock"
+            className="splash lock"
             role="dialog"
             aria-modal="true"
             aria-label="Aplicación bloqueada"
@@ -125,10 +128,10 @@ export function LockGate({ children }: { children: ReactNode }) {
             exit={{ opacity: 0, scale: 1.04 }}
             transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
           >
-            <RingLogo />
+            <RingLogo animated={false} />
             <h1 className="splash__name">{APP_NAME}</h1>
             {status === 'checking' ? (
-              <p className="splash__text">Abriendo…</p>
+              <SplashLoading />
             ) : (
               <>
                 <p className="splash__text">{message || 'Usa tu huella, tu rostro o el PIN del teléfono.'}</p>

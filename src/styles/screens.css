@@ -237,17 +237,11 @@ number-flow-react {
 
 /* ---------- Exportar ---------- */
 /* ---------- Bloqueo con huella ---------- */
+/* Se dibuja encima como `.splash` (misma disposición que la pantalla de carga) para que el paso de una a otra no salte. */
 .lock {
   position: fixed;
   inset: 0;
   z-index: 200;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: var(--space-4);
-  padding: calc(var(--space-5) + env(safe-area-inset-top)) var(--space-5) calc(var(--space-5) + env(safe-area-inset-bottom));
-  text-align: center;
   background: var(--bg);
   color: var(--ink);
 }
