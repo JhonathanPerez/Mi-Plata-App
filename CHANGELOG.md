@@ -1,3 +1,10 @@
+## [1.2.7](https://github.com/JhonathanPerez/Mi-Plata-App/compare/v1.2.6...v1.2.7) (2026-10-03)
+
+
+### Bug Fixes
+
+* **ui:** poner la barra del botón Guardar gasto por encima de los textos de los campos ([#34](https://github.com/JhonathanPerez/Mi-Plata-App/issues/34)) ([33acf37](https://github.com/JhonathanPerez/Mi-Plata-App/commit/33acf379d257815e10acc064370a021385230dce))
+
 ## [1.2.6](https://github.com/JhonathanPerez/Mi-Plata-App/compare/v1.2.5...v1.2.6) (2026-10-03)
 
 
