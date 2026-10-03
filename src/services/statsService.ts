@@ -30,9 +30,8 @@ export interface DashboardData {
   dailyAverage: number;
   /** Lo gastado en todo el mes anterior. */
   previousTotal: number;
+  /** Lo gastado este mes menos lo del mes anterior (negativo si gastó menos). */
   changeAmount: number;
-  /** null cuando el mes anterior no tiene gastos. */
-  changePercent: number | null;
   budget: BudgetStatus;
   byCategory: CategoryTotal[];
   topCategory: CategoryTotal | null;
@@ -53,22 +52,13 @@ export interface MonthlySummary {
   daily: DailyTotal[];
   previousTotal: number;
   previousTransactions: number;
+  /** Lo gastado este mes menos lo del mes anterior (negativo si gastó menos). */
   changeAmount: number;
-  /** null cuando el mes anterior no tiene gastos. */
-  changePercent: number | null;
 }
 
 /** Promedio por día: el mes en curso se divide entre los días que van; uno pasado, entre todos los suyos. */
 export function averagePerDay(yearMonth: YearMonth, total: number, now: Date = new Date()): number {
   return total / Math.max(1, elapsedDaysInMonth(yearMonth, now));
-}
-
-/** Cuánto cambió el gasto frente al mes anterior; el porcentaje es null cuando el anterior no tuvo gastos. */
-export function changeBetween(total: number, previousTotal: number): { changeAmount: number; changePercent: number | null } {
-  return {
-    changeAmount: total - previousTotal,
-    changePercent: previousTotal > 0 ? ((total - previousTotal) / previousTotal) * 100 : null,
-  };
 }
 
 export function withCategoryPercents(items: CategoryTotal[], total: number): CategoryTotal[] {
@@ -124,7 +114,7 @@ export const statsService = {
       monthCount: monthTotals.count,
       dailyAverage: averagePerDay(yearMonth, monthTotals.total, now),
       previousTotal: previousTotals.total,
-      ...changeBetween(monthTotals.total, previousTotals.total),
+      changeAmount: monthTotals.total - previousTotals.total,
       budget: computeBudgetStatus(yearMonth, budgetAmount, monthTotals.total),
       byCategory: categories,
       topCategory: categories[0] ?? null,
@@ -160,7 +150,7 @@ export const statsService = {
       daily: fillDailyTotals(yearMonth, daily),
       previousTotal: previousTotals.total,
       previousTransactions: previousTotals.count,
-      ...changeBetween(totals.total, previousTotals.total),
+      changeAmount: totals.total - previousTotals.total,
     };
   },
 };
