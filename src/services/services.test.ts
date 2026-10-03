@@ -39,6 +39,14 @@ suite('servicios con SQLite real', () => {
     expect(validateExpenseInput({ ...base, time: '25:00' }).time).toBeTruthy();
   });
 
+  it('rechaza fechas futuras solo cuando el formulario pone un tope', () => {
+    const base = { amount: 35000, categoryId: 'cat_alimentacion', paymentMethodId: 'pm_nubank', date: '2026-10-04', time: null, note: null };
+    expect(validateExpenseInput(base)).toEqual({});
+    expect(validateExpenseInput(base, { maxDate: '2026-10-03' }).date).toBeTruthy();
+    expect(validateExpenseInput({ ...base, date: '2026-10-03' }, { maxDate: '2026-10-03' })).toEqual({});
+    expect(validateExpenseInput({ ...base, date: '2026-09-19' }, { maxDate: '2026-10-03' })).toEqual({});
+  });
+
   it('exige descripción solo cuando el formulario lo pide', () => {
     const base = { amount: 35000, categoryId: 'cat_alimentacion', paymentMethodId: 'pm_nubank', date: '2026-09-19', time: null, note: null };
     expect(validateExpenseInput(base).note).toBeUndefined();

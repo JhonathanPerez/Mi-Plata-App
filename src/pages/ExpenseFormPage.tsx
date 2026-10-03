@@ -213,7 +213,7 @@ export function ExpenseFormPage() {
       note: note.trim() ? note.trim() : null,
       paid,
     };
-    const found = validateExpenseInput(input, { requireNote: true });
+    const found = validateExpenseInput(input, { requireNote: true, maxDate: todayIso() });
     setErrors(found);
     if (Object.keys(found).length > 0) {
       // Lleva la vista al primer error para que se vea sin buscarlo.
@@ -301,7 +301,7 @@ export function ExpenseFormPage() {
             />
           </Field>
 
-          <DateField label="Fecha" quick value={date} onChange={setDate} min="2000-01-01" max="2100-12-31" error={errors.date} />
+          <DateField label="Fecha" quick value={date} onChange={setDate} min="2000-01-01" max={todayIso()} error={errors.date} />
 
           <PickerField
             label="Categoría"
