@@ -53,11 +53,11 @@ export function ConfirmProvider({ children }: { children: ReactNode }) {
               <h2 className="dialog__title">{options.title}</h2>
               <p className="dialog__text">{options.message}</p>
               <div className="dialog__actions">
-                <Button variant="secondary" onClick={() => close(false)}>
-                  {options.cancelLabel ?? 'Cancelar'}
-                </Button>
                 <Button variant={options.danger ? 'danger' : 'primary'} onClick={() => close(true)}>
                   {options.confirmLabel ?? 'Confirmar'}
+                </Button>
+                <Button variant="secondary" onClick={() => close(false)}>
+                  {options.cancelLabel ?? 'Cancelar'}
                 </Button>
               </div>
             </div>

@@ -14,7 +14,7 @@ import { normalizeText } from '@/lib/text';
  */
 
 export interface CaptureInput {
-  /** Paquete Android de la app que mostró la notificación ('manual' si se pegó el texto). */
+  /** Paquete Android de la app que mostró la notificación. */
   pkg: string;
   title: string;
   text: string;
@@ -36,17 +36,6 @@ export type ParseResult = { ok: true; value: ParsedCapture } | { ok: false; reas
 export const MIN_CAPTURE_AMOUNT = 100;
 const MAX_MERCHANT_LENGTH = 60;
 const MAX_MERCHANT_WORDS = 6;
-
-const FAILURE_MESSAGES: Record<ParseFailure, string> = {
-  'no-amount': 'No encontré un valor en pesos en ese mensaje.',
-  ignored: 'Parece un aviso (código, oferta, recordatorio o compra rechazada), no un gasto.',
-  income: 'Parece un ingreso o un pago recibido, no un gasto.',
-  'not-expense': 'No parece una compra, un pago ni un retiro.',
-};
-
-export function describeFailure(reason: ParseFailure): string {
-  return FAILURE_MESSAGES[reason];
-}
 
 // ---------- Clasificación por palabras (sobre texto sin tildes y en minúsculas) ----------
 

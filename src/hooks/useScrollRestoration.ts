@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigationType } from 'react-router-dom';
 
 /**
  * Última posición de scroll conocida por ruta. Vive en memoria del módulo (no en el componente),
@@ -9,8 +9,10 @@ import { useLocation } from 'react-router-dom';
 const positions = new Map<string, number>();
 
 /**
- * Recuerda dónde iba el scroll de cada pestaña (Inicio, Gastos, etc.) y lo restaura al volver a
- * esa ruta, sin que se alcance a ver el salto.
+ * Recuerda dónde iba el scroll de cada pestaña (Inicio, Gastos, etc.) y lo restaura cuando se
+ * vuelve a ella con «Atrás» (por ejemplo, al salir de editar un gasto), sin que se alcance a ver el salto.
+ * Al llegar a una pestaña desde la barra inferior (o con un enlace) no se restaura nada: la pantalla
+ * empieza arriba, aunque la anterior estuviera al final (el scroll es el de la ventana y sobrevive al cambio de ruta).
  *
  * La lista tarda un instante en pintar sus datos (se cargan de forma asíncrona), así que si se
  * restaurara el scroll apenas se monta, el usuario vería primero el inicio de la lista y luego un
@@ -21,9 +23,15 @@ const positions = new Map<string, number>();
  */
 export function useScrollRestoration(): boolean {
   const { pathname } = useLocation();
-  const [ready, setReady] = useState(() => (positions.get(pathname) ?? 0) === 0);
+  // POP = «Atrás» (o recargar): ahí sí se vuelve a donde se iba. PUSH / REPLACE = se llegó navegando: arriba.
+  const navigationType = useNavigationType();
+  const [ready, setReady] = useState(() => navigationType !== 'POP' || (positions.get(pathname) ?? 0) === 0);
 
   useEffect(() => {
+    if (navigationType !== 'POP') {
+      positions.delete(pathname);
+      window.scrollTo(0, 0);
+    }
     const target = positions.get(pathname) ?? 0;
     let cancelled = false;
     setReady(target === 0);
@@ -50,7 +58,7 @@ export function useScrollRestoration(): boolean {
       cancelled = true;
       window.removeEventListener('scroll', onScroll);
     };
-  }, [pathname]);
+  }, [pathname, navigationType]);
 
   return ready;
 }

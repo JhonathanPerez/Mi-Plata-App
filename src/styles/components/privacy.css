@@ -28,6 +28,15 @@
   animation: amount-mask-in 0.24s var(--ease-out) both;
 }
 
+/*
+ * NumberFlow dibuja el monto con line-height 1em y un relleno vertical propio (0.125em arriba y abajo).
+ * El monto oculto replica esa misma caja para que la tarjeta no cambie de alto al tocar el ojito.
+ */
+.amount-mask--flow {
+  line-height: 1em;
+  padding-block: round(nearest, calc(0.25em / 2), 1px);
+}
+
 .donut__total .amount-mask {
   font-size: 0.8em;
   letter-spacing: 0.06em;

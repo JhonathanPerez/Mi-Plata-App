@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { dueLabel, formatDayMonth, periodMonthName, relativeDays, shadeColor } from './statementText';
+import { cycleDatesLabel, dueLabel, dueShortLabel, formatDayMonth, periodMonthName, relativeDays, shadeColor, statementDatesLabel } from './statementText';
 
 describe('textos de extractos', () => {
   it('día de la semana, día y mes', () => {
@@ -22,6 +22,18 @@ describe('textos de extractos', () => {
     expect(dueLabel('2026-09-17', -3)).toBe('Vencido hace 3 días');
     expect(dueLabel('2026-09-19', -1)).toBe('Vencido hace 1 día');
     expect(dueLabel('2026-10-20', 10)).toBe('Hasta el mar 20 oct · en 10 días');
+  });
+  it('etiqueta corta de vencimiento para la tarjeta de crédito', () => {
+    expect(dueShortLabel('2026-10-06', 6)).toBe('Pago en 6 días · mar 6 oct');
+    expect(dueShortLabel('2026-10-01', 1)).toBe('Pago mañana · jue 1 oct');
+    expect(dueShortLabel('2026-09-30', 0)).toBe('Vence hoy');
+    expect(dueShortLabel('2026-09-27', -3)).toBe('Vencido hace 3 días');
+  });
+  it('fechas de un ciclo abierto', () => {
+    expect(cycleDatesLabel('2026-10-08', '2026-11-03')).toBe('Corta jue 8 oct · pago hasta mar 3 nov');
+  });
+  it('fechas de un extracto cerrado', () => {
+    expect(statementDatesLabel('2026-09-30', '2026-10-20')).toBe('Corte mié 30 sep · pago hasta mar 20 oct');
   });
   it('oscurece colores y respeta entradas inválidas', () => {
     expect(shadeColor('#FFFFFF', 0.5)).toBe('#808080');

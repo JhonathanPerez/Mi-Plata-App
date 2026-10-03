@@ -2,7 +2,7 @@ import { EmojiTile } from './EmojiTile';
 import { Icon } from './Icon';
 
 export interface PickerValue {
-  /** Sin `icon` y `color` no se dibuja el cuadro de emoji (por ejemplo, para una regla en texto). */
+  /** Sin `icon` y `color` no se dibuja el cuadro de emoji. */
   icon?: string;
   color?: string;
   name: string;
@@ -59,7 +59,7 @@ function PickerButton({ selected, placeholder, popup, onOpen }: PickerButtonProp
 /**
  * Campo que se comporta como un enlace: muestra lo elegido (ícono y nombre, con estilo de vínculo) y al tocarlo
  * abre una ventana auxiliar para cambiarlo. Reemplaza a las cuadrículas de opciones que ocupaban toda la pantalla.
- * Es el único sitio donde vive ese patrón: las reglas del ciclo y los métodos de pago lo reutilizan.
+ * Es el único sitio donde vive ese patrón: el formulario de gasto y los métodos de pago lo reutilizan.
  */
 export function PickerField({ label, placeholder = '', selected, error, hint, popup = true, onOpen }: PickerFieldProps) {
   return (

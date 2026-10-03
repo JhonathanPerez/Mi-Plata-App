@@ -61,7 +61,6 @@
   --neutral-tile: #7a6f66;
   --status-paid: #2a9d8f;
   --status-pending: #f5b301;
-  --hero-cta-ink: #0e3a33;
 
   /* Tintes de la marca y del acento (los de la marca se derivan de --primary, así siguen al tema) */
   --primary-tint: color-mix(in srgb, var(--primary) 12%, transparent);
@@ -97,7 +96,7 @@
   --radius-l: 24px;
   --radius-pill: 999px;
   --nav-h: 64px;
-  --fab-clearance: 104px;
+  --fab-clearance: 72px;
   --tap: 48px;
   --content-max: 560px;
 
@@ -112,11 +111,11 @@
  */
 :root[data-theme='dark'] {
   --bg: #0b1719;
-  --surface: #132428;
+  --surface: #152a2f;
   --surface-2: #1b3136;
   --ink: #e8f1ee;
   --ink-2: #9db4b0;
-  --line: #24393d;
+  --line: #2f484d;
   --line-strong: #5f7b76;
   --warning-text: #f5b301;
   --primary: #3ccba6;
@@ -135,11 +134,11 @@
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme='light']) {
     --bg: #0b1719;
-    --surface: #132428;
+    --surface: #152a2f;
     --surface-2: #1b3136;
     --ink: #e8f1ee;
     --ink-2: #9db4b0;
-    --line: #24393d;
+    --line: #2f484d;
     --line-strong: #5f7b76;
     --warning-text: #f5b301;
     --primary: #3ccba6;

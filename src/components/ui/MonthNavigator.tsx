@@ -5,9 +5,11 @@ import { Stepper } from './Stepper';
 interface MonthNavigatorProps {
   value: YearMonth;
   onChange: (value: YearMonth) => void;
+  /** Último mes al que se puede llegar (por ejemplo, el actual). Sin él no hay tope. */
+  max?: YearMonth;
 }
 
-export function MonthNavigator({ value, onChange }: MonthNavigatorProps) {
+export function MonthNavigator({ value, onChange, max }: MonthNavigatorProps) {
   return (
     <Stepper
       label={formatMonthTitle(value)}
@@ -15,6 +17,7 @@ export function MonthNavigator({ value, onChange }: MonthNavigatorProps) {
       nextLabel="Mes siguiente"
       onPrev={() => onChange(addMonths(value, -1))}
       onNext={() => onChange(addMonths(value, 1))}
+      nextDisabled={max !== undefined && value >= max}
     />
   );
 }

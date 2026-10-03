@@ -1,22 +1,27 @@
 import { useMemo, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { ExpenseList } from '@/components/expenses/ExpenseList';
+import { ExpenseListSkeleton } from '@/components/expenses/ExpenseListSkeleton';
 import { EMPTY_FILTERS, FilterSheet, type HistoryFilters } from '@/components/expenses/FilterSheet';
-import { Button } from '@/components/ui/Button';
+import { Button, IconButton } from '@/components/ui/Button';
 import { EmptyState } from '@/components/ui/EmptyState';
+import { ErrorState } from '@/components/ui/ErrorState';
 import { Icon } from '@/components/ui/Icon';
 import { MonthNavigator } from '@/components/ui/MonthNavigator';
 import { Amount } from '@/components/ui/Money';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { PrivacyToggle } from '@/components/ui/PrivacyToggle';
 import { Segmented } from '@/components/ui/Segmented';
+import { Skeleton } from '@/components/ui/Skeleton';
 import { useConfirm } from '@/app/providers/ConfirmProvider';
 import { useToast } from '@/app/providers/ToastProvider';
 import { errorMessage } from '@/lib/errors';
 import { haptics } from '@/lib/haptics';
 import { useDebounced } from '@/hooks/useDebounced';
+import { useSwipeHint } from '@/hooks/useSwipeHint';
 import { useQuery } from '@/hooks/useQuery';
 import { currentYearMonth, formatNumericDate, monthRange } from '@/lib/dates';
+import { parseHistoryParams } from '@/lib/historyLink';
 import { pluralize } from '@/lib/text';
 import { categoryService } from '@/services/categoryService';
 import { expenseService } from '@/services/expenseService';
@@ -29,9 +34,18 @@ export function HistoryPage() {
   const navigate = useNavigate();
   const toast = useToast();
   const confirm = useConfirm();
-  const [status, setStatus] = useState<StatusView>(useSearchParams()[0].get('estado') === 'por-pagar' ? 'due' : 'all');
-  const [yearMonth, setYearMonth] = useState(currentYearMonth());
-  const [filters, setFilters] = useState<HistoryFilters>({ mode: 'month', from: '', to: '', ...EMPTY_FILTERS });
+  // Otras pantallas pueden abrir Gastos ya filtrado (Por pagar desde Inicio; una categoría y un mes desde Estadísticas). Se lee una sola vez.
+  const [searchParams] = useSearchParams();
+  const [initial] = useState(() => parseHistoryParams(searchParams));
+  const [status, setStatus] = useState<StatusView>(initial.status);
+  const [yearMonth, setYearMonth] = useState(initial.yearMonth ?? currentYearMonth());
+  const [filters, setFilters] = useState<HistoryFilters>({
+    mode: 'month',
+    from: '',
+    to: '',
+    ...EMPTY_FILTERS,
+    categoryIds: initial.categoryId ? [initial.categoryId] : [],
+  });
   const [search, setSearch] = useState('');
   const [sheetOpen, setSheetOpen] = useState(false);
   const debouncedSearch = useDebounced(search);
@@ -63,7 +77,9 @@ export function HistoryPage() {
     return result;
   }, [filters, yearMonth, debouncedSearch, status]);
 
-  const { data: expenses, loading } = useQuery(() => expenseService.list(sqlFilters), [JSON.stringify(sqlFilters)]);
+  const { data: expenses, loading, error: loadError, retry } = useQuery(() => expenseService.list(sqlFilters), [JSON.stringify(sqlFilters)]);
+
+  const swipeHint = useSwipeHint((expenses?.length ?? 0) > 0);
 
   const activeCount =
     (filters.mode === 'month' ? 0 : 1) +
@@ -87,6 +103,7 @@ export function HistoryPage() {
     const nowPaid = expense.paidAt === null;
     try {
       await expenseService.setPaid(expense.id, nowPaid);
+      swipeHint.markLearned();
       void haptics.success();
       toast.show(nowPaid ? 'Marcado como pagado' : 'Marcado como por pagar');
     } catch (error) {
@@ -104,12 +121,15 @@ export function HistoryPage() {
     if (!ok) return;
     try {
       await expenseService.remove(expense.id);
+      swipeHint.markLearned();
       void haptics.success();
       toast.show('Gasto eliminado');
     } catch (error) {
       toast.show(errorMessage(error), 'error');
     }
   };
+
+  const hasSearch = search.trim() !== '';
 
   const clearAll = () => {
     setFilters({ mode: 'month', from: '', to: '', ...EMPTY_FILTERS });
@@ -130,21 +150,37 @@ export function HistoryPage() {
           value={search}
           onChange={(event) => setSearch(event.target.value)}
         />
+        <IconButton
+          className="search__filter"
+          icon="filter"
+          label={activeCount > 0 ? `Filtros, ${activeCount} ${pluralize(activeCount, 'activo', 'activos')}` : 'Filtros'}
+          badge={activeCount}
+          onClick={() => setSheetOpen(true)}
+        />
       </div>
 
       <div className="toolbar">
-        {filters.mode === 'month' && status !== 'due' ? (
-          <MonthNavigator value={yearMonth} onChange={setYearMonth} />
-        ) : (
-          <p className="toolbar__period">{periodText}</p>
-        )}
-        <Button variant="secondary" icon="filter" onClick={() => setSheetOpen(true)}>
-          Filtros{activeCount > 0 ? ` (${activeCount})` : ''}
-        </Button>
+        {periodText === null ? <MonthNavigator value={yearMonth} onChange={setYearMonth} /> : <p className="period-pill">{periodText}</p>}
+        {expenses ? (
+          <p className="toolbar__summary" aria-live="polite">
+            <span className="toolbar__count">
+              {count} {status === 'due' ? 'por pagar' : pluralize(count, 'gasto', 'gastos')}
+            </span>
+            <strong className="toolbar__total">
+              <Amount value={total} />
+            </strong>
+          </p>
+        ) : loading ? (
+          <div className="toolbar__summary" aria-hidden="true">
+            <Skeleton height={13} width="64px" />
+            <Skeleton height={18} width="96px" />
+          </div>
+        ) : null}
       </div>
 
       <Segmented<StatusView>
         label="Estado de los gastos"
+        tone="primary"
         value={status}
         onChange={setStatus}
         options={[
@@ -154,44 +190,36 @@ export function HistoryPage() {
         ]}
       />
 
-      <p className="summary-line" aria-live="polite">
-        {status === 'due' ? (
-          <>
-            {count} por pagar · <strong><Amount value={total} /></strong>
-          </>
-        ) : (
-          <>
-            {count} {pluralize(count, 'gasto', 'gastos')} · <strong><Amount value={total} /></strong>
-          </>
-        )}
-      </p>
-
-      {loading && !expenses ? (
-        <p className="muted">Cargando…</p>
+      {loadError && !expenses ? (
+        <div className="card">
+          <ErrorState description="No pudimos leer tus gastos. Inténtalo de nuevo." onRetry={retry} />
+        </div>
+      ) : loading && !expenses ? (
+        <ExpenseListSkeleton />
       ) : count === 0 ? (
         <div className="card">
-          <EmptyState
-            icon={status === 'due' ? 'check' : 'search'}
-            title={status === 'due' ? 'Nada por pagar' : activeCount > 0 || search ? 'Sin resultados' : 'No hay gastos en este periodo'}
-            description={
-              status === 'due'
-                ? 'Los gastos con tarjeta de crédito quedan aquí hasta que le pagues el extracto al banco.'
-                : activeCount > 0 || search
-                  ? 'Prueba cambiando o limpiando los filtros.'
-                  : 'Cuando registres gastos aparecerán aquí.'
-            }
-            action={
-              activeCount > 0 || search ? (
+          {activeCount > 0 || hasSearch ? (
+            <EmptyState
+              icon="search"
+              title="Sin resultados"
+              description="Prueba cambiando o limpiando los filtros."
+              action={
                 <Button variant="secondary" onClick={clearAll}>
                   Limpiar filtros
                 </Button>
-              ) : (
-                <Button icon="plus" onClick={() => navigate('/gasto/nuevo')}>
-                  Agregar gasto
-                </Button>
-              )
-            }
-          />
+              }
+            />
+          ) : status === 'due' ? (
+            <EmptyState
+              icon="check"
+              title="Nada por pagar"
+              description="Los gastos con tarjeta de crédito quedan aquí hasta que le pagues el extracto al banco."
+            />
+          ) : status === 'paid' ? (
+            <EmptyState icon="check" title="Sin gastos pagados" description="Aquí verás los gastos que ya pagaste en este periodo." />
+          ) : (
+            <EmptyState icon="list" title="No hay gastos en este periodo" description="Toca el botón + para registrar uno." />
+          )}
         </div>
       ) : (
         <ExpenseList
@@ -199,6 +227,7 @@ export function HistoryPage() {
           onSelect={(id) => navigate(`/gasto/${id}`)}
           onTogglePaid={togglePaid}
           onDelete={removeExpense}
+          hintFirst={swipeHint.showHint}
         />
       )}
 

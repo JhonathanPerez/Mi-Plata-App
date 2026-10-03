@@ -1,12 +1,18 @@
-export type BackAction = { type: 'back' } | { type: 'goto'; to: string } | { type: 'exit' };
+import type { ReturnTarget } from './navigationState';
+
+export type BackAction = { type: 'back' } | { type: 'goto'; to: string; state?: unknown } | { type: 'exit' };
 
 /**
  * Qué hace el botón/gesto Atrás de Android según la pantalla:
  *  - Pantallas secundarias (/gasto/..., /ajustes/..., /tarjetas/..., /pendientes): vuelve a la anterior.
  *  - Pestañas distintas de Inicio: vuelve a Inicio.
  *  - Inicio: sale de la app.
+ *  - Si la pantalla se abrió desde otra con un destino de regreso (`returnTo`, p. ej. una categoría de Estadísticas que abre Gastos),
+ *    Atrás vuelve ahí, con el estado que se guardó (el mes que se estaba viendo).
  */
-export function decideBackAction(pathname: string, canGoBack: boolean): BackAction {
+export function decideBackAction(pathname: string, canGoBack: boolean, returnTo?: ReturnTarget): BackAction {
+  if (returnTo) return returnTo.state === undefined ? { type: 'goto', to: returnTo.to } : { type: 'goto', to: returnTo.to, state: returnTo.state };
+
   const isSettingsChild = pathname.startsWith('/ajustes/');
   const isExpense = pathname.startsWith('/gasto/'); // ojo: '/gastos' (historial) es una pestaña
   const isCards = pathname === '/tarjetas' || pathname.startsWith('/tarjetas/');

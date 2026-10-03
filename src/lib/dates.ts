@@ -45,6 +45,11 @@ export function currentYearMonth(now: Date = new Date()): YearMonth {
   return toYearMonth(now);
 }
 
+/** ¿Es un mes con la forma «AAAA-MM» (mes del 01 al 12)? Para valores que vienen de fuera: la dirección o el historial de navegación. */
+export function isYearMonth(value: unknown): value is YearMonth {
+  return typeof value === 'string' && /^\d{4}-(0[1-9]|1[0-2])$/.test(value);
+}
+
 export function addMonths(yearMonth: YearMonth, delta: number): YearMonth {
   const [year, month] = yearMonth.split('-').map(Number);
   return toYearMonth(new Date(year, month - 1 + delta, 1));
@@ -101,6 +106,12 @@ export function formatWeekdayDate(iso: IsoDate, now: Date = new Date()): string 
   const date = parseIsoDate(iso);
   const base = `${WEEKDAY_LONG[date.getDay()]} ${date.getDate()} de ${MONTH_NAMES[date.getMonth()]}`;
   return date.getFullYear() === now.getFullYear() ? base : `${base} de ${date.getFullYear()}`;
+}
+
+/** "miércoles 30": el mes ya lo dice el título de Inicio, así que no se repite. */
+export function formatWeekdayDay(iso: IsoDate): string {
+  const date = parseIsoDate(iso);
+  return `${WEEKDAY_LONG[date.getDay()]} ${date.getDate()}`;
 }
 
 /** "19 sep" */

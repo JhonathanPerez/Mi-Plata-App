@@ -11,6 +11,8 @@ interface ExpenseListProps {
   onTogglePaid?: (expense: ExpenseWithRefs) => void;
   /** Si se pasa (junto con onTogglePaid), deslizar a la izquierda pide eliminar el gasto. */
   onDelete?: (expense: ExpenseWithRefs) => void;
+  /** La primera fila «asoma» sus acciones de deslizar para enseñarlas (ver `useSwipeHint`). */
+  hintFirst?: boolean;
 }
 
 interface PayableRowProps {
@@ -18,17 +20,19 @@ interface PayableRowProps {
   onSelect: (id: string) => void;
   onTogglePaid: (expense: ExpenseWithRefs) => void;
   onDelete?: (expense: ExpenseWithRefs) => void;
+  hint?: boolean;
 }
 
 /**
  * Una fila del historial que se desliza a la derecha para marcarla como pagada (si estaba por pagar) o de nuevo
  * como por pagar, y a la izquierda para eliminarla (si hay `onDelete`; la confirmación queda a cargo de quien lo reciba).
  */
-function PayableExpenseRow({ expense, onSelect, onTogglePaid, onDelete }: PayableRowProps) {
+function PayableExpenseRow({ expense, onSelect, onTogglePaid, onDelete, hint }: PayableRowProps) {
   const isDue = expense.paidAt === null;
   const subject = `${expense.categoryName} ${expense.note ?? ''}`;
   return (
     <SwipeRow
+      hint={hint}
       swipeRight={{
         label: isDue ? 'Pagado' : 'Por pagar',
         icon: isDue ? 'check' : 'refresh',
@@ -46,13 +50,15 @@ function PayableExpenseRow({ expense, onSelect, onTogglePaid, onDelete }: Payabl
         }
       }
     >
-      <ExpenseRow expense={expense} onSelect={onSelect} />
+      <div className="expense-item">
+        <ExpenseRow expense={expense} onSelect={onSelect} compact stacked />
+      </div>
     </SwipeRow>
   );
 }
 
-/** Lista agrupada por día, con el total de cada día. */
-export function ExpenseList({ expenses, onSelect, onTogglePaid, onDelete }: ExpenseListProps) {
+/** Lista agrupada por día, con el total de cada día. Cada fila usa tres renglones: descripción, categoría y método de pago. */
+export function ExpenseList({ expenses, onSelect, onTogglePaid, onDelete, hintFirst }: ExpenseListProps) {
   const groups: Array<{ date: string; items: ExpenseWithRefs[]; total: number }> = [];
   for (const expense of expenses) {
     const last = groups[groups.length - 1];
@@ -70,12 +76,15 @@ export function ExpenseList({ expenses, onSelect, onTogglePaid, onDelete }: Expe
         <section key={group.date} className="expense-group" aria-label={formatDayHeading(group.date)}>
           <header className="expense-group__head">
             <h3>{formatDayHeading(group.date)}</h3>
-            <span>
-              <Amount value={group.total} />
-            </span>
+            {/* Con un solo día, su total repetiría el del encabezado de la pantalla. */}
+            {groups.length > 1 && (
+              <span>
+                <Amount value={group.total} />
+              </span>
+            )}
           </header>
           <div className="card card--flush">
-            {group.items.map((expense) =>
+            {group.items.map((expense, index) =>
               onTogglePaid ? (
                 <PayableExpenseRow
                   key={expense.id}
@@ -83,9 +92,10 @@ export function ExpenseList({ expenses, onSelect, onTogglePaid, onDelete }: Expe
                   onSelect={onSelect}
                   onTogglePaid={onTogglePaid}
                   onDelete={onDelete}
+                  hint={hintFirst && group === groups[0] && index === 0}
                 />
               ) : (
-                <ExpenseRow key={expense.id} expense={expense} onSelect={onSelect} />
+                <ExpenseRow key={expense.id} expense={expense} onSelect={onSelect} compact stacked />
               ),
             )}
           </div>

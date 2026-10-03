@@ -1,19 +1,5 @@
 /* Pagos: estado pagado / por pagar, deslizar para pagar, resumen de pendientes, pagar tarjeta y avisos. */
 
-.payment-badge {
-  display:inline-block;
-  margin-left:var(--space-2);
-  padding:var(--space-0) var(--space-2);
-  border-radius:var(--radius-pill);
-  background:var(--accent-soft-strong);
-  color:var(--warning-text);
-  font-size:var(--fs-xs);
-  font-weight:800;
-  letter-spacing:.02em;
-  text-transform:uppercase;
-  vertical-align:1px;
-}
-
 .due-summary {
   display:flex;
   flex-direction:column;
@@ -28,7 +14,7 @@
 .due-summary__head {
   display:flex;
   justify-content:space-between;
-  align-items:baseline;
+  align-items:center;
   font-weight:700;
 }
 
@@ -40,8 +26,46 @@
 
 .due-summary__head strong {
   font-family:var(--font-display);
-  font-size:var(--fs-2xl);
+  font-size:var(--fs-lg);
+}
+
+/* Área táctil de 48 px sin agrandar el encabezado. */
+.due-summary__info {
+  display:grid;
+  place-items:center;
+  width:var(--tap);
+  height:var(--tap);
+  margin-block:calc(-1 * var(--space-3));
+  margin-inline:calc(-1 * var(--space-2)) calc(-1 * var(--space-3));
+  border:0;
+  background:transparent;
+  color:var(--ink-2);
+}
+
+/* Vencimiento: el color dice la urgencia (calma, atención, urgente) y el icono al final refuerza que hay que actuar. */
+.due-label--neutral {
+  color:var(--ink-2);
+}
+
+.due-label--warning {
   color:var(--warning-text);
+  font-weight:600;
+}
+
+.due-label--danger {
+  color:var(--danger);
+  font-weight:600;
+}
+
+/* Última palabra + icono: no se separan al cortar el renglón. */
+.due-label__tail {
+  white-space:nowrap;
+}
+
+.due-label__tail > svg {
+  display:inline-block;
+  margin-inline-start:var(--space-1);
+  vertical-align:-3px;
 }
 
 .pay-summary {
@@ -104,15 +128,3 @@
 .pay-link {
   white-space:nowrap;
 }
-
-.reminder-note {
-  display: flex;
-  gap: var(--space-2);
-  align-items: flex-start;
-}
-
-.reminder-note svg {
-  flex: none;
-  margin-top: var(--space-0);
-}
-

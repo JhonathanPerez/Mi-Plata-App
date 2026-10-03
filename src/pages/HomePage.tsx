@@ -1,21 +1,22 @@
-import { useState } from 'react';
+import { Fragment, useState, type ReactNode } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'motion/react';
 import { BudgetStrip } from '@/components/charts/BudgetStrip';
 import { CategoryBars } from '@/components/charts/CategoryBars';
 import { BudgetSheet } from '@/components/expenses/BudgetSheet';
 import { ExpenseRow } from '@/components/expenses/ExpenseRow';
-import { Button } from '@/components/ui/Button';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { Icon } from '@/components/ui/Icon';
-import { Money } from '@/components/ui/Money';
+import { Amount, Money } from '@/components/ui/Money';
 import { Notice } from '@/components/ui/Notice';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { PrivacyToggle } from '@/components/ui/PrivacyToggle';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { Stat } from '@/components/ui/Stat';
 import { useQuery } from '@/hooks/useQuery';
-import { formatLongDate, formatMonthTitle } from '@/lib/dates';
+import { describeChange } from '@/lib/comparison';
+import { cx } from '@/lib/cx';
+import { formatMonthTitle, formatWeekdayDay } from '@/lib/dates';
 import { formatPercent } from '@/lib/money';
 import { useAmountFormat } from '@/app/providers/PrivacyProvider';
 import { pluralize } from '@/lib/text';
@@ -42,11 +43,7 @@ export function HomePage() {
         ) : (
           <div className="page-skeleton" role="status" aria-label="Cargando tus gastos">
             <Skeleton height={34} width="62%" radius="s" />
-            <Skeleton height={150} radius="l" />
-            <div className="tiles">
-              <Skeleton height={76} radius="l" />
-              <Skeleton height={76} radius="l" />
-            </div>
+            <Skeleton height={300} radius="l" />
             <Skeleton height={72} radius="l" />
           </div>
         )}
@@ -56,24 +53,31 @@ export function HomePage() {
 
   const { budget } = data;
   const hasSpending = data.monthCount > 0;
+  // Si todos los gastos visibles son del mismo método, repetirlo en cada fila es ruido.
+  const showMethod = new Set(data.recent.map((expense) => expense.paymentMethodId)).size > 1;
+  // Pastilla frente al mes anterior: sin gastos este mes no hay nada que comparar, y sin gastos el mes anterior tampoco.
+  const change = hasSpending ? describeChange(data, cop) : null;
+  // Datos de apoyo bajo la cifra. Con presupuesto la cifra grande es lo disponible, así que lo gastado va aquí.
+  const facts: { key: string; node: ReactNode }[] = [];
+  if (budget.hasBudget && hasSpending) facts.push({ key: 'spent', node: <>Gastado <Amount value={data.monthTotal} /></> });
+  facts.push({ key: 'today', node: data.todayTotal === 0 ? 'Hoy sin gastos' : <>Hoy <Amount value={data.todayTotal} /></> });
+  if (hasSpending) facts.push({ key: 'average', node: <>Prom. diario <Amount value={data.dailyAverage} /></> });
 
   return (
     <div className="page">
       <PageHeader
         title={formatMonthTitle(data.yearMonth)}
-        subtitle={`Hoy es ${formatLongDate(data.today)}`}
+        subtitle={`Hoy es ${formatWeekdayDay(data.today)}`}
         actions={<PrivacyToggle />}
       />
 
       {pendingCount ? (
         <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} transition={{ type: 'spring', stiffness: 420, damping: 32 }}>
-        <Notice tone="warning" icon="inbox" to="/pendientes" title={`${pendingCount} ${pluralize(pendingCount, 'gasto por categorizar', 'gastos por categorizar')}`}>
-          Detectados en tus notificaciones y mensajes
-        </Notice>
+        <Notice tone="warning" icon="inbox" to="/pendientes" title={`${pendingCount} ${pluralize(pendingCount, 'gasto por categorizar', 'gastos por categorizar')}`} />
         </motion.div>
       ) : null}
 
-      <section className="hero" aria-label="Resumen del presupuesto">
+      <section className="hero" aria-label="Resumen del mes">
         {budget.hasBudget ? (
           <Stat
             tone="hero"
@@ -86,6 +90,25 @@ export function HomePage() {
           <Stat tone="hero" size="lg" label="Gastado este mes" value={<Money value={data.monthTotal} />} />
         )}
 
+        <div className="hero__meta">
+          {change && (
+            <p className={cx('hero__chip', `hero__chip--${change.direction}`)}>
+              {(change.direction === 'more' || change.direction === 'less') && (
+                <Icon name={change.direction === 'more' ? 'arrowUp' : 'arrowDown'} size={18} />
+              )}
+              {change.text}
+            </p>
+          )}
+          <p className="hero__summary">
+            {facts.map((fact, index) => (
+              <Fragment key={fact.key}>
+                {index > 0 && ' · '}
+                <span className="hero__fact">{fact.node}</span>
+              </Fragment>
+            ))}
+          </p>
+        </div>
+
         <BudgetStrip segments={data.byCategory} budget={budget.budget} spent={budget.spent} />
 
         {budget.hasBudget ? (
@@ -97,9 +120,13 @@ export function HomePage() {
             </span>
           </button>
         ) : (
-          <Button variant="secondary" className="hero__cta" onClick={() => setBudgetOpen(true)} icon="target">
-            Definir presupuesto mensual
-          </Button>
+          <button type="button" className="hero__foot" onClick={() => setBudgetOpen(true)}>
+            <span className="hero__cta">
+              <Icon name="target" size={20} />
+              Definir presupuesto mensual
+            </span>
+            <Icon name="chevronRight" size={20} />
+          </button>
         )}
 
         {budget.level === 'over' && (
@@ -113,15 +140,6 @@ export function HomePage() {
           </Notice>
         )}
       </section>
-
-      {budget.hasBudget ? (
-        <div className="tiles">
-          <Stat size="sm" label="Gastos de hoy" value={<Money value={data.todayTotal} />} />
-          <Stat size="sm" label="Gastos del mes" value={<Money value={data.monthTotal} />} />
-        </div>
-      ) : (
-        <Stat size="sm" label="Hoy" value={<Money value={data.todayTotal} />} />
-      )}
 
       {dueSummary && dueSummary.total + dueSummary.other.total > 0 && (
         <DueSummaryCard summary={dueSummary} onPay={() => navigate('/tarjetas')} />
@@ -138,18 +156,6 @@ export function HomePage() {
       ) : (
         <>
           <section className="section">
-            <h2 className="section__title">Por categoría</h2>
-            <div className="card">
-              <CategoryBars items={data.byCategory} limit={3} highlightFirst />
-              {data.byCategory.length > 3 && (
-                <Link className="link" to="/estadisticas">
-                  Ver todas las categorías
-                </Link>
-              )}
-            </div>
-          </section>
-
-          <section className="section">
             <div className="section__head">
               <h2 className="section__title">Recientes</h2>
               <Link className="link" to="/gastos">
@@ -158,8 +164,23 @@ export function HomePage() {
             </div>
             <div className="card card--flush">
               {data.recent.map((expense) => (
-                <ExpenseRow key={expense.id} expense={expense} showDate onSelect={(id) => navigate(`/gasto/${id}`)} />
+                <ExpenseRow key={expense.id} expense={expense} showDate compact showMethod={showMethod} onSelect={(id) => navigate(`/gasto/${id}`)} />
               ))}
+            </div>
+          </section>
+
+          <section className="section">
+            <div className="section__head">
+              <div className="section__heading">
+                <h2 className="section__title">Por categoría</h2>
+                <p className="section__hint">Porcentaje sobre el total del mes</p>
+              </div>
+              <Link className="link" to="/estadisticas" state={{ scrollTo: 'por-categoria' }}>
+                Ver todas
+              </Link>
+            </div>
+            <div className="card">
+              <CategoryBars items={data.byCategory} limit={3} highlightFirst compact />
             </div>
           </section>
         </>

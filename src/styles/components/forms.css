@@ -82,6 +82,21 @@
   min-height: var(--tap);
 }
 
+/* «Otra fecha»: el campo nativo va oculto bajo el atajo y solo sirve para anclar el calendario. */
+.date-field__other {
+  position: relative;
+  display: inline-flex;
+}
+
+.date-field__native {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  pointer-events: none;
+}
+
 /* Sin atajos el campo comparte fila con otro (Desde / Hasta): puede encogerse. */
 .date-field--solo .input--date {
   min-width: 0;
@@ -145,11 +160,4 @@
 
 .money--hero .money__input::placeholder {
   color: var(--line);
-}
-
-.input--area {
-  padding: var(--space-3) var(--space-4);
-  min-height: 120px;
-  resize: vertical;
-  line-height: 1.4;
 }

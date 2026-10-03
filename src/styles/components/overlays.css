@@ -81,6 +81,17 @@
   border-top: 1px solid var(--line);
 }
 
+/* Pie de hoja con dos botones lado a lado: el secundario a la izquierda. */
+.sheet__actions {
+  display: flex;
+  gap: var(--space-3);
+  margin-top: var(--space-2);
+}
+
+.sheet__actions > * {
+  flex: 1;
+}
+
 .dialog {
   position: relative;
   z-index: 1;
@@ -107,14 +118,12 @@
   color: var(--ink-2);
 }
 
+/* Botones apilados y a todo el ancho: «Seguir editando» y similares no caben lado a lado sin partirse en dos renglones. */
 .dialog__actions {
   display: flex;
-  gap: var(--space-3);
+  flex-direction: column;
+  gap: var(--space-2);
   margin-top: var(--space-2);
-}
-
-.dialog__actions > * {
-  flex: 1;
 }
 
 .toast-region {

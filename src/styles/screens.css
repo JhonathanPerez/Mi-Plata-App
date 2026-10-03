@@ -42,7 +42,7 @@ number-flow-react {
   align-items: center;
   justify-content: space-between;
   gap: var(--space-3);
-  min-height: 44px;
+  min-height: var(--tap);
   padding: 0;
   border: 0;
   background: transparent;
@@ -58,10 +58,50 @@ number-flow-react {
   color: var(--hero-ink-2);
 }
 
+/* Sin presupuesto: el mismo pie de una línea que con presupuesto, sin botón blanco que le quite protagonismo a la cifra. */
 .hero__cta {
-  background: var(--hero-ink);
-  color: var(--hero-cta-ink);
-  border-color: transparent;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+/* Bajo la cifra principal: la pastilla frente al mes anterior y una línea con lo del día. */
+.hero__meta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-2);
+}
+
+.hero__chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-s);
+  background: var(--white-a12);
+  font-size: var(--fs-sm);
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+/* Gastar más que el mes anterior llama la atención (ámbar); gastar menos se lee en menta. */
+.hero__chip--more {
+  background: color-mix(in srgb, var(--accent) 26%, transparent);
+}
+
+.hero__chip--less {
+  background: color-mix(in srgb, var(--mint-solid) 24%, transparent);
+}
+
+.hero__summary {
+  font-size: var(--fs-sm);
+  color: var(--hero-ink-2);
+}
+
+/* Cada dato va entero en un renglón; si no caben todos, el siguiente baja. */
+.hero__fact {
+  white-space: nowrap;
 }
 
 .tiles {
@@ -106,42 +146,66 @@ number-flow-react {
   color: var(--ink);
 }
 
+/* El botón de filtros mide 48 × 48 dentro de un campo de 48 con borde de 1.5 px: los márgenes negativos compensan el borde y el relleno derecho del campo. */
+.search__filter {
+  margin: -1.5px calc(-1.5px - var(--space-4)) -1.5px 0;
+}
+
+/* Segunda fila: mes (o periodo) a la izquierda, resumen a la derecha. Siempre mide lo mismo, así nada salta al cambiar de estado. */
 .toolbar {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: var(--space-2);
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-3);
+  min-height: var(--tap);
 }
 
 .toolbar .stepper {
-  flex: 1;
-  min-width: 0;
-}
-
-.toolbar .btn {
-  padding: 0 var(--space-4);
   flex: none;
 }
 
-.toolbar__period {
-  font-weight: 650;
+.toolbar .stepper__label {
+  font-size: var(--fs-md);
 }
 
-.summary-line {
+.toolbar__summary {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  margin-left: auto;
+  gap: var(--space-0);
+  text-align: right;
+  line-height: 1.25;
+}
+
+.toolbar__count {
+  font-size: var(--fs-xs);
   color: var(--ink-2);
 }
 
-.summary-line strong {
-  color: var(--ink);
+.toolbar__total {
   font-family: var(--font-display);
+  font-size: var(--fs-md);
+  font-weight: 700;
+  color: var(--ink);
 }
 
-/* ---------- Configuración ---------- */
+/* Periodo fijo (Por pagar, rango de fechas, todo el historial): misma altura que el selector de mes. */
+.period-pill {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--tap);
+  padding: 0 var(--space-4);
+  border-radius: var(--radius-pill);
+  background: var(--primary-tint);
+  font-weight: 650;
+}
+
+/* ---------- Ajustes ---------- */
 .setting-theme {
   display: flex;
   align-items: center;
   gap: var(--space-3);
-  margin-bottom: var(--space-3);
   font-weight: 650;
 }
 
@@ -173,17 +237,11 @@ number-flow-react {
 
 /* ---------- Exportar ---------- */
 /* ---------- Bloqueo con huella ---------- */
+/* Se dibuja encima como `.splash` (misma disposición que la pantalla de carga) para que el paso de una a otra no salte. */
 .lock {
   position: fixed;
   inset: 0;
   z-index: 200;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: var(--space-4);
-  padding: calc(var(--space-5) + env(safe-area-inset-top)) var(--space-5) calc(var(--space-5) + env(safe-area-inset-bottom));
-  text-align: center;
   background: var(--bg);
   color: var(--ink);
 }
@@ -277,4 +335,19 @@ number-flow-react {
   display: flex;
   flex-direction: column;
   gap: var(--space-3);
+}
+
+/* Por categorizar: la fila ocupa el ancho y el botón ⋮ (48 px) queda a su derecha; el menú evita depender de los gestos. */
+.pending-row__main {
+  flex: 1;
+  width: auto;
+  min-width: 0;
+  gap: var(--space-3);
+  padding-inline-end: var(--space-1);
+}
+
+.pending-row__more {
+  align-self: center;
+  margin-inline-end: var(--space-1);
+  color: var(--ink-2);
 }

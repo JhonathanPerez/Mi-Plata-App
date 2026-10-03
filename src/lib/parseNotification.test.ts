@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { describeFailure, displayText, fingerprintOf, parseCapture, type ParsedCapture } from './parseNotification';
+import { displayText, fingerprintOf, parseCapture, type ParsedCapture } from './parseNotification';
 
 const NU = 'com.nu.production';
 const SMS = 'com.google.android.apps.messaging';
@@ -232,12 +232,6 @@ describe('parseCapture: lo que NO es un gasto', () => {
 
   it('texto con valor pero sin verbo de gasto', () => {
     expect(fails(NU, '', 'Hoy tienes $50.000 de descuento en tus favoritos')).toBe('not-expense');
-  });
-
-  it('todas las razones tienen un mensaje para el usuario', () => {
-    for (const reason of ['no-amount', 'ignored', 'income', 'not-expense'] as const) {
-      expect(describeFailure(reason).length > 10).toBe(true);
-    }
   });
 });
 

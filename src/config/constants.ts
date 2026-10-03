@@ -5,6 +5,12 @@ export const APP_VERSION = __APP_VERSION__;
 export const APP_AUTHOR = '@Jperez.Ortega';
 export const DB_NAME = 'miplata';
 
+/**
+ * Tiempo mínimo que se ve la pantalla de arranque (logo y spinner) al abrir la app.
+ * Es lo que tarda el anillo del logo en dibujarse; la huella o el PIN se piden recién después.
+ */
+export const STARTUP_SPLASH_MS = 1_200;
+
 /** Moneda de la app. Los montos se guardan como enteros en pesos. */
 export const CURRENCY = 'COP';
 /** 12 dígitos: 999.999.999.999 (dentro del rango seguro de enteros de JS). */
@@ -30,6 +36,7 @@ export const SETTING_KEYS = {
   pendingReminderMinutes: 'pending_reminder_minutes',
   captureApps: 'capture_apps',
   hideAmounts: 'hide_amounts',
+  swipeHintCount: 'swipe_hint_count',
 } as const;
 
 export const CATEGORY_COLORS = [
@@ -73,6 +80,10 @@ export const PAYMENT_TYPE_LABELS: Record<PaymentMethodType, string> = {
 };
 
 export const PAYMENT_TYPES: PaymentMethodType[] = ['cash', 'debit_card', 'credit_card', 'other'];
+
+/** Interruptor de «Categorías» y «Métodos de pago»: el mismo texto en las dos hojas de edición. */
+export const VISIBLE_TOGGLE_LABEL = 'Aparece al registrar un gasto';
+export const VISIBLE_TOGGLE_HINT = 'Si lo apagas, no sale en la lista al registrar un gasto, pero sus gastos siguen en tu historial.';
 
 export const DEFAULT_CATEGORY_ICON = '📦';
 export const DEFAULT_PAYMENT_ICON = '💳';

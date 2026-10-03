@@ -61,12 +61,10 @@ suite('captura automática con SQLite real', () => {
     expect(await captureService.countPending()).toBe(2);
   });
 
-  it('pegar un mensaje: lo agrega, avisa del duplicado y explica los rechazos', async () => {
+  it('un SMS de otro banco se agrega y su repetición cercana no se duplica', async () => {
     const text = 'Bancolombia le informa Compra por $52.900 en MERCADO LIBRE T.Cre *4321';
-    const first = await captureService.addFromText(text, NOW);
-    expect(first.status).toBe('added');
-    expect((await captureService.addFromText(text, NOW + 3600_000)).status).toBe('duplicate');
-    expect(await captureService.addFromText('Hola, ¿cómo estás?', NOW)).toEqual({ status: 'rejected', reason: 'no-amount' });
+    expect(await captureService.ingestEvents([event({ pkg: SMS, title: '', text })])).toEqual({ added: 1, skipped: 0 });
+    expect(await captureService.ingestEvents([event({ pkg: SMS, title: '', text, time: NOW + 30_000, capturedAt: NOW + 31_000 })])).toEqual({ added: 0, skipped: 1 });
     expect(await captureService.countPending()).toBe(3);
   });
 
@@ -87,8 +85,10 @@ suite('captura automática con SQLite real', () => {
     expect(rows[0]).toMatchObject({ raw_text: '', status: 'accepted' });
 
     // Aunque la app de SMS republique el mensaje, no reaparece.
-    const again = await captureService.addFromText('Bancolombia le informa Compra por $52.900 en MERCADO LIBRE T.Cre *4321', NOW + 5000);
-    expect(again.status).toBe('duplicate');
+    const again = await captureService.ingestEvents([
+      event({ pkg: SMS, title: '', text: 'Bancolombia le informa Compra por $52.900 en MERCADO LIBRE T.Cre *4321', time: NOW + 5000, capturedAt: NOW + 6000 }),
+    ]);
+    expect(again).toEqual({ added: 0, skipped: 1 });
   });
 
   it('si el gasto no es válido, el aviso sigue pendiente (todo o nada)', async () => {

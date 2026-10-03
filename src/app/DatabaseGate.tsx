@@ -1,15 +1,13 @@
 import { useCallback, useEffect, useState, type ReactNode } from 'react';
 import { Capacitor } from '@capacitor/core';
-import { APP_NAME } from '@/config/constants';
+import { APP_NAME, STARTUP_SPLASH_MS } from '@/config/constants';
 import { initDatabase } from '@/db';
 import { errorMessage } from '@/lib/errors';
 import { Button } from '@/components/ui/Button';
 import { RingLogo } from '@/components/ui/RingLogo';
+import { SplashLoading } from '@/components/ui/SplashLoading';
 
 const OPEN_TIMEOUT_MS = 12_000;
-/** La base local abre casi al instante, pero el anillo del logo tarda ~1.2 s en dibujarse.
- *  Sin este mínimo, la pantalla de arranque desaparecía antes de que se alcanzara a ver. */
-const MIN_SPLASH_MS = 1_200;
 
 function wait(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
@@ -53,7 +51,7 @@ export function DatabaseGate({ children }: { children: ReactNode }) {
     setStatus('loading');
     const started = Date.now();
     openWithTimeout()
-      .then(() => wait(Math.max(0, MIN_SPLASH_MS - (Date.now() - started))))
+      .then(() => wait(Math.max(0, STARTUP_SPLASH_MS - (Date.now() - started))))
       .then(() => setStatus('ready'))
       .catch((error: unknown) => {
         setMessage(errorMessage(error));
@@ -70,10 +68,7 @@ export function DatabaseGate({ children }: { children: ReactNode }) {
       <RingLogo />
       <h1 className="splash__name">{APP_NAME}</h1>
       {status === 'loading' ? (
-        <>
-          <div className="splash__spinner" role="status" aria-label="Cargando" />
-          <p className="splash__text">Abriendo tus datos…</p>
-        </>
+        <SplashLoading />
       ) : (
         <>
           <p className="splash__text">No se pudo abrir la base de datos local.</p>

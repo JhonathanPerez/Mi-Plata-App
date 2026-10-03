@@ -4,8 +4,8 @@
   position: relative;
   display: flex;
   gap: var(--space-0);
-  height: 22px;
-  border-radius: var(--radius-xs);
+  height: 10px;
+  border-radius: var(--radius-pill);
   background: var(--hero-track);
   overflow: hidden;
 }
@@ -14,6 +14,33 @@
   width: var(--seg-w, 0%);
   height: 100%;
   min-width: 3px;
+  background: var(--swatch);
+  flex: none;
+}
+
+/* Leyenda de la barra: punto de color + nombre de las categorías que más pesan, y «+N» con las demás. */
+.strip__legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1) var(--space-3);
+  margin: var(--space-3) 0 0;
+  padding: 0;
+  list-style: none;
+  font-size: var(--fs-sm);
+  color: var(--hero-ink-2);
+}
+
+.strip__item {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  white-space: nowrap;
+}
+
+.strip__dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
   background: var(--swatch);
   flex: none;
 }
@@ -74,6 +101,28 @@
   font-weight: 650;
 }
 
+/* Fila de Estadísticas que lleva a Gastos: sin aspecto de botón, con un resalte al tocar y una flecha al final. */
+.bars__row--button {
+  /* El relleno y el margen negativo se compensan: el texto no se mueve, solo el resalte sale un poco de la fila. */
+  width: calc(100% + 2 * var(--space-2));
+  margin: calc(-1 * var(--space-1)) calc(-1 * var(--space-2));
+  padding: var(--space-1) var(--space-2);
+  border: 0;
+  border-radius: var(--radius-s);
+  background: transparent;
+  text-align: left;
+}
+
+.bars__row--button:active {
+  background: var(--surface-2);
+}
+
+.bars__chevron {
+  flex: none;
+  align-self: center;
+  color: var(--ink-2);
+}
+
 .bars__row--top .bars__name {
   font-weight: 800;
 }
@@ -112,6 +161,24 @@
 .bars__percent {
   font-size: var(--fs-xs);
   color: var(--ink-2);
+}
+
+/* Versión de Inicio: barra y porcentaje en la misma línea. */
+.bars__meter {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.bars__meter .bars__track {
+  flex: 1;
+}
+
+.bars__percent--inline {
+  flex: none;
+  min-width: 40px;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
 }
 
 .donut {
@@ -188,6 +255,12 @@
 }
 
 .daily {
+  /* Se desliza el dedo en horizontal para elegir un día; el desplazamiento vertical de la página sigue funcionando. */
+  touch-action: pan-y;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  cursor: pointer;
   display: flex;
   align-items: flex-end;
   gap: var(--space-0);
@@ -207,8 +280,20 @@
   min-height: 2px;
 }
 
+/* Días que aún no llegan (mes en curso): punteados, para no confundirlos con días sin gasto. */
+.daily__bar.is-future {
+  background: transparent;
+  border-bottom: 2px dotted var(--line-strong);
+}
+
 .daily__bar.is-peak {
   background: var(--primary);
+}
+
+/* Va al final: la selección gana a vacío, futuro y pico. */
+.daily__bar.is-selected {
+  background: var(--accent);
+  border-bottom-color: var(--accent);
 }
 
 .daily__axis {
@@ -219,7 +304,7 @@
   margin-top: var(--space-1);
 }
 
-.daily__peak {
+.daily__readout {
   margin-top: var(--space-3);
   font-size: var(--fs-sm);
   color: var(--ink-2);

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { formatAmountInput, formatCOP, formatCOPCompact, parseAmount, parseLooseAmount } from './money';
+import { formatAmountInput, formatCOP, formatCOPCompact, formatPercent, parseAmount, parseLooseAmount } from './money';
 
 describe('formatCOP', () => {
   it('usa puntos como separador de miles y sin decimales', () => {
@@ -47,5 +47,19 @@ describe('parseLooseAmount', () => {
     expect(parseLooseAmount('35.000,50')).toBe(35000);
     expect(parseLooseAmount('nada')).toBeNull();
     expect(parseLooseAmount(null)).toBeNull();
+  });
+});
+
+describe('formatPercent', () => {
+  it('redondea al entero más cercano', () => {
+    expect(formatPercent(0)).toBe('0%');
+    expect(formatPercent(4.2)).toBe('4%');
+    expect(formatPercent(58.6)).toBe('59%');
+    expect(formatPercent(100)).toBe('100%');
+  });
+  it('no muestra 0 % ni 100 % cuando no lo son', () => {
+    // 12.000.000 de 12.035.000 = 99,71 %; 35.000 de 12.035.000 = 0,29 %.
+    expect(formatPercent((12_000_000 / 12_035_000) * 100)).toBe('>99%');
+    expect(formatPercent((35_000 / 12_035_000) * 100)).toBe('<1%');
   });
 });

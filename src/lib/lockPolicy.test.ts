@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { normalizeLockDelay, shouldRelock } from './lockPolicy';
+import { describeLockDelay, normalizeLockDelay, shouldRelock } from './lockPolicy';
 
 describe('shouldRelock', () => {
   it('con retardo 0 siempre bloquea al volver', () => {
@@ -25,5 +25,13 @@ describe('normalizeLockDelay', () => {
     expect(normalizeLockDelay('999')).toBe(0);
     expect(normalizeLockDelay(null)).toBe(0);
     expect(normalizeLockDelay('abc')).toBe(0);
+  });
+});
+
+describe('describeLockDelay', () => {
+  it('resume cuándo se vuelve a pedir', () => {
+    expect(describeLockDelay(0)).toBe('se pide siempre');
+    expect(describeLockDelay(60)).toBe('se pide tras 1 min');
+    expect(describeLockDelay(300)).toBe('se pide tras 5 min');
   });
 });

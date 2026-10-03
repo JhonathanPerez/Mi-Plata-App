@@ -1,5 +1,4 @@
-import { useEffect, useRef, useState, type ChangeEvent, type ComponentProps, type ReactNode } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useRef, useState, type ChangeEvent, type ReactNode } from 'react';
 import { useConfirm } from '@/app/providers/ConfirmProvider';
 import { useTheme } from '@/app/providers/ThemeProvider';
 import { useToast } from '@/app/providers/ToastProvider';
@@ -8,40 +7,64 @@ import { Icon } from '@/components/ui/Icon';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { Row } from '@/components/ui/Row';
 import { Segmented } from '@/components/ui/Segmented';
-import { Toggle } from '@/components/ui/Toggle';
-import { PendingReminderCard } from '@/components/cards/PendingReminderCard';
-import { ReminderSettingsCard } from '@/components/cards/ReminderSettingsCard';
+import { useReminderStatus } from '@/components/cards/useReminderStatus';
 import { APP_AUTHOR, APP_NAME, APP_VERSION } from '@/config/constants';
+import { useCaptureAccess } from '@/hooks/useCaptureAccess';
 import { useQuery } from '@/hooks/useQuery';
-import { authenticate, getBiometricSupport, type BiometricSupport } from '@/lib/biometrics';
 import { currentYearMonth } from '@/lib/dates';
-import { normalizeLockDelay } from '@/lib/lockPolicy';
+import { describeLockDelay } from '@/lib/lockPolicy';
+import { formatInterval } from '@/lib/pendingReminders';
+import { HOUR_LABELS } from '@/lib/reminders';
 import { errorMessage } from '@/lib/errors';
 import { formatCOP } from '@/lib/money';
 import { pluralize } from '@/lib/text';
 import { backupService, parseBackup } from '@/services/backupService';
 import { budgetService } from '@/services/budgetService';
+import { captureAppsService } from '@/services/captureAppsService';
 import { captureService } from '@/services/captureService';
 import { importService } from '@/services/importService';
 import { lockService } from '@/services/lockService';
 import type { ThemeMode } from '@/types/models';
 
-/** Fila de ajustes: la fila genérica con su ícono y una flecha al final. */
-function SettingsRow(props: Omit<ComponentProps<typeof Row>, 'chevron'>) {
-  return <Row chevron="chevronRight" {...props} />;
+interface GroupProps {
+  title: string;
+  children: ReactNode;
+  /** `true`: filas pegadas a los bordes de la tarjeta, con divisores. `false`: tarjeta con margen para controles. */
+  flush?: boolean;
 }
 
-function Group({ title, children }: { title: string; children: ReactNode }) {
+/** Una sección de Ajustes: un título y una sola tarjeta. */
+function Group({ title, children, flush = true }: GroupProps) {
   return (
     <section className="section">
       <h2 className="section__title">{title}</h2>
-      <div className="card card--flush">{children}</div>
+      <div className={flush ? 'card card--flush' : 'card stack'}>{children}</div>
     </section>
   );
 }
 
+/** Línea de estado de «Activar notificaciones»: si Mi Plata puede leer las notificaciones del banco. */
+function captureAccessDetail({ supported, enabled }: ReturnType<typeof useCaptureAccess>): string | undefined {
+  if (!supported) return 'Solo en el teléfono';
+  if (enabled === null) return undefined;
+  return enabled ? 'Activadas' : 'Desactivadas';
+}
+
+/** Línea de estado de «Avisos de pago»: lo que está activo, o por qué no lo está. */
+function paymentRemindersDetail({ active, supported, settings }: ReturnType<typeof useReminderStatus>): string {
+  if (active && settings) {
+    return `Activados · ${HOUR_LABELS[settings.hour]}`;
+  }
+  return settings?.enabled && supported ? 'Falta el permiso' : 'Desactivados';
+}
+
+/** Línea de estado de «Recordatorio de pendientes». */
+function pendingRemindersDetail({ pendingActive, supported, pendingSettings }: ReturnType<typeof useReminderStatus>): string {
+  if (pendingActive && pendingSettings) return `Activado · cada ${formatInterval(pendingSettings.intervalMinutes)}`;
+  return pendingSettings?.enabled && supported ? 'Falta el permiso' : 'Desactivado';
+}
+
 export function SettingsPage() {
-  const navigate = useNavigate();
   const toast = useToast();
   const confirm = useConfirm();
   const { mode, setMode } = useTheme();
@@ -49,40 +72,13 @@ export function SettingsPage() {
   const { data: budget } = useQuery(() => budgetService.getAmount(yearMonth), [yearMonth]);
   const { data: lock } = useQuery(() => lockService.getConfig());
   const { data: pendingCount } = useQuery(() => captureService.countPending());
-  const [support, setSupport] = useState<BiometricSupport | null>(null);
+  const { data: trackedApps } = useQuery(() => captureAppsService.getSelected());
+  const reminders = useReminderStatus();
+  const captureAccess = useCaptureAccess();
   const [budgetOpen, setBudgetOpen] = useState(false);
   const [busy, setBusy] = useState<string | null>(null);
   const importRef = useRef<HTMLInputElement>(null);
   const restoreRef = useRef<HTMLInputElement>(null);
-
-  useEffect(() => {
-    void getBiometricSupport().then(setSupport);
-  }, []);
-
-  const onToggleLock = async (next: boolean) => {
-    if (support === 'web') {
-      toast.show('El bloqueo funciona en la app instalada en el teléfono.', 'info');
-      return;
-    }
-    if (next && support !== 'available') {
-      toast.show('Primero configura una huella, un rostro o un PIN en los ajustes de tu teléfono.', 'error');
-      return;
-    }
-    // Se confirma la identidad tanto para activar (prueba que funciona) como para desactivar (evita que otro lo apague).
-    if (support === 'available') {
-      const outcome = await authenticate(next ? 'Confirma para activar el bloqueo' : 'Confirma para desactivar el bloqueo');
-      if (!outcome.ok) {
-        if (!outcome.cancelled) toast.show(outcome.message, 'error');
-        return;
-      }
-    }
-    try {
-      await lockService.setEnabled(next);
-      toast.show(next ? 'Bloqueo activado' : 'Bloqueo desactivado');
-    } catch (error) {
-      toast.show(errorMessage(error), 'error');
-    }
-  };
 
   const onImport = async (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -142,120 +138,118 @@ export function SettingsPage() {
 
   return (
     <div className="page">
-      <PageHeader title="Configuración" />
+      <PageHeader title="Ajustes" />
 
-      <Group title="Presupuesto">
-        <SettingsRow
+      {/* 1 · Lo que defines una vez: presupuesto y cómo se organizan tus gastos. La flecha «›» marca lo que abre otra pantalla u hoja. */}
+      <Group title="Presupuesto y organización">
+        <Row
           icon="target"
           title="Presupuesto mensual"
           detail={budget && budget > 0 ? formatCOP(budget) : 'Sin definir'}
+          chevron="chevronRight"
           onClick={() => setBudgetOpen(true)}
+        />
+        <Row to="/ajustes/categorias" icon="tag" title="Categorías" detail="Crear y editar" chevron="chevronRight" />
+        <Row to="/ajustes/metodos" icon="card" title="Métodos de pago" detail="Efectivo y tarjetas" chevron="chevronRight" />
+        <Row to="/tarjetas" icon="calendar" title="Tarjetas y extractos" detail="Cortes, pagos y qué debes" chevron="chevronRight" />
+      </Group>
+
+      {/* 2 · Seguridad: el bloqueo se configura en su propia pantalla. */}
+      <Group title="Seguridad">
+        <Row
+          to="/ajustes/bloqueo"
+          icon="lock"
+          title="Bloqueo con huella o rostro"
+          detail={lock ? (lock.enabled ? `Activado · ${describeLockDelay(lock.delaySeconds)}` : 'Desactivado') : undefined}
+          chevron="chevronRight"
         />
       </Group>
 
-      <Group title="Organizar">
-        <SettingsRow icon="tag" title="Categorías" detail="Crear y editar" onClick={() => navigate('/ajustes/categorias')} />
-        <SettingsRow icon="card" title="Métodos de pago" detail="Efectivo y tarjetas" onClick={() => navigate('/ajustes/metodos')} />
-        <SettingsRow icon="calendar" title="Tarjetas y extractos" detail="Cortes, pagos y qué debes" onClick={() => navigate('/tarjetas')} />
-      </Group>
-
-      <section className="section">
-        <h2 className="section__title">Seguridad</h2>
-        <div className="card stack">
-          <Toggle
-            checked={lock?.enabled ?? true}
-            onChange={(next) => void onToggleLock(next)}
-            label="Bloqueo con huella o rostro"
-            hint={
-              support === 'none'
-                ? 'Tu teléfono no tiene huella, rostro ni PIN configurado: no se puede proteger la app.'
-                : 'Se pide al abrir la app. Si falla el sensor, usas el PIN del teléfono.'
-            }
-          />
-          {lock?.enabled && support !== 'none' && (
-            <>
-              <span className="field__label">Volver a pedirlo</span>
-              <Segmented<string>
-                label="Cuándo volver a pedir el bloqueo"
-                value={String(lock.delaySeconds)}
-                onChange={(value) => void lockService.setDelay(normalizeLockDelay(value))}
-                options={[
-                  { value: '0', label: 'Siempre' },
-                  { value: '60', label: '1 min' },
-                  { value: '300', label: '5 min' },
-                ]}
-              />
-              <p className="field__hint">
-                «Siempre» lo pide cada vez que sales de la app y regresas. Con un tiempo, no lo pide si vuelves antes.
-              </p>
-            </>
-          )}
-        </div>
-      </section>
-
-      <Group title="Captura automática">
-        <SettingsRow
+      {/* 3 · Seguimiento de apps: de qué apps se leen las compras y dónde caen. El permiso para leer notificaciones va aparte, en «Notificaciones». */}
+      <Group title="Seguimiento de apps">
+        <Row
+          to="/ajustes/apps"
+          icon="apps"
+          title="Apps que se siguen"
+          detail={trackedApps ? `${trackedApps.length} ${pluralize(trackedApps.length, 'app', 'apps')}` : undefined}
+          chevron="chevronRight"
+        />
+        <Row
+          to="/pendientes"
           icon="inbox"
           title="Por categorizar"
           detail={pendingCount ? `${pendingCount} ${pluralize(pendingCount, 'pendiente', 'pendientes')}` : 'Ninguno por ahora'}
-          onClick={() => navigate('/pendientes')}
-        />
-        <SettingsRow
-          icon="bell"
-          title="Notificaciones y SMS del banco"
-          detail="Detectar compras automáticamente"
-          onClick={() => navigate('/ajustes/captura')}
+          chevron="chevronRight"
         />
       </Group>
 
-      <section className="section">
-        <h2 className="section__title">Avisos de pago</h2>
-        <ReminderSettingsCard />
-      </section>
+      {/* 4 · Notificaciones: el permiso para leer las del banco y lo que te avisa el teléfono. Cada cosa se configura en su propia pantalla. */}
+      <Group title="Notificaciones">
+        <Row
+          to="/ajustes/captura"
+          icon="bell"
+          title="Activar notificaciones"
+          detail={captureAccessDetail(captureAccess)}
+          chevron="chevronRight"
+        />
+        <Row
+          to="/ajustes/avisos-pago"
+          icon="bellRinging"
+          title="Avisos de pago"
+          detail={paymentRemindersDetail(reminders)}
+          chevron="chevronRight"
+        />
+        <Row
+          to="/ajustes/recordatorio-pendientes"
+          icon="clockCountdown"
+          title="Recordatorio de pendientes"
+          detail={pendingRemindersDetail(reminders)}
+          chevron="chevronRight"
+        />
+      </Group>
 
-      <section className="section">
-        <h2 className="section__title">Recordatorio de pendientes</h2>
-        <PendingReminderCard />
-      </section>
+      {/* 5 · Apariencia */}
+      <Group title="Apariencia" flush={false}>
+        <div className="setting-theme">
+          <Icon name="moon" size={22} />
+          <span>Tema</span>
+        </div>
+        <Segmented<ThemeMode>
+          label="Tema de la aplicación"
+          value={mode}
+          onChange={setMode}
+          options={[
+            { value: 'system', label: 'Sistema' },
+            { value: 'light', label: 'Claro' },
+            { value: 'dark', label: 'Oscuro' },
+          ]}
+        />
+      </Group>
 
+      {/* 6 · Datos y Acerca de. Importar, copia y restaurar abren el selector de archivos, por eso no llevan flecha. */}
       <section className="section">
-        <h2 className="section__title">Apariencia</h2>
-        <div className="card">
-          <div className="setting-theme">
-            <Icon name="moon" size={22} />
-            <span>Tema</span>
-          </div>
-          <Segmented<ThemeMode>
-            label="Tema de la aplicación"
-            value={mode}
-            onChange={setMode}
-            options={[
-              { value: 'system', label: 'Sistema' },
-              { value: 'light', label: 'Claro' },
-              { value: 'dark', label: 'Oscuro' },
-            ]}
+        <h2 className="section__title">Datos y acerca de</h2>
+        <div className="card card--flush">
+          <Row to="/ajustes/exportar" icon="download" title="Exportar a Excel" detail="Por mes, año o rango de fechas" chevron="chevronRight" />
+          <Row
+            icon="upload"
+            title="Importar desde Excel"
+            detail="Desde un archivo .xlsx"
+            onClick={() => importRef.current?.click()}
+            disabled={busy !== null}
+          />
+          <Row icon="save" title="Crear copia de seguridad" detail="Para guardar o compartir" onClick={() => void onBackup()} disabled={busy !== null} />
+          <Row
+            icon="refresh"
+            title="Restaurar copia de seguridad"
+            detail="Reemplaza todos tus datos"
+            tone="danger"
+            onClick={() => restoreRef.current?.click()}
+            disabled={busy !== null}
           />
         </div>
-      </section>
+        <p className="section__hint">Para importar, el Excel necesita las columnas Fecha, Categoría, Descripción, Método y Valor. Estado es opcional.</p>
 
-      <Group title="Tus datos">
-        <SettingsRow icon="download" title="Exportar a Excel" detail="Por mes, año o rango de fechas" onClick={() => navigate('/ajustes/exportar')} />
-        <SettingsRow icon="upload" title="Importar desde Excel" detail="Columnas: Fecha, Categoría, Descripción, Método, Valor (y Estado, opcional)" onClick={() => importRef.current?.click()} disabled={busy !== null} />
-        <SettingsRow icon="save" title="Crear copia de seguridad" detail="Archivo completo para guardar o compartir" onClick={onBackup} disabled={busy !== null} />
-        <SettingsRow icon="refresh" title="Restaurar copia de seguridad" detail="Reemplaza todos los datos actuales" onClick={() => restoreRef.current?.click()} disabled={busy !== null} />
-      </Group>
-
-      <input
-        ref={importRef}
-        type="file"
-        hidden
-        accept=".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-        onChange={onImport}
-      />
-      <input ref={restoreRef} type="file" hidden accept=".json,application/json" onChange={onRestore} />
-
-      <section className="section">
-        <h2 className="section__title">Acerca de</h2>
         <div className="card about">
           <p className="about__name">
             {APP_NAME} <span className="muted">v{APP_VERSION}</span>
@@ -270,6 +264,15 @@ export function SettingsPage() {
           </p>
         </div>
       </section>
+
+      <input
+        ref={importRef}
+        type="file"
+        hidden
+        accept=".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        onChange={onImport}
+      />
+      <input ref={restoreRef} type="file" hidden accept=".json,application/json" onChange={onRestore} />
 
       {busy && (
         <div className="busy" role="status">

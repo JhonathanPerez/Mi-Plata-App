@@ -1,4 +1,4 @@
-import { useRef, type ReactNode } from 'react';
+import { useEffect, useRef, type ReactNode } from 'react';
 import { useDrag } from '@use-gesture/react';
 import { animate, motion, useMotionValue, useTransform, type HTMLMotionProps, type MotionValue } from 'motion/react';
 import { cx } from '@/lib/cx';
@@ -24,6 +24,8 @@ interface SwipeRowProps {
   swipeLeft?: SwipeAction;
   /** Anima la entrada y la salida de la fila (alto y opacidad). Úsalo dentro de `AnimatePresence`. */
   collapse?: boolean;
+  /** Al activarse, la fila «asoma» un momento cada acción (derecha e izquierda) para enseñar que se desliza. Sin movimiento si la persona pidió reducirlo. */
+  hint?: boolean;
   className?: string;
   children: ReactNode;
 }
@@ -32,6 +34,8 @@ interface SwipeRowProps {
 const COMMIT_DISTANCE = 96;
 /** Ancho máximo que se puede arrastrar (con un poco de resistencia). */
 const MAX_PULL = 160;
+/** Cuánto asoma cada acción en la pista (px): lo justo para ver el color, el icono y el texto. */
+const HINT_PEEK = 84;
 /** Por debajo de esta distancia un gesto rápido no cuenta como "lanzar" la fila. */
 const FLICK_MIN_DISTANCE = 32;
 
@@ -69,7 +73,7 @@ function Reveal({ action, side, opacity, scale }: RevealProps) {
  * si no, la fila vuelve a su sitio. Un clic justo después de arrastrar se ignora, así el contenido no se abre por accidente.
  * Para lector de pantalla y teclado se añaden botones ocultos equivalentes a cada acción.
  */
-export function SwipeRow({ swipeRight, swipeLeft, collapse, className, children }: SwipeRowProps) {
+export function SwipeRow({ swipeRight, swipeLeft, collapse, hint, className, children }: SwipeRowProps) {
   const x = useMotionValue(0);
   // Cada aviso solo se ve mientras x se mueve hacia su lado: useTransform deja en el extremo del rango cuando x se sale de él.
   const rightOpacity = useTransform(x, [0, FLICK_MIN_DISTANCE, COMMIT_DISTANCE], [0, 0.55, 1]);
@@ -79,10 +83,33 @@ export function SwipeRow({ swipeRight, swipeLeft, collapse, className, children 
   const dragged = useRef(false);
   const crossed = useRef(false);
 
+  const hintAnimation = useRef<ReturnType<typeof animate> | null>(null);
+  // Booleanos y no los objetos de acción: esos se crean de nuevo en cada render y reiniciarían la pista.
+  const hasRight = Boolean(swipeRight);
+  const hasLeft = Boolean(swipeLeft);
+
+  useEffect(() => {
+    if (!hint || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return undefined;
+    // Un momento después de entrar la pantalla, para que se vea y no se pierda en la transición.
+    const timer = setTimeout(() => {
+      const peek = Math.min(HINT_PEEK, MAX_PULL);
+      hintAnimation.current = animate(x, [0, hasRight ? peek : 0, 0, hasLeft ? -peek : 0, 0], {
+        duration: 1.9,
+        ease: 'easeInOut',
+        times: [0, 0.28, 0.5, 0.78, 1],
+      });
+    }, 700);
+    return () => {
+      clearTimeout(timer);
+      hintAnimation.current?.stop();
+    };
+  }, [hint, hasRight, hasLeft, x]);
+
   const bind = useDrag(
     ({ movement: [mx], velocity: [vx], direction: [dx], first, last, tap }) => {
       if (tap) return;
       if (first) {
+        hintAnimation.current?.stop(); // si la persona toca la fila, manda ella
         dragged.current = false;
         crossed.current = false;
       }

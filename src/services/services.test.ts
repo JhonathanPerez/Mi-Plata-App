@@ -39,6 +39,14 @@ suite('servicios con SQLite real', () => {
     expect(validateExpenseInput({ ...base, time: '25:00' }).time).toBeTruthy();
   });
 
+  it('exige descripción solo cuando el formulario lo pide', () => {
+    const base = { amount: 35000, categoryId: 'cat_alimentacion', paymentMethodId: 'pm_nubank', date: '2026-09-19', time: null, note: null };
+    expect(validateExpenseInput(base).note).toBeUndefined();
+    expect(validateExpenseInput(base, { requireNote: true }).note).toBeTruthy();
+    expect(validateExpenseInput({ ...base, note: '   ' }, { requireNote: true }).note).toBeTruthy();
+    expect(validateExpenseInput({ ...base, note: 'Almuerzo' }, { requireNote: true })).toEqual({});
+  });
+
   it('crea, edita, filtra y elimina gastos', async () => {
     const created = await expenseService.create({
       amount: 35000, categoryId: 'cat_alimentacion', paymentMethodId: 'pm_nubank',
@@ -108,6 +116,9 @@ suite('servicios con SQLite real', () => {
     expect(status.level).toBe('ok');
     expect(computeBudgetStatus('2026-09', 1000, 1200).level).toBe('over');
     expect(computeBudgetStatus('2026-09', 1000, 1200).overBy).toBe(200);
+    // Excedido: el porcentaje nunca pasa de 100.
+    expect(computeBudgetStatus('2026-09', 1000, 1200).percentUsed).toBe(100);
+    expect(computeBudgetStatus('2026-09', 1000, 5000).percentUsed).toBe(100);
     expect(computeBudgetStatus('2026-09', 1000, 900).level).toBe('near');
     expect(computeBudgetStatus('2026-09', 0, 900).level).toBe('none');
   });
@@ -120,6 +131,11 @@ suite('servicios con SQLite real', () => {
     expect(dash.topCategory?.name).toBe('Alimentación');
     expect(dash.budget.available).toBe(3000000 - 52000);
     expect(dash.recent.length).toBeGreaterThan(0);
+    // Comparación con agosto y promedio por día, calculados de los gastos (19 días transcurridos).
+    expect(dash.previousTotal).toBe(250000);
+    expect(dash.changeAmount).toBe(52000 - 250000);
+    expect(Math.round(dash.changePercent ?? 0)).toBe(-79);
+    expect(Math.round(dash.dailyAverage)).toBe(Math.round(52000 / 19));
 
     const summary = await statsService.getMonthlySummary('2026-09', now);
     expect(summary.transactions).toBe(2);

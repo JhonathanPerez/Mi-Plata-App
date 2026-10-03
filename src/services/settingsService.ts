@@ -26,6 +26,16 @@ export const settingsService = {
     await settingsRepository.set(SETTING_KEYS.hideAmounts, hidden ? 'true' : 'false');
   },
 
+  /** Cuántas veces se mostró la pista de deslizar un gasto (un número alto = ya la aprendió). No cambia gastos: no avisa al bus. */
+  async getSwipeHintCount(): Promise<number> {
+    const value = Number(await settingsRepository.get(SETTING_KEYS.swipeHintCount));
+    return Number.isFinite(value) && value > 0 ? value : 0;
+  },
+
+  async setSwipeHintCount(count: number): Promise<void> {
+    await settingsRepository.set(SETTING_KEYS.swipeHintCount, String(count));
+  },
+
   getLastPaymentMethodId(): Promise<string | null> {
     return settingsRepository.get(SETTING_KEYS.lastPaymentMethodId);
   },

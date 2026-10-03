@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
+import { useLocation, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { useConfirm } from '@/app/providers/ConfirmProvider';
 import { useToast } from '@/app/providers/ToastProvider';
 import { haptics } from '@/lib/haptics';
@@ -17,7 +17,8 @@ import { NOTE_MAX_LENGTH } from '@/config/constants';
 import { useQuery } from '@/hooks/useQuery';
 import { todayIso } from '@/lib/dates';
 import { errorMessage } from '@/lib/errors';
-import { describePaymentMethod } from '@/lib/payment';
+import { pushBackHandler } from '@/lib/backStack';
+import { describePaymentMethod, statusHint } from '@/lib/payment';
 import { captureService, suggestPaymentMethodId } from '@/services/captureService';
 import { categoryService } from '@/services/categoryService';
 import { expenseService, validateExpenseInput, type ExpenseFieldErrors } from '@/services/expenseService';
@@ -25,16 +26,14 @@ import { paymentMethodService } from '@/services/paymentMethodService';
 import { settingsService } from '@/services/settingsService';
 import type { ExpenseInput } from '@/types/models';
 
-/** Explica qué significa el estado elegido, según el método de pago. */
-function statusHint(paid: boolean, methodType: string | null, methodName: string | undefined): string {
-  if (methodType === 'credit_card') {
-    return paid
-      ? 'Ya se lo pagaste al banco: no aparecerá en «Pagar tarjeta».'
-      : `Con tarjeta de crédito queda por pagar hasta que le pagues el extracto a ${methodName ?? 'tu banco'}.`;
-  }
-  return paid
-    ? 'Con este método se marca como pagado. Puedes cambiarlo si fue fiado.'
-    : 'Queda pendiente hasta que lo marques como pagado.';
+/** Valores del formulario; el estado inicial sirve para saber si hay cambios sin guardar. */
+interface FormValues {
+  amount: number;
+  categoryId: string | null;
+  methodId: string | null;
+  date: string;
+  note: string;
+  paid: boolean;
 }
 
 async function loadFormData(id: string | undefined, pendingId: string | null) {
@@ -54,6 +53,7 @@ export function ExpenseFormPage() {
   // Si viene de "Por categorizar", el valor, el comercio, la fecha y el método ya llegan rellenos.
   const pendingId = useSearchParams()[0].get('pendiente');
   const navigate = useNavigate();
+  const location = useLocation();
   const toast = useToast();
   const confirm = useConfirm();
   const { data, loading } = useQuery(() => loadFormData(id, pendingId), [id, pendingId]);
@@ -72,36 +72,44 @@ export function ExpenseFormPage() {
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const initialized = useRef(false);
+  // Cómo quedó el formulario al rellenarse: lo que se compara para avisar antes de descartar.
+  const [initial, setInitial] = useState<FormValues | null>(null);
   const leaveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Rellena el formulario una sola vez cuando llegan los datos.
   useEffect(() => {
     if (!data || initialized.current) return;
     initialized.current = true;
+    const start: FormValues = { amount: 0, categoryId: null, methodId: null, date: todayIso(), note: '', paid: true };
     if (data.existing) {
-      setAmount(data.existing.amount);
-      setCategoryId(data.existing.categoryId);
-      setMethodId(data.existing.paymentMethodId);
-      setDate(data.existing.date);
-      setNote(data.existing.note ?? '');
-      setPaid(data.existing.paidAt !== null);
+      start.amount = data.existing.amount;
+      start.categoryId = data.existing.categoryId;
+      start.methodId = data.existing.paymentMethodId;
+      start.date = data.existing.date;
+      start.note = data.existing.note ?? '';
+      start.paid = data.existing.paidAt !== null;
       statusTouched.current = true; // al editar se respeta el estado que ya tenía
     } else {
       const active = data.methods.filter((m) => m.isActive);
       const last = active.find((m) => m.id === data.lastMethodId);
       const fallback = (last ?? active[0])?.id ?? null;
+      start.methodId = fallback;
       if (data.pending) {
         const pending = data.pending;
-        const when = new Date(pending.occurredAt);
-        setAmount(pending.amount);
-        setNote(pending.merchant ?? '');
-        setDate(todayIso(when));
+        start.amount = pending.amount;
+        start.note = pending.merchant ?? '';
+        start.date = todayIso(new Date(pending.occurredAt));
         // La categoría se deja vacía a propósito: es lo que falta por decidir.
-        setMethodId(suggestPaymentMethodId(data.methods, pending) ?? fallback);
-      } else {
-        setMethodId(fallback);
+        start.methodId = suggestPaymentMethodId(data.methods, pending) ?? fallback;
       }
     }
+    setAmount(start.amount);
+    setCategoryId(start.categoryId);
+    setMethodId(start.methodId);
+    setDate(start.date);
+    setNote(start.note);
+    setPaid(start.paid);
+    setInitial(start);
   }, [data]);
 
   const methodType = (data?.methods ?? []).find((m) => m.id === methodId)?.type ?? null;
@@ -141,6 +149,41 @@ export function ExpenseFormPage() {
   const selectedCategory = categoryOptions.find((o) => o.id === categoryId) ?? null;
   const selectedMethod = methodOptions.find((o) => o.id === methodId) ?? null;
 
+  // Cambios sin guardar. El estado «pagado» solo cuenta al editar: en un gasto nuevo se sugiere solo según el método.
+  const hasChanges =
+    initial !== null &&
+    !saved &&
+    !saving &&
+    (amount !== initial.amount ||
+      categoryId !== initial.categoryId ||
+      methodId !== initial.methodId ||
+      date !== initial.date ||
+      note !== initial.note ||
+      (isEdit && paid !== initial.paid));
+
+  const requestClose = async () => {
+    if (!hasChanges) {
+      navigate(-1);
+      return;
+    }
+    const discard = await confirm({
+      title: isEdit || pendingId ? '¿Descartar los cambios?' : '¿Descartar este gasto?',
+      message: isEdit || pendingId ? 'Los cambios que hiciste no se guardarán.' : 'Lo que ingresaste no se guardará.',
+      confirmLabel: 'Descartar',
+      cancelLabel: 'Seguir editando',
+      danger: true,
+    });
+    if (discard) navigate(-1);
+  };
+
+  // El botón o gesto Atrás de Android pide la misma confirmación que la «X».
+  const requestCloseRef = useRef(requestClose);
+  requestCloseRef.current = requestClose;
+  useEffect(() => {
+    if (!hasChanges) return undefined;
+    return pushBackHandler(() => void requestCloseRef.current());
+  }, [hasChanges]);
+
   if (pendingId && !isEdit && data && !data.pending && !saved && !saving) {
     return (
       <div className="page page--form">
@@ -170,7 +213,7 @@ export function ExpenseFormPage() {
       note: note.trim() ? note.trim() : null,
       paid,
     };
-    const found = validateExpenseInput(input);
+    const found = validateExpenseInput(input, { requireNote: true });
     setErrors(found);
     if (Object.keys(found).length > 0) {
       // Lleva la vista al primer error para que se vea sin buscarlo.
@@ -184,8 +227,9 @@ export function ExpenseFormPage() {
       void haptics.success();
       setSaved(true);
       leaveTimer.current = setTimeout(() => {
-        // Editar o categorizar un pendiente regresa a la pantalla anterior (la bandeja, para seguir con el siguiente).
-        if (isEdit || pendingId) navigate(-1);
+        // Se vuelve a donde se estaba (Inicio o Gastos, desde donde se tocó «+»; o la bandeja de pendientes).
+        // `key === 'default'` es la primera pantalla de la sesión (enlace directo): no hay a dónde volver, así que va a Inicio.
+        if (location.key !== 'default') navigate(-1);
         else navigate('/', { replace: true });
       }, 850);
     } catch (error) {
@@ -218,6 +262,7 @@ export function ExpenseFormPage() {
         title={isEdit ? 'Editar gasto' : pendingId ? 'Categorizar gasto' : 'Agregar gasto'}
         close
         closeLabel="Cerrar sin guardar"
+        onClose={() => void requestClose()}
         actions={isEdit ? <IconButton icon="trash" label="Eliminar gasto" onClick={remove} /> : undefined}
       />
 
@@ -243,13 +288,14 @@ export function ExpenseFormPage() {
             size="hero"
           />
 
-          <Field label="Descripción (opcional)" htmlFor="expense-note" error={errors.note}>
+          <Field label="Descripción" htmlFor="expense-note" error={errors.note}>
             <input
               id="expense-note"
               className="input"
               type="text"
               placeholder="¿En qué gastaste? Ej.: Almuerzo con el equipo"
               maxLength={NOTE_MAX_LENGTH}
+              aria-required="true"
               value={note}
               onChange={(event) => setNote(event.target.value)}
             />
@@ -288,7 +334,7 @@ export function ExpenseFormPage() {
               ]}
             />
             <Notice tone={paid ? 'info' : 'warning'} icon={paid ? 'check' : 'info'}>
-              {statusHint(paid, methodType, selectedMethod?.name)}
+              {statusHint(paid, methodType)}
             </Notice>
           </div>
 

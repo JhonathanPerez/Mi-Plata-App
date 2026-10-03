@@ -2,9 +2,7 @@ import {
   BANK_ALIASES,
   CAPTURE_DEDUPE_WINDOW_MS,
   CAPTURE_KEEP_RESOLVED_DAYS,
-  CAPTURE_MANUAL_DEDUPE_MS,
   CAPTURE_MAX_LAG_MS,
-  MANUAL_SOURCE,
   type BankKey,
 } from '@/config/capture';
 import { notifyDataChanged } from '@/lib/dataBus';
@@ -32,21 +30,13 @@ export interface IngestSummary {
   skipped: number;
 }
 
-export type PasteResult =
-  | { status: 'added'; item: PendingCapture }
-  | { status: 'duplicate' }
-  | { status: 'rejected'; reason: ParseFailure };
-
-async function addIfNew(
-  event: { pkg: string; title: string; text: string; time: number },
-  windowMs: number,
-): Promise<PendingCapture | 'duplicate' | ParseFailure> {
+async function addIfNew(event: { pkg: string; title: string; text: string; time: number }): Promise<PendingCapture | 'duplicate' | ParseFailure> {
   const learnedPromo = await spamLearningService.getPattern();
   const parsed = parseCapture({ pkg: event.pkg, title: event.title, text: event.text }, learnedPromo);
   if (!parsed.ok) return parsed.reason;
 
   const fingerprint = fingerprintOf(event.text);
-  if (await pendingCaptureRepository.existsFingerprint(fingerprint, event.time - windowMs, event.time + windowMs)) {
+  if (await pendingCaptureRepository.existsFingerprint(fingerprint, event.time - CAPTURE_DEDUPE_WINDOW_MS, event.time + CAPTURE_DEDUPE_WINDOW_MS)) {
     return 'duplicate';
   }
 
@@ -128,7 +118,7 @@ export const captureService = {
         void clearPlaceholder(event);
         continue;
       }
-      const outcome = await addIfNew(event, CAPTURE_DEDUPE_WINDOW_MS);
+      const outcome = await addIfNew(event);
       if (typeof outcome === 'string') {
         summary.skipped += 1;
         void clearPlaceholder(event);
@@ -142,15 +132,6 @@ export const captureService = {
       void notifyNewCaptures(added);
     }
     return summary;
-  },
-
-  /** Para el botón "Pegar un mensaje": procesa un texto copiado del SMS o de la notificación. */
-  async addFromText(text: string, now: number = Date.now()): Promise<PasteResult> {
-    const outcome = await addIfNew({ pkg: MANUAL_SOURCE, title: '', text: text.trim(), time: now }, CAPTURE_MANUAL_DEDUPE_MS);
-    if (outcome === 'duplicate') return { status: 'duplicate' };
-    if (typeof outcome === 'string') return { status: 'rejected', reason: outcome };
-    notifyDataChanged();
-    return { status: 'added', item: outcome };
   },
 
   listPending(): Promise<PendingCapture[]> {

@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   addDays, addMonths, daysInMonth, diffDays, elapsedDaysInMonth, formatDayHeading, formatLongDate,
-  formatMonthTitle, formatTime, formatWeekdayDate, isValidIsoDate, monthRange, toIsoDate,
+  formatMonthTitle, formatShortDate, formatTime, formatWeekdayDate, formatWeekdayDay, isValidIsoDate, isYearMonth, monthRange, toIsoDate,
 } from './dates';
 
 describe('fechas locales', () => {
@@ -27,6 +27,8 @@ describe('fechas locales', () => {
   it('formatea en español', () => {
     expect(formatLongDate('2026-09-19')).toBe('19 septiembre 2026');
     expect(formatWeekdayDate('2026-09-30', new Date(2026, 8, 30))).toBe('miércoles 30 de septiembre');
+    expect(formatWeekdayDay('2026-09-30')).toBe('miércoles 30');
+    expect(formatWeekdayDay('2026-09-19')).toBe('sábado 19');
     expect(formatWeekdayDate('2025-12-25', new Date(2026, 8, 30))).toBe('jueves 25 de diciembre de 2025');
     expect(formatMonthTitle('2026-09')).toBe('Septiembre 2026');
     expect(formatTime('14:05')).toBe('2:05 p. m.');
@@ -36,10 +38,31 @@ describe('fechas locales', () => {
     expect(formatDayHeading('2026-09-18', now)).toBe('Ayer');
     expect(formatDayHeading('2026-09-12', now)).toBe('sáb 12 sep');
   });
+  it('fecha corta siempre con día y mes, también para hoy y ayer', () => {
+    expect(formatShortDate('2026-09-30')).toBe('30 sep');
+    expect(formatShortDate('2026-09-29')).toBe('29 sep');
+    expect(formatShortDate('2026-10-02')).toBe('2 oct');
+  });
   it('días transcurridos para promedios', () => {
     const now = new Date(2026, 8, 19);
     expect(elapsedDaysInMonth('2026-09', now)).toBe(19);
     expect(elapsedDaysInMonth('2026-08', now)).toBe(31);
     expect(elapsedDaysInMonth('2026-10', now)).toBe(1);
+  });
+});
+
+describe('isYearMonth', () => {
+  it('acepta meses con forma AAAA-MM', () => {
+    expect(isYearMonth('2026-01')).toBe(true);
+    expect(isYearMonth('2026-12')).toBe(true);
+  });
+  it('rechaza lo demás', () => {
+    expect(isYearMonth('2026-00')).toBe(false);
+    expect(isYearMonth('2026-13')).toBe(false);
+    expect(isYearMonth('2026-1')).toBe(false);
+    expect(isYearMonth('2026-10-05')).toBe(false);
+    expect(isYearMonth('octubre')).toBe(false);
+    expect(isYearMonth(null)).toBe(false);
+    expect(isYearMonth(202610)).toBe(false);
   });
 });
