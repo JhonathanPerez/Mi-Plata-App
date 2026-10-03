@@ -1,3 +1,10 @@
+## [1.2.3](https://github.com/JhonathanPerez/Mi-Plata-App/compare/v1.2.2...v1.2.3) (2026-10-03)
+
+
+### Bug Fixes
+
+* **ui:** mostrar la comparación con el mes anterior en pesos en vez de porcentaje en Inicio y Estadísticas ([#30](https://github.com/JhonathanPerez/Mi-Plata-App/issues/30)) ([2df43f8](https://github.com/JhonathanPerez/Mi-Plata-App/commit/2df43f88e09de2aed17abbfe157aade7696cc4f9))
+
 ## [1.2.2](https://github.com/JhonathanPerez/Mi-Plata-App/compare/v1.2.1...v1.2.2) (2026-10-03)
 
 
