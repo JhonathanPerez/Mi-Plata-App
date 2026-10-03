@@ -1,3 +1,10 @@
+# [1.2.0](https://github.com/JhonathanPerez/Mi-Plata-App/compare/v1.1.1...v1.2.0) (2026-10-03)
+
+
+### Features
+
+* **actualizaciones:** avisar de versiones nuevas al abrir y comprobar actualizaciones desde Ajustes ([#27](https://github.com/JhonathanPerez/Mi-Plata-App/issues/27)) ([1385097](https://github.com/JhonathanPerez/Mi-Plata-App/commit/1385097acf9c56c7c230b2d92bf234ecf0f02728))
+
 ## [1.1.1](https://github.com/JhonathanPerez/Mi-Plata-App/compare/v1.1.0...v1.1.1) (2026-10-03)
 
 
