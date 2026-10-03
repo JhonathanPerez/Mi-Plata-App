@@ -1,3 +1,10 @@
+## [1.2.1](https://github.com/JhonathanPerez/Mi-Plata-App/compare/v1.2.0...v1.2.1) (2026-10-03)
+
+
+### Bug Fixes
+
+* **ui:** Gastos sin meses futuros y fecha del gasto limitada a hoy ([#28](https://github.com/JhonathanPerez/Mi-Plata-App/issues/28)) ([9fad32f](https://github.com/JhonathanPerez/Mi-Plata-App/commit/9fad32f162cca06afde1b1117a7211e8165d0950))
+
 # [1.2.0](https://github.com/JhonathanPerez/Mi-Plata-App/compare/v1.1.1...v1.2.0) (2026-10-03)
 
 
