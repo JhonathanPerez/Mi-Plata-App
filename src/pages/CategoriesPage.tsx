@@ -3,15 +3,16 @@ import { useConfirm } from '@/app/providers/ConfirmProvider';
 import { useToast } from '@/app/providers/ToastProvider';
 import { Button } from '@/components/ui/Button';
 import { ColorPicker } from '@/components/ui/ColorPicker';
-import { EmojiTile } from '@/components/ui/EmojiTile';
 import { EmptyState } from '@/components/ui/EmptyState';
+import { ErrorState } from '@/components/ui/ErrorState';
 import { Field } from '@/components/ui/Field';
 import { IconPicker } from '@/components/ui/IconPicker';
+import { ManagedListSkeleton } from '@/components/ui/ManagedListSkeleton';
+import { ManagedRow } from '@/components/ui/ManagedRow';
 import { PageHeader } from '@/components/ui/PageHeader';
-import { Row } from '@/components/ui/Row';
 import { Sheet } from '@/components/ui/Sheet';
 import { Toggle } from '@/components/ui/Toggle';
-import { CATEGORY_COLORS, CATEGORY_ICONS, NAME_MAX_LENGTH } from '@/config/constants';
+import { CATEGORY_COLORS, CATEGORY_ICONS, NAME_MAX_LENGTH, VISIBLE_TOGGLE_HINT, VISIBLE_TOGGLE_LABEL } from '@/config/constants';
 import { useQuery } from '@/hooks/useQuery';
 import { errorMessage, ValidationError } from '@/lib/errors';
 import { pluralize } from '@/lib/text';
@@ -30,7 +31,7 @@ const NEW_DRAFT: Draft = { name: '', icon: CATEGORY_ICONS[0], color: CATEGORY_CO
 export function CategoriesPage() {
   const toast = useToast();
   const confirm = useConfirm();
-  const { data: categories, loading } = useQuery(() => categoryService.listWithCounts());
+  const { data: categories, loading, error, retry } = useQuery(() => categoryService.listWithCounts());
   const [editing, setEditing] = useState<CategoryWithCount | 'new' | null>(null);
   const [draft, setDraft] = useState<Draft>(NEW_DRAFT);
   const [nameError, setNameError] = useState('');
@@ -92,27 +93,31 @@ export function CategoriesPage() {
         Nueva categoría
       </Button>
 
-      {loading && !categories ? (
-        <p className="muted">Cargando…</p>
+      {error && !categories ? (
+        <div className="card">
+          <ErrorState description="No pudimos leer tus categorías. Inténtalo de nuevo." onRetry={retry} />
+        </div>
+      ) : loading && !categories ? (
+        <ManagedListSkeleton label="Cargando categorías" />
       ) : (categories ?? []).length === 0 ? (
         <div className="card">
-          <EmptyState icon="tag" title="No hay categorías" description="Crea la primera para empezar a registrar gastos." />
+          <EmptyState
+            icon="tag"
+            title="Aún no hay categorías"
+            description="Toca «Nueva categoría» para crear la primera y empezar a registrar gastos."
+          />
         </div>
       ) : (
         <div className="card card--flush list-gap">
           {(categories ?? []).map((category) => (
-            <Row
+            <ManagedRow
               key={category.id}
-              leading={<EmojiTile emoji={category.icon} color={category.color} />}
-              title={category.name}
-              detail={
-                <>
-                  {category.expenseCount} {pluralize(category.expenseCount, 'gasto', 'gastos')}
-                  {!category.isActive && ' · Oculta al registrar'}
-                </>
-              }
-              chevron="edit"
-              onClick={() => setEditing(category)}
+              emoji={category.icon}
+              color={category.color}
+              name={category.name}
+              expenseCount={category.expenseCount}
+              hidden={!category.isActive}
+              onEdit={() => setEditing(category)}
             />
           ))}
         </div>
@@ -123,7 +128,7 @@ export function CategoriesPage() {
         onClose={close}
         title={editing === 'new' ? 'Nueva categoría' : 'Editar categoría'}
         actions={{
-          primary: { label: 'Guardar categoría', loading: saving, onClick: save },
+          primary: { label: 'Guardar', loading: saving, onClick: save },
           secondary: current
             ? { label: 'Eliminar categoría', variant: 'danger', icon: 'trash', onClick: remove, disabled: current.expenseCount > 0 }
             : undefined,
@@ -148,8 +153,8 @@ export function CategoriesPage() {
             <ColorPicker label="Color de la categoría" colors={CATEGORY_COLORS} value={draft.color} onChange={(color) => setDraft({ ...draft, color })} />
           </Field>
           <Toggle
-            label="Mostrar al registrar gastos"
-            hint="Si la ocultas, sigue apareciendo en tu historial."
+            label={VISIBLE_TOGGLE_LABEL}
+            hint={VISIBLE_TOGGLE_HINT}
             checked={draft.isActive}
             onChange={(isActive) => setDraft({ ...draft, isActive })}
           />

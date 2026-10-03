@@ -5,13 +5,14 @@ import { useToast } from '@/app/providers/ToastProvider';
 import { Button } from '@/components/ui/Button';
 import { Chip } from '@/components/ui/Chip';
 import { ColorPicker } from '@/components/ui/ColorPicker';
-import { EmojiTile } from '@/components/ui/EmojiTile';
 import { EmptyState } from '@/components/ui/EmptyState';
+import { ErrorState } from '@/components/ui/ErrorState';
 import { Field } from '@/components/ui/Field';
 import { IconPicker } from '@/components/ui/IconPicker';
+import { ManagedListSkeleton } from '@/components/ui/ManagedListSkeleton';
+import { ManagedRow } from '@/components/ui/ManagedRow';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { PickerField } from '@/components/ui/PickerField';
-import { Row } from '@/components/ui/Row';
 import { Sheet } from '@/components/ui/Sheet';
 import { Toggle } from '@/components/ui/Toggle';
 import {
@@ -20,10 +21,13 @@ import {
   PAYMENT_ICONS,
   PAYMENT_TYPES,
   PAYMENT_TYPE_LABELS,
+  VISIBLE_TOGGLE_HINT,
+  VISIBLE_TOGGLE_LABEL,
 } from '@/config/constants';
 import { useQuery } from '@/hooks/useQuery';
 import { describeCut, describeDue } from '@/lib/cycles';
 import { errorMessage, ValidationError } from '@/lib/errors';
+import { methodKindLabel } from '@/lib/payment';
 import { pluralize } from '@/lib/text';
 import { paymentMethodService } from '@/services/paymentMethodService';
 import type { PaymentMethodInput, PaymentMethodWithCount } from '@/types/models';
@@ -40,7 +44,7 @@ const NEW_DRAFT: PaymentMethodInput = {
 export function PaymentMethodsPage() {
   const toast = useToast();
   const confirm = useConfirm();
-  const { data: methods, loading } = useQuery(() => paymentMethodService.listWithCounts());
+  const { data: methods, loading, error, retry } = useQuery(() => paymentMethodService.listWithCounts());
   const navigate = useNavigate();
   const [editing, setEditing] = useState<PaymentMethodWithCount | 'new' | null>(null);
   const [draft, setDraft] = useState<PaymentMethodInput>(NEW_DRAFT);
@@ -109,32 +113,33 @@ export function PaymentMethodsPage() {
         Nueva tarjeta o método
       </Button>
 
-      {loading && !methods ? (
-        <p className="muted">Cargando…</p>
+      {error && !methods ? (
+        <div className="card">
+          <ErrorState description="No pudimos leer tus métodos de pago. Inténtalo de nuevo." onRetry={retry} />
+        </div>
+      ) : loading && !methods ? (
+        <ManagedListSkeleton label="Cargando métodos de pago" />
       ) : (methods ?? []).length === 0 ? (
         <div className="card">
-          <EmptyState icon="card" title="No hay métodos de pago" description="Agrega efectivo o una tarjeta para registrar gastos." />
+          <EmptyState
+            icon="card"
+            title="Aún no hay métodos de pago"
+            description="Toca «Nueva tarjeta o método» para agregar efectivo o una tarjeta."
+          />
         </div>
       ) : (
         <div className="card card--flush list-gap">
           {(methods ?? []).map((method) => (
-            <Row
+            <ManagedRow
               key={method.id}
-              leading={<EmojiTile emoji={method.icon} color={method.color} />}
-              title={
-                <>
-                  {method.name}
-                  {method.last4 && <span className="muted"> · •••• {method.last4}</span>}
-                </>
-              }
-              detail={
-                <>
-                  {PAYMENT_TYPE_LABELS[method.type]} · {method.expenseCount} {pluralize(method.expenseCount, 'gasto', 'gastos')}
-                  {!method.isActive && ' · Oculto al registrar'}
-                </>
-              }
-              chevron="edit"
-              onClick={() => setEditing(method)}
+              emoji={method.icon}
+              color={method.color}
+              name={method.name}
+              suffix={method.last4 && <span className="muted"> · •••• {method.last4}</span>}
+              kind={methodKindLabel(method.name, method.type)}
+              expenseCount={method.expenseCount}
+              hidden={!method.isActive}
+              onEdit={() => setEditing(method)}
             />
           ))}
         </div>
@@ -197,8 +202,8 @@ export function PaymentMethodsPage() {
             <ColorPicker label="Color del método de pago" colors={CATEGORY_COLORS} value={draft.color} onChange={(color) => setDraft({ ...draft, color })} />
           </Field>
           <Toggle
-            label="Mostrar al registrar gastos"
-            hint="Si lo ocultas, sus gastos siguen en tu historial."
+            label={VISIBLE_TOGGLE_LABEL}
+            hint={VISIBLE_TOGGLE_HINT}
             checked={draft.isActive}
             onChange={(isActive) => setDraft({ ...draft, isActive })}
           />
