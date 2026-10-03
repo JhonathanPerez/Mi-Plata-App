@@ -1,3 +1,10 @@
+# [1.1.0](https://github.com/JhonathanPerez/Mi-Plata-App/compare/v1.0.2...v1.1.0) (2026-10-03)
+
+
+### Features
+
+* **ui:** rediseño de vistas (E2, E3, E4, E5) ([d8fbc4e](https://github.com/JhonathanPerez/Mi-Plata-App/commit/d8fbc4ebe3b990bdcce0deaabe2a45272ecd2d89))
+
 ## [1.0.2](https://github.com/JhonathanPerez/Mi-Plata-App/compare/v1.0.1...v1.0.2) (2026-09-30)
 
 
