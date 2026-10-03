@@ -1,3 +1,10 @@
+## [1.2.2](https://github.com/JhonathanPerez/Mi-Plata-App/compare/v1.2.1...v1.2.2) (2026-10-03)
+
+
+### Bug Fixes
+
+* **actualizaciones:** usar un FileProvider propio para entregar el APK al instalador de Android ([#29](https://github.com/JhonathanPerez/Mi-Plata-App/issues/29)) ([d71e96d](https://github.com/JhonathanPerez/Mi-Plata-App/commit/d71e96dc0b030345cf56ae66d4af8b9361eaddfd))
+
 ## [1.2.1](https://github.com/JhonathanPerez/Mi-Plata-App/compare/v1.2.0...v1.2.1) (2026-10-03)
 
 
