@@ -22,17 +22,15 @@ export function previousMonthLabel(yearMonth: YearMonth): string {
   return formatMonthTitle(previous).toLowerCase();
 }
 
-/** La frase que compara el mes con el anterior, siempre en pesos (nunca en porcentaje). `formatAmount` respeta el modo privacidad (viene de `useAmountFormat`). */
+/** La frase que compara el mes con el anterior, siempre en pesos (nunca en porcentaje): «Gastaste … más» si gastó más y «Has gastado … menos» si gastó menos y «Has gastado lo mismo» si gastó igual. `formatAmount` respeta el modo privacidad (viene de `useAmountFormat`). */
 export function describeComparison(input: ComparisonInput, formatAmount: (value: number) => string): Comparison {
   const label = previousMonthLabel(input.yearMonth);
   if (input.previousTotal === 0) return { direction: 'none', text: `Sin gastos en ${label} para comparar.` };
-  if (input.changeAmount === 0) return { direction: 'same', text: `Igual que en ${label}.` };
+  if (input.changeAmount === 0) return { direction: 'same', text: `Has gastado lo mismo que en ${label}.` };
 
-  const more = input.changeAmount > 0;
-  return {
-    direction: more ? 'more' : 'less',
-    text: `Gastaste ${formatAmount(Math.abs(input.changeAmount))} ${more ? 'más' : 'menos'} que en ${label}.`,
-  };
+  const amount = formatAmount(Math.abs(input.changeAmount));
+  if (input.changeAmount > 0) return { direction: 'more', text: `Gastaste ${amount} más que en ${label}.` };
+  return { direction: 'less', text: `Has gastado ${amount} menos que en ${label}.` };
 }
 
 /** La versión corta de la comparación, para la pastilla del hero de Inicio (`null` cuando no hay con qué comparar). */
