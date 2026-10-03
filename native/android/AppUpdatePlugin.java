@@ -34,8 +34,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * archivo y abre el instalador de Android. La parte web nunca pasa rutas: el APK vive siempre en
  * {@code cache/updates/mi-plata-update.apk}, así que no puede pedir que se instale otro archivo.
  *
- * Necesita (los pone `scripts/apply-android-native.mjs`): el permiso REQUEST_INSTALL_PACKAGES, el FileProvider
- * «.updates» y {@code res/xml/update_paths.xml}.
+ * Necesita (los pone `scripts/apply-android-native.mjs`): el permiso REQUEST_INSTALL_PACKAGES, el provider
+ * {@code UpdateFileProvider} («.updates») y {@code res/xml/update_paths.xml}.
  */
 @CapacitorPlugin(name = "AppUpdate")
 public class AppUpdatePlugin extends Plugin {

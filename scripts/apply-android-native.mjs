@@ -9,7 +9,7 @@
  *  2. AndroidManifest.xml: declara el servicio CaptureListenerService y el permiso USE_BIOMETRIC.
  *  3. MainActivity.java: registra el plugin NotificationCapture.
  *  4. Avisos de pago: permiso POST_NOTIFICATIONS (Android 13+) e ícono res/drawable/ic_stat_miplata.xml.
- *  5. Actualizaciones desde la app: permiso REQUEST_INSTALL_PACKAGES, FileProvider «.updates» y res/xml/update_paths.xml
+ *  5. Actualizaciones desde la app: permiso REQUEST_INSTALL_PACKAGES, UpdateFileProvider («.updates») y res/xml/update_paths.xml
  *     (los usa AppUpdatePlugin.java para entregarle el APK descargado al instalador de Android).
  */
 import { existsSync, readFileSync, readdirSync, statSync, writeFileSync, mkdirSync } from 'node:fs';
@@ -101,6 +101,9 @@ if (!xml.includes('android.permission.SCHEDULE_EXACT_ALARM')) {
 }
 // Actualizaciones: instalar el APK descargado exige este permiso (en Android 8+ la persona lo concede a la app en «Instalar apps
 // desconocidas»; la app la guía) y un FileProvider propio que solo expone la carpeta cache/updates/.
+// Es la subclase UpdateFileProvider, no androidx.core.content.FileProvider: Android identifica los providers por el nombre de
+// su clase y Capacitor ya declara uno con ese nombre; con el mismo nombre, «.updates» lo atendía el de Capacitor y el
+// instalador fallaba con «There was a problem parsing the package».
 if (!xml.includes('android.permission.REQUEST_INSTALL_PACKAGES')) {
   xml = xml.replace('</manifest>', '    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />\n</manifest>');
 }
@@ -108,7 +111,7 @@ if (!xml.includes('@xml/update_paths')) {
   const provider = `
         <!-- Entrega el APK descargado al instalador de Android (ver AppUpdatePlugin.java). Solo comparte cache/updates/. -->
         <provider
-            android:name="androidx.core.content.FileProvider"
+            android:name="${appId}.UpdateFileProvider"
             android:authorities="${appId}.updates"
             android:exported="false"
             android:grantUriPermissions="true">
@@ -116,6 +119,9 @@ if (!xml.includes('@xml/update_paths')) {
         </provider>
 `;
   xml = xml.replace('</application>', `${provider}    </application>`);
+} else {
+  // Un android/ generado con la versión anterior declaraba el provider «.updates» con la clase base: se pasa a la subclase.
+  xml = xml.replace(/(<provider\s+android:name=")androidx\.core\.content\.FileProvider("\s+android:authorities="[^"]*\.updates")/, `$1${appId}.UpdateFileProvider$2`);
 }
 if (xml !== originalXml) {
   writeFileSync(manifestPath, xml);
