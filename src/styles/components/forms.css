@@ -6,12 +6,25 @@
   gap: var(--space-4);
 }
 
+/* Barra del botón de guardar: fondo sólido, para que los campos que pasan por detrás no se vean a través del botón. */
 .form__footer {
   position: sticky;
   bottom: 0;
   margin: 0 calc(-1 * var(--space-4));
   padding: var(--space-4) var(--space-4) calc(var(--space-4) + env(safe-area-inset-bottom));
-  background: linear-gradient(to bottom, transparent, var(--bg) 28%);
+  background: var(--bg);
+}
+
+/* El degradado va solo por encima de la barra (mide lo mismo que el espacio entre campos, así no tapa nada en reposo): lo que se desplaza se desvanece en vez de cortarse de golpe. */
+.form__footer::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 100%;
+  height: var(--space-4);
+  background: linear-gradient(to bottom, transparent, var(--bg));
+  pointer-events: none;
 }
 
 .field {
