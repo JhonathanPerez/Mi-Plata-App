@@ -1,0 +1,2 @@
+# Los hooks de Git los ejecuta sh: con finales de línea de Windows (CRLF) fallan con "\r: command not found".
+.husky/** text eol=lf
