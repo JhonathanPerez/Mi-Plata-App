@@ -118,6 +118,24 @@
   color: var(--ink-2);
 }
 
+/* Icono del diálogo de actualización: mismo círculo que el de las invitaciones (.prompt__badge). */
+.dialog__badge {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--primary-tint);
+  color: var(--primary);
+}
+
+/* Nota secundaria bajo el texto del diálogo. */
+.dialog__meta {
+  font-size: var(--fs-xs);
+  color: var(--ink-2);
+}
+
 /* Botones apilados y a todo el ancho: «Seguir editando» y similares no caben lado a lado sin partirse en dos renglones. */
 .dialog__actions {
   display: flex;
