@@ -10,13 +10,13 @@ describe('estado de un extracto cerrado', () => {
     expect(statementStatus({ ...base, unpaidCount: 0, paidCount: 3, unpaidTotal: 0 }, TODAY).label).toBe('Pagado');
   });
   it('por pagar con más de 7 días: calma', () => {
-    expect(statementStatus(base, TODAY)).toEqual({ tone: 'neutral', label: 'Por pagar', partialUnpaid: null });
+    expect(statementStatus(base, TODAY)).toEqual({ tone: 'neutral', label: 'Pago en 18 días · mar 20 oct', partialUnpaid: null });
     expect(statementStatus({ ...base, dueDate: '2026-10-10' }, TODAY).tone).toBe('neutral'); // 8 días
   });
   it('por pagar en 7 días o menos: atención, con los días que faltan', () => {
-    expect(statementStatus({ ...base, dueDate: '2026-10-09' }, TODAY)).toMatchObject({ tone: 'warning', label: 'Por pagar · en 7 días' });
-    expect(statementStatus({ ...base, dueDate: '2026-10-06' }, TODAY).label).toBe('Por pagar · en 4 días');
-    expect(statementStatus({ ...base, dueDate: '2026-10-03' }, TODAY).label).toBe('Por pagar · mañana');
+    expect(statementStatus({ ...base, dueDate: '2026-10-09' }, TODAY)).toMatchObject({ tone: 'warning', label: 'Pago en 7 días · vie 9 oct' });
+    expect(statementStatus({ ...base, dueDate: '2026-10-06' }, TODAY).label).toBe('Pago en 4 días · mar 6 oct');
+    expect(statementStatus({ ...base, dueDate: '2026-10-03' }, TODAY).label).toBe('Pago mañana · sáb 3 oct');
   });
   it('hoy o vencido: urgente', () => {
     expect(statementStatus({ ...base, dueDate: '2026-10-02' }, TODAY)).toMatchObject({ tone: 'danger', label: 'Vence hoy' });
