@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
-  addDays, addMonths, daysInMonth, diffDays, elapsedDaysInMonth, formatDayHeading, formatLongDate,
+  addDays, addMonths, clampYearMonth, daysInMonth, diffDays, elapsedDaysInMonth, formatDayHeading, formatLongDate,
   formatMonthTitle, formatShortDate, formatTime, formatWeekdayDate, formatWeekdayDay, isValidIsoDate, isYearMonth, monthRange, toIsoDate,
 } from './dates';
 
@@ -48,6 +48,18 @@ describe('fechas locales', () => {
     expect(elapsedDaysInMonth('2026-09', now)).toBe(19);
     expect(elapsedDaysInMonth('2026-08', now)).toBe(31);
     expect(elapsedDaysInMonth('2026-10', now)).toBe(1);
+  });
+});
+
+describe('clampYearMonth', () => {
+  it('deja pasar el mes del tope y los anteriores', () => {
+    expect(clampYearMonth('2026-10', '2026-10')).toBe('2026-10');
+    expect(clampYearMonth('2026-09', '2026-10')).toBe('2026-09');
+    expect(clampYearMonth('2025-12', '2026-01')).toBe('2025-12');
+  });
+  it('baja al tope un mes que aún no llega, también si cambia el año', () => {
+    expect(clampYearMonth('2026-11', '2026-10')).toBe('2026-10');
+    expect(clampYearMonth('2027-01', '2026-12')).toBe('2026-12');
   });
 });
 

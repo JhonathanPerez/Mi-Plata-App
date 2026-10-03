@@ -50,6 +50,11 @@ export function isYearMonth(value: unknown): value is YearMonth {
   return typeof value === 'string' && /^\d{4}-(0[1-9]|1[0-2])$/.test(value);
 }
 
+/** Limita un mes a un tope (por ejemplo, el actual): sirve para no mostrar meses que aún no llegan. «AAAA-MM» se ordena igual como texto. */
+export function clampYearMonth(value: YearMonth, max: YearMonth): YearMonth {
+  return value > max ? max : value;
+}
+
 export function addMonths(yearMonth: YearMonth, delta: number): YearMonth {
   const [year, month] = yearMonth.split('-').map(Number);
   return toYearMonth(new Date(year, month - 1 + delta, 1));
