@@ -109,6 +109,14 @@
   overflow-wrap: anywhere;
 }
 
+.row--dim .emoji-tile {
+  opacity: 0.55;
+}
+
+.row--dim .row__title {
+  color: var(--ink-2);
+}
+
 .row__detail {
   font-size: var(--fs-sm);
   color: var(--ink-2);

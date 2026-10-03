@@ -81,5 +81,9 @@ export const PAYMENT_TYPE_LABELS: Record<PaymentMethodType, string> = {
 
 export const PAYMENT_TYPES: PaymentMethodType[] = ['cash', 'debit_card', 'credit_card', 'other'];
 
+/** Interruptor de «Categorías» y «Métodos de pago»: el mismo texto en las dos hojas de edición. */
+export const VISIBLE_TOGGLE_LABEL = 'Aparece al registrar un gasto';
+export const VISIBLE_TOGGLE_HINT = 'Si lo apagas, no sale en la lista al registrar un gasto, pero sus gastos siguen en tu historial.';
+
 export const DEFAULT_CATEGORY_ICON = '📦';
 export const DEFAULT_PAYMENT_ICON = '💳';

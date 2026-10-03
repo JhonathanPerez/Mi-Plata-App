@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { describePaymentMethod, statusHint } from './payment';
+import { describePaymentMethod, methodKindLabel, statusHint } from './payment';
 
 describe('describePaymentMethod', () => {
   it('muestra el tipo y, si existen, los últimos 4 dígitos', () => {
@@ -27,5 +27,21 @@ describe('statusHint', () => {
         expect(statusHint(paid, type).length).toBeLessThanOrEqual(70);
       }
     }
+  });
+});
+
+describe('methodKindLabel', () => {
+  it('muestra el tipo cuando el nombre no lo dice', () => {
+    expect(methodKindLabel('Davibank', 'credit_card')).toBe('Tarjeta de crédito');
+    expect(methodKindLabel('Mi débito', 'debit_card')).toBe('Tarjeta débito');
+    expect(methodKindLabel('Billetera', 'cash')).toBe('Efectivo');
+  });
+  it('lo omite si repite el nombre, sin importar mayúsculas ni tildes', () => {
+    expect(methodKindLabel('Efectivo', 'cash')).toBeNull();
+    expect(methodKindLabel(' EFECTIVO ', 'cash')).toBeNull();
+    expect(methodKindLabel('Tarjeta debito', 'debit_card')).toBeNull();
+  });
+  it('lo omite para el tipo «Otro»', () => {
+    expect(methodKindLabel('Transferencia', 'other')).toBeNull();
   });
 });
