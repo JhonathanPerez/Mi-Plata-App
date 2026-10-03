@@ -39,16 +39,18 @@ describe('describeComparison', () => {
   it('gastó menos: monto sin signo, sin porcentaje', () => {
     expect(describeComparison({ ...base, changeAmount: -40 }, money)).toEqual({
       direction: 'less',
-      text: 'Gastaste $40 menos que en septiembre.',
+      text: 'Has gastado $40 menos que en septiembre.',
     });
   });
 
   it('en enero compara con diciembre del año anterior', () => {
     expect(describeComparison({ ...base, yearMonth: '2026-01' }, money).text).toBe('Gastaste $50 más que en diciembre 2025.');
+    expect(describeComparison({ ...base, yearMonth: '2026-01', changeAmount: -40 }, money).text).toBe('Has gastado $40 menos que en diciembre 2025.');
   });
 
   it('usa el formato recibido (modo privacidad)', () => {
     expect(describeComparison(base, () => '$ ••••').text).toBe('Gastaste $ •••• más que en septiembre.');
+    expect(describeComparison({ ...base, changeAmount: -40 }, () => '$ ••••').text).toBe('Has gastado $ •••• menos que en septiembre.');
   });
 });
 
