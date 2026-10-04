@@ -1,3 +1,5 @@
+import { PENDING_REMINDER_TITLE, pendingReminderBody } from './captureCopy';
+
 /**
  * Recordatorio periódico de gastos registrados automáticamente que siguen sin categoría.
  * Es puro (sin plugin ni base de datos): recibe cuántos pendientes hay y devuelve los avisos a programar.
@@ -80,11 +82,18 @@ export interface PlannedPendingReminder {
 
 /**
  * Los avisos que deben quedar programados: uno cada `intervalMinutes` a partir de "ahora", sin caer de noche.
- * No lleva la cantidad de pendientes en el texto a propósito: el aviso se programa de antemano y, si llegan más
- * gastos con la app cerrada, un número escrito hoy quedaría desactualizado.
+ * El texto dice cuántas compras hay pendientes (o su valor, si es una sola) tal como estaban al programar. Como los
+ * avisos se programan de antemano, si llegan más gastos con la app cerrada el dato puede quedar desactualizado hasta
+ * que se abra la app: ahí se reprograman todos con la cifra nueva.
+ * `singleAmount` es el valor de la compra pendiente cuando solo hay una.
  */
-export function planPendingReminders(input: { pendingCount: number; settings: PendingReminderSettings; now?: Date }): PlannedPendingReminder[] {
-  const { pendingCount, settings } = input;
+export function planPendingReminders(input: {
+  pendingCount: number;
+  singleAmount?: number | null;
+  settings: PendingReminderSettings;
+  now?: Date;
+}): PlannedPendingReminder[] {
+  const { pendingCount, singleAmount, settings } = input;
   const now = input.now ?? new Date();
   if (!settings.enabled || pendingCount <= 0) return [];
 
@@ -98,8 +107,8 @@ export function planPendingReminders(input: { pendingCount: number; settings: Pe
     plan.push({
       id: PENDING_REMINDER_ID_BASE + plan.length,
       at,
-      title: 'Gastos por categorizar',
-      body: 'Tienes gastos registrados automáticamente sin categoría. Toca para asignarlos.',
+      title: PENDING_REMINDER_TITLE,
+      body: pendingReminderBody(pendingCount, singleAmount),
     });
     cursor = at;
   }

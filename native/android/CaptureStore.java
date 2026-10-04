@@ -30,7 +30,9 @@ final class CaptureStore {
     private static final String KEY_REM_ENABLED = "rem_enabled";
     private static final String KEY_REM_MINUTES = "rem_minutes";
     private static final String KEY_REM_COVERED = "rem_covered_until";
+    private static final String KEY_REM_PENDING = "rem_pending_count";
     private static final String KEY_UNSEEN = "unseen_expenses";
+    private static final String KEY_UNSEEN_AMOUNT = "unseen_last_amount";
     private static final String KEY_FB_START = "fb_start";
     private static final String KEY_FB_SENT = "fb_sent";
     private static final String KEY_FB_NEXT = "fb_next_at";
@@ -65,13 +67,19 @@ final class CaptureStore {
 
     // ---- Recordatorio de pendientes con la app cerrada (ver PendingReminderReceiver) ----
 
-    /** La parte web publica aquí su configuración y hasta cuándo dejó avisos programados. */
-    static void setReminderConfig(Context context, boolean enabled, int minutes, long coveredUntil) {
+    /** La parte web publica aquí su configuración, hasta cuándo dejó avisos programados y cuántos gastos hay por categorizar. */
+    static void setReminderConfig(Context context, boolean enabled, int minutes, long coveredUntil, int pendingCount) {
         prefs(context).edit()
                 .putBoolean(KEY_REM_ENABLED, enabled)
                 .putInt(KEY_REM_MINUTES, minutes)
                 .putLong(KEY_REM_COVERED, coveredUntil)
+                .putInt(KEY_REM_PENDING, Math.max(0, pendingCount))
                 .commit();
+    }
+
+    /** Gastos por categorizar que la parte web ya tenía guardados la última vez que se abrió. */
+    static int getReminderPendingCount(Context context) {
+        return prefs(context).getInt(KEY_REM_PENDING, 0);
     }
 
     static boolean isReminderEnabled(Context context) {
@@ -91,10 +99,18 @@ final class CaptureStore {
         return prefs(context).getInt(KEY_UNSEEN, 0);
     }
 
-    static void incrementUnseenExpenses(Context context) {
+    /** Valor del último gasto detectado sin recoger (0 si no se pudo leer). Solo sirve cuando es el único pendiente. */
+    static long getLastUnseenAmount(Context context) {
+        return prefs(context).getLong(KEY_UNSEEN_AMOUNT, 0L);
+    }
+
+    static void incrementUnseenExpenses(Context context, long amount) {
         synchronized (LOCK) {
             SharedPreferences p = prefs(context);
-            p.edit().putInt(KEY_UNSEEN, p.getInt(KEY_UNSEEN, 0) + 1).commit();
+            p.edit()
+                    .putInt(KEY_UNSEEN, p.getInt(KEY_UNSEEN, 0) + 1)
+                    .putLong(KEY_UNSEEN_AMOUNT, amount)
+                    .commit();
         }
     }
 
@@ -156,7 +172,7 @@ final class CaptureStore {
                 JSONObject event = queue.optJSONObject(i);
                 if (event != null) events.add(event);
             }
-            prefs(context).edit().remove(KEY_QUEUE).remove(KEY_UNSEEN).commit();
+            prefs(context).edit().remove(KEY_QUEUE).remove(KEY_UNSEEN).remove(KEY_UNSEEN_AMOUNT).commit();
             return events;
         }
     }

@@ -20,6 +20,21 @@ describe('planPendingReminders', () => {
     expect(planPendingReminders({ pendingCount: 0, settings: on(60), now: at(10) })).toEqual([]);
   });
 
+  it('el texto dice el valor si hay una sola compra pendiente y cuántas si hay varias', () => {
+    const una = planPendingReminders({ pendingCount: 1, singleAmount: 25000, settings: on(60), now: at(8) });
+    expect(una[0]).toMatchObject({
+      title: 'Gastos por categorizar',
+      body: 'Tienes una compra por $25.000 pendiente por categorizar',
+    });
+    const varias = planPendingReminders({ pendingCount: 3, singleAmount: null, settings: on(60), now: at(8) });
+    expect(varias.every((p) => p.body === 'Tienes 3 compras pendientes por categorizar')).toBe(true);
+  });
+
+  it('con una sola compra de valor desconocido no inventa una cifra', () => {
+    const plan = planPendingReminders({ pendingCount: 1, settings: on(60), now: at(8) });
+    expect(plan[0].body).toBe('Tienes una compra pendiente por categorizar');
+  });
+
   it('avisa cada intervalo a partir de ahora', () => {
     const plan = planPendingReminders({ pendingCount: 2, settings: on(120), now: at(8) });
     expect(plan.slice(0, 4).map((p) => stamp(p.at))).toEqual(['24 10:00', '24 12:00', '24 14:00', '24 16:00']);

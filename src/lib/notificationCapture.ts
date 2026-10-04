@@ -24,7 +24,7 @@ interface NotificationCapturePlugin {
   /** Pide a Android reconectar el servicio si se había desconectado. */
   rebind(): Promise<void>;
   /** Estado del recordatorio de pendientes, para que el lado nativo lo mantenga con la app cerrada. */
-  setPendingReminder(options: { enabled: boolean; intervalMinutes: number; coveredUntil: number }): Promise<void>;
+  setPendingReminder(options: { enabled: boolean; intervalMinutes: number; coveredUntil: number; pendingCount: number }): Promise<void>;
   addListener(eventName: 'captured', listener: () => void): Promise<PluginListenerHandle>;
 }
 
@@ -66,9 +66,10 @@ export const captureBridge = {
 
   /**
    * Le cuenta al lado nativo si el recordatorio de pendientes está activo y hasta cuándo hay avisos programados desde aquí
-   * (`coveredUntil`, ms; 0 = ninguno). Con la app cerrada, el servicio programa su propio recordatorio si no hay cobertura.
+   * (`coveredUntil`, ms; 0 = ninguno), y cuántos gastos hay por categorizar (`pendingCount`). Con la app cerrada, el servicio
+   * programa su propio recordatorio si no hay cobertura, y con esa cantidad más los gastos nuevos arma el texto.
    */
-  async setPendingReminder(options: { enabled: boolean; intervalMinutes: number; coveredUntil: number }): Promise<void> {
+  async setPendingReminder(options: { enabled: boolean; intervalMinutes: number; coveredUntil: number; pendingCount: number }): Promise<void> {
     if (this.isSupported()) await Native.setPendingReminder(options);
   },
 

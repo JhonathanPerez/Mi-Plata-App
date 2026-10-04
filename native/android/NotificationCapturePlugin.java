@@ -132,15 +132,18 @@ public class NotificationCapturePlugin extends Plugin {
     }
 
     /**
-     * La parte web informa cómo quedó el recordatorio de pendientes: si está activo, cada cuántos minutos y hasta cuándo
-     * dejó avisos programados (0 = ninguno). Como la app está abierta, se cancela la cadena nativa: la web toma el control.
+     * La parte web informa cómo quedó el recordatorio de pendientes: si está activo, cada cuántos minutos, hasta cuándo
+     * dejó avisos programados (0 = ninguno) y cuántos gastos hay por categorizar. Como la app está abierta, se cancela
+     * la cadena nativa: la web toma el control.
      */
     @PluginMethod
     public void setPendingReminder(PluginCall call) {
         boolean enabled = Boolean.TRUE.equals(call.getBoolean("enabled", false));
         Integer minutes = call.getInt("intervalMinutes", 240);
         long coveredUntil = call.getData().optLong("coveredUntil", 0L);
-        CaptureStore.setReminderConfig(getContext(), enabled, minutes == null ? 240 : minutes, coveredUntil);
+        Integer pending = call.getInt("pendingCount", 0);
+        CaptureStore.setReminderConfig(
+                getContext(), enabled, minutes == null ? 240 : minutes, coveredUntil, pending == null ? 0 : pending);
         PendingReminderReceiver.cancelFallback(getContext());
         call.resolve();
     }
