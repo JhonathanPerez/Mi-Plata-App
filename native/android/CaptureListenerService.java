@@ -83,8 +83,10 @@ public class CaptureListenerService extends NotificationListenerService {
      * Texto del aviso. Gemelo de `CAPTURE_NOTIFICATION_TITLE` y `captureNotificationBody` en `captureCopy.ts`.
      * El emoji de dólar (U+1F4B2) va como escape para que no dependa de la codificación al compilar.
      */
-    private static final String DETECTED_TITLE = "Nuevo gasto detectado \uD83D\uDCB8";
+    private static final String DETECTED_TITLE = "Nuevo gasto detectado \uD83D\uDCB2";
     private static final String DETECTED_BODY_FALLBACK = "Nueva compra detectada. Abre Mi Plata para categorizarlo.";
+    /** Un mensaje mucho más viejo que su captura es historial que se volvió a mostrar. Igual que `CAPTURE_MAX_LAG_MS` en `config/capture.ts`. */
+    private static final long MAX_LAG_MS = 6L * 3_600_000L;
     private static final long CAPTURE_ID_BASE = 2_000_000L;
     private static final long CAPTURE_ID_SPAN = 900_000L;
 
@@ -169,10 +171,15 @@ public class CaptureListenerService extends NotificationListenerService {
                 ExpenseTextParser.Parsed parsed = ExpenseTextParser.parse(storedTitle, storedText);
                 notifyDetected(displayText(storedTitle, storedText), detectedBody(parsed));
                 // Con la app cerrada, la parte web no puede programar el recordatorio de "gastos por categorizar":
-                // se deja armado desde aquí (si el usuario lo activó y no hay ya avisos programados). El valor se
-                // guarda para que, si es la única compra pendiente, el recordatorio pueda decir cuánto fue.
-                CaptureStore.incrementUnseenExpenses(this, parsed == null ? 0L : parsed.amount);
-                PendingReminderReceiver.onExpenseCaptured(this);
+                // se deja armado desde aquí (si el usuario lo activó y no hay ya avisos programados). Solo cuenta lo que
+                // la parte web también registraría como pendiente (con valor legible, reciente y no repetido); si no, el
+                // recordatorio diría más compras de las que hay. El valor se guarda para que, si es la única, diga cuánto fue.
+                if (parsed != null
+                        && capturedAt - time <= MAX_LAG_MS
+                        && CaptureStore.registerUnseenExpense(
+                                this, collapse(ExpenseTextParser.normalize(storedText)), time, parsed.amount)) {
+                    PendingReminderReceiver.onExpenseCaptured(this);
+                }
             }
             return true;
         } catch (JSONException error) {
