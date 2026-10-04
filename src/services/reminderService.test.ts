@@ -101,10 +101,10 @@ suite('avisos de pago con datos reales', () => {
     expect(await reminderService.buildPendingPlan(NOW)).toEqual([]); // sin pendientes no hay avisos
 
     await capture('pc_1', 25000);
-    expect((await reminderService.buildPendingPlan(NOW))[0].body).toBe('Tienes una compra por $25.000 pendiente por categorizar');
+    expect((await reminderService.buildPendingPlan(NOW))[0].body).toBe('Tienes una compra por $25.000 pendiente por categorizar.');
 
     await capture('pc_2', 8000);
-    expect((await reminderService.buildPendingPlan(NOW))[0].body).toBe('Tienes 2 compras pendientes por categorizar');
+    expect((await reminderService.buildPendingPlan(NOW))[0].body).toBe('Tienes 2 compras pendientes por categorizar.');
     expect(await reminderService.countPending()).toBe(2);
   });
 });

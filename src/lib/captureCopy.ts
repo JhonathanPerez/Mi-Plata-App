@@ -26,9 +26,9 @@ export const PENDING_REMINDER_TITLE = "Gastos por categorizar";
 
 /**
  * Cuerpo del recordatorio de gastos pendientes. Gemelo en Java: `reminderBody`.
- *  - una sola compra: "Tienes una compra por $25.000 pendiente por categorizar"
- *  - varias:          "Tienes 3 compras pendientes por categorizar"
- * Si es una sola y no se conoce su valor, no se inventa una cifra: "Tienes una compra pendiente por categorizar".
+ *  - una sola compra: "Tienes una compra por $25.000 pendiente por categorizar."
+ *  - varias:          "Tienes 3 compras pendientes por categorizar."
+ * Si es una sola y no se conoce su valor, no se inventa una cifra: "Tienes una compra pendiente por categorizar."
  */
 export function pendingReminderBody(
   count: number,
@@ -36,8 +36,8 @@ export function pendingReminderBody(
 ): string {
   if (count === 1) {
     return singleAmount && singleAmount > 0
-      ? `Tienes una compra por ${formatCOP(singleAmount)} pendiente por categorizar`
-      : "Tienes una compra pendiente por categorizar";
+      ? `Tienes una compra por ${formatCOP(singleAmount)} pendiente por categorizar.`
+      : "Tienes una compra pendiente por categorizar.";
   }
-  return `Tienes ${count} compras pendientes por categorizar`;
+  return `Tienes ${count} compras pendientes por categorizar.`;
 }

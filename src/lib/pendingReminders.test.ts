@@ -24,15 +24,15 @@ describe('planPendingReminders', () => {
     const una = planPendingReminders({ pendingCount: 1, singleAmount: 25000, settings: on(60), now: at(8) });
     expect(una[0]).toMatchObject({
       title: 'Gastos por categorizar',
-      body: 'Tienes una compra por $25.000 pendiente por categorizar',
+      body: 'Tienes una compra por $25.000 pendiente por categorizar.',
     });
     const varias = planPendingReminders({ pendingCount: 3, singleAmount: null, settings: on(60), now: at(8) });
-    expect(varias.every((p) => p.body === 'Tienes 3 compras pendientes por categorizar')).toBe(true);
+    expect(varias.every((p) => p.body === 'Tienes 3 compras pendientes por categorizar.')).toBe(true);
   });
 
   it('con una sola compra de valor desconocido no inventa una cifra', () => {
     const plan = planPendingReminders({ pendingCount: 1, settings: on(60), now: at(8) });
-    expect(plan[0].body).toBe('Tienes una compra pendiente por categorizar');
+    expect(plan[0].body).toBe('Tienes una compra pendiente por categorizar.');
   });
 
   it('avisa cada intervalo a partir de ahora', () => {

@@ -143,10 +143,10 @@ public class PendingReminderReceiver extends BroadcastReceiver {
     static String reminderBody(int count, long singleAmount) {
         if (count == 1) {
             return singleAmount > 0
-                    ? "Tienes una compra por " + ExpenseTextParser.formatCop(singleAmount) + " pendiente por categorizar"
-                    : "Tienes una compra pendiente por categorizar";
+                    ? "Tienes una compra por " + ExpenseTextParser.formatCop(singleAmount) + " pendiente por categorizar."
+                    : "Tienes una compra pendiente por categorizar.";
         }
-        return "Tienes " + count + " compras pendientes por categorizar";
+        return "Tienes " + count + " compras pendientes por categorizar.";
     }
 
     private static void show(Context app) {
