@@ -1,3 +1,10 @@
+## [1.2.11](https://github.com/JhonathanPerez/Mi-Plata-App/compare/v1.2.10...v1.2.11) (2026-10-04)
+
+
+### Bug Fixes
+
+* **avisos:** no contar dos veces el mismo gasto en el recordatorio de pendientes cuando la app está cerrada. ([#39](https://github.com/JhonathanPerez/Mi-Plata-App/issues/39)) ([d834ac6](https://github.com/JhonathanPerez/Mi-Plata-App/commit/d834ac63925b171b43dfaf9563a3fd3730e47860))
+
 ## [1.2.10](https://github.com/JhonathanPerez/Mi-Plata-App/compare/v1.2.9...v1.2.10) (2026-10-04)
 
 
