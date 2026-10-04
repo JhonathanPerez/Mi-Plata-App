@@ -1,3 +1,10 @@
+## [1.2.10](https://github.com/JhonathanPerez/Mi-Plata-App/compare/v1.2.9...v1.2.10) (2026-10-04)
+
+
+### Bug Fixes
+
+* **avisos:** igualar el aviso nativo al de la app con el valor y el comercio de la compra. ([#37](https://github.com/JhonathanPerez/Mi-Plata-App/issues/37)) ([c6d9134](https://github.com/JhonathanPerez/Mi-Plata-App/commit/c6d9134c1fb6279bb483c99314befd31c278ff8d))
+
 ## [1.2.9](https://github.com/JhonathanPerez/Mi-Plata-App/compare/v1.2.8...v1.2.9) (2026-10-03)
 
 
