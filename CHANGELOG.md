@@ -1,3 +1,10 @@
+## [1.2.12](https://github.com/JhonathanPerez/Mi-Plata-App/compare/v1.2.11...v1.2.12) (2026-10-04)
+
+
+### Bug Fixes
+
+* **avisos:** agregar el punto final al texto del recordatorio de compras pendientes por categorizar ([#40](https://github.com/JhonathanPerez/Mi-Plata-App/issues/40)) ([d86dc39](https://github.com/JhonathanPerez/Mi-Plata-App/commit/d86dc39ac01c0563997245a8dc8e2921b422ef23))
+
 ## [1.2.11](https://github.com/JhonathanPerez/Mi-Plata-App/compare/v1.2.10...v1.2.11) (2026-10-04)
 
 
