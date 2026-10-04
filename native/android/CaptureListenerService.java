@@ -83,7 +83,7 @@ public class CaptureListenerService extends NotificationListenerService {
      * Texto del aviso. Gemelo de `CAPTURE_NOTIFICATION_TITLE` y `captureNotificationBody` en `captureCopy.ts`.
      * El emoji de dólar (U+1F4B2) va como escape para que no dependa de la codificación al compilar.
      */
-    private static final String DETECTED_TITLE = "Nuevo gasto detectado \uD83D\uDCB2";
+    private static final String DETECTED_TITLE = "Nuevo gasto detectado \uD83D\uDCB8";
     private static final String DETECTED_BODY_FALLBACK = "Nueva compra detectada. Abre Mi Plata para categorizarlo.";
     /** Un mensaje mucho más viejo que su captura es historial que se volvió a mostrar. Igual que `CAPTURE_MAX_LAG_MS` en `config/capture.ts`. */
     private static final long MAX_LAG_MS = 6L * 3_600_000L;
