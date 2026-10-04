@@ -75,8 +75,13 @@ export const reminderService = {
   async buildPendingPlan(now: Date = new Date()): Promise<PlannedPendingReminder[]> {
     const settings = await reminderService.getPendingSettings();
     if (!settings.enabled) return [];
-    const pendingCount = await pendingCaptureRepository.countPending();
-    return planPendingReminders({ pendingCount, settings, now });
+    const { count, singleAmount } = await pendingCaptureRepository.pendingSummary();
+    return planPendingReminders({ pendingCount: count, singleAmount, settings, now });
+  },
+
+  /** Cuántos gastos siguen por categorizar (el lado nativo lo usa para decir la cantidad cuando la app está cerrada). */
+  async countPending(): Promise<number> {
+    return pendingCaptureRepository.countPending();
   },
 
   /** Los avisos que deberían estar programados ahora mismo (según extractos y ajustes). */

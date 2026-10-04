@@ -46,6 +46,17 @@ final class ExpenseTextParser {
         return new Parsed(match.amount, extractMerchant(prepared, match.numeric, transferLike));
     }
 
+    /** 1250000 -> "$1.250.000", igual que `formatCOP` en `money.ts`. */
+    static String formatCop(long value) {
+        String digits = Long.toString(value);
+        StringBuilder out = new StringBuilder("$");
+        for (int i = 0; i < digits.length(); i++) {
+            if (i > 0 && (digits.length() - i) % 3 == 0) out.append('.');
+            out.append(digits.charAt(i));
+        }
+        return out.toString();
+    }
+
     /** Minúsculas y sin tildes, igual que `normalizeText` en `text.ts`, para comparar tolerante a acentos. */
     static String normalize(String value) {
         String decomposed = Normalizer.normalize(value, Normalizer.Form.NFD);

@@ -31,6 +31,8 @@ public class PendingReminderReceiver extends BroadcastReceiver {
     private static final String TAG = "MiPlataReminder";
     private static final String ACTION = "__PACKAGE__.PENDING_REMINDER";
     private static final String CHANNEL_ID = "capturas";
+    /** Gemelo de `PENDING_REMINDER_TITLE` en `captureCopy.ts`. */
+    private static final String REMINDER_TITLE = "Gastos por categorizar";
     private static final int REQUEST_CODE = 7301;
     /** Fuera del rango de ids que usa la parte web (2_100_000_000 + 0..39) para no pisarse con sus avisos. */
     private static final int NOTIFICATION_ID = 2_100_000_500;
@@ -134,6 +136,19 @@ public class PendingReminderReceiver extends BroadcastReceiver {
         return PendingIntent.getBroadcast(app, REQUEST_CODE, intent, flags);
     }
 
+    /**
+     * Gemelo de `pendingReminderBody` en `captureCopy.ts`: el valor si es una sola compra, la cantidad si son varias.
+     * Si es una sola y no se conoce su valor (`singleAmount` <= 0), no se inventa una cifra.
+     */
+    static String reminderBody(int count, long singleAmount) {
+        if (count == 1) {
+            return singleAmount > 0
+                    ? "Tienes una compra por " + ExpenseTextParser.formatCop(singleAmount) + " pendiente por categorizar"
+                    : "Tienes una compra pendiente por categorizar";
+        }
+        return "Tienes " + count + " compras pendientes por categorizar";
+    }
+
     private static void show(Context app) {
         if (!NotificationManagerCompat.from(app).areNotificationsEnabled()) return;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -155,11 +170,14 @@ public class PendingReminderReceiver extends BroadcastReceiver {
             tap = PendingIntent.getActivity(app, 1, launch, flags);
         }
 
+        // Los que la app ya tenía guardados + los detectados desde entonces. Con una sola compra, el único valor
+        // posible es el del gasto detectado con la app cerrada (si ya había uno guardado, el total sería 2 o más).
+        int total = CaptureStore.getReminderPendingCount(app) + CaptureStore.getUnseenExpenses(app);
         int icon = app.getResources().getIdentifier("ic_stat_miplata", "drawable", app.getPackageName());
         NotificationCompat.Builder builder = new NotificationCompat.Builder(app, CHANNEL_ID)
                 .setSmallIcon(icon != 0 ? icon : android.R.drawable.stat_notify_chat)
-                .setContentTitle("Gastos por categorizar")
-                .setContentText("Tienes gastos registrados automáticamente sin categoría. Toca para asignarlos.")
+                .setContentTitle(REMINDER_TITLE)
+                .setContentText(reminderBody(total, CaptureStore.getLastUnseenAmount(app)))
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .setCategory(NotificationCompat.CATEGORY_REMINDER)
                 .setAutoCancel(true);

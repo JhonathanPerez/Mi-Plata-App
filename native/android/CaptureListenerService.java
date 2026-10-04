@@ -81,10 +81,12 @@ public class CaptureListenerService extends NotificationListenerService {
     private static final String CAPTURE_CHANNEL_ID = "capturas";
     /**
      * Texto del aviso. Gemelo de `CAPTURE_NOTIFICATION_TITLE` y `captureNotificationBody` en `captureCopy.ts`.
-     * El emoji de billete (U+1F4B5) va como escape para que no dependa de la codificación al compilar.
+     * El emoji de dólar (U+1F4B2) va como escape para que no dependa de la codificación al compilar.
      */
-    private static final String DETECTED_TITLE = "Nuevo gasto detectado \uD83D\uDCB5";
+    private static final String DETECTED_TITLE = "Nuevo gasto detectado \uD83D\uDCB8";
     private static final String DETECTED_BODY_FALLBACK = "Nueva compra detectada. Abre Mi Plata para categorizarlo.";
+    /** Un mensaje mucho más viejo que su captura es historial que se volvió a mostrar. Igual que `CAPTURE_MAX_LAG_MS` en `config/capture.ts`. */
+    private static final long MAX_LAG_MS = 6L * 3_600_000L;
     private static final long CAPTURE_ID_BASE = 2_000_000L;
     private static final long CAPTURE_ID_SPAN = 900_000L;
 
@@ -166,11 +168,18 @@ public class CaptureListenerService extends NotificationListenerService {
                     && !INCOME.matcher(folded).find()
                     && SPEND.matcher(folded).find();
             if (looksLikeExpense) {
-                notifyDetected(displayText(storedTitle, storedText), detectedBody(storedTitle, storedText));
+                ExpenseTextParser.Parsed parsed = ExpenseTextParser.parse(storedTitle, storedText);
+                notifyDetected(displayText(storedTitle, storedText), detectedBody(parsed));
                 // Con la app cerrada, la parte web no puede programar el recordatorio de "gastos por categorizar":
-                // se deja armado desde aquí (si el usuario lo activó y no hay ya avisos programados).
-                CaptureStore.incrementUnseenExpenses(this);
-                PendingReminderReceiver.onExpenseCaptured(this);
+                // se deja armado desde aquí (si el usuario lo activó y no hay ya avisos programados). Solo cuenta lo que
+                // la parte web también registraría como pendiente (con valor legible, reciente y no repetido); si no, el
+                // recordatorio diría más compras de las que hay. El valor se guarda para que, si es la única, diga cuánto fue.
+                if (parsed != null
+                        && capturedAt - time <= MAX_LAG_MS
+                        && CaptureStore.registerUnseenExpense(
+                                this, collapse(ExpenseTextParser.normalize(storedText)), time, parsed.amount)) {
+                    PendingReminderReceiver.onExpenseCaptured(this);
+                }
             }
             return true;
         } catch (JSONException error) {
@@ -183,23 +192,11 @@ public class CaptureListenerService extends NotificationListenerService {
      * solo el valor; si tampoco hay un valor claro, una versión sin valor (la parte web la reemplaza luego).
      * La lectura del valor y del comercio vive en {@link ExpenseTextParser}.
      */
-    private static String detectedBody(String title, String text) {
-        ExpenseTextParser.Parsed parsed = ExpenseTextParser.parse(title, text);
+    private static String detectedBody(ExpenseTextParser.Parsed parsed) {
         if (parsed == null) return DETECTED_BODY_FALLBACK;
-        StringBuilder body = new StringBuilder("Nueva compra por ").append(formatCop(parsed.amount));
+        StringBuilder body = new StringBuilder("Nueva compra por ").append(ExpenseTextParser.formatCop(parsed.amount));
         if (parsed.merchant != null) body.append(" en ").append(parsed.merchant);
         return body.append(". Abre Mi Plata para categorizarlo.").toString();
-    }
-
-    /** 1250000 -> "$1.250.000", igual que `formatCOP` en `money.ts`. */
-    private static String formatCop(long value) {
-        String digits = Long.toString(value);
-        StringBuilder out = new StringBuilder("$");
-        for (int i = 0; i < digits.length(); i++) {
-            if (i > 0 && (digits.length() - i) % 3 == 0) out.append('.');
-            out.append(digits.charAt(i));
-        }
-        return out.toString();
     }
 
     /**

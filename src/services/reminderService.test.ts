@@ -4,6 +4,7 @@ import { setDbForTesting } from '@/db/connection';
 import { createTestDb } from '@/test/sqliteTestDb';
 import { cardService } from './cardService';
 import { expenseService } from './expenseService';
+import { pendingCaptureRepository } from '@/repositories/pendingCaptureRepository';
 import { paymentMethodService } from './paymentMethodService';
 import { reminderService } from './reminderService';
 
@@ -78,5 +79,32 @@ suite('avisos de pago con datos reales', () => {
   it('apagado, no hay nada que programar', async () => {
     await reminderService.setEnabled(false);
     expect(await reminderService.buildPlan(NOW)).toEqual([]);
+  });
+
+  it('el recordatorio de pendientes dice el valor si hay una sola compra y cuántas si hay varias', async () => {
+    const capture = (id: string, amount: number) =>
+      pendingCaptureRepository.insert({
+        id,
+        source: 'manual',
+        bank: null,
+        amount,
+        merchant: null,
+        last4: null,
+        rawText: `compra ${id}`,
+        occurredAt: NOW.getTime(),
+        fingerprint: `fp_${id}`,
+        status: 'pending',
+        createdAt: NOW.toISOString(),
+        resolvedAt: null,
+      });
+    await reminderService.setPendingEnabled(true);
+    expect(await reminderService.buildPendingPlan(NOW)).toEqual([]); // sin pendientes no hay avisos
+
+    await capture('pc_1', 25000);
+    expect((await reminderService.buildPendingPlan(NOW))[0].body).toBe('Tienes una compra por $25.000 pendiente por categorizar');
+
+    await capture('pc_2', 8000);
+    expect((await reminderService.buildPendingPlan(NOW))[0].body).toBe('Tienes 2 compras pendientes por categorizar');
+    expect(await reminderService.countPending()).toBe(2);
   });
 });

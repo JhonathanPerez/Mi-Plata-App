@@ -39,6 +39,16 @@ export const pendingCaptureRepository = {
     return Number(rows[0]?.n ?? 0);
   },
 
+  /** Cuántos hay por categorizar y, si es uno solo, su valor (para el texto del recordatorio). */
+  async pendingSummary(): Promise<{ count: number; singleAmount: number | null }> {
+    const db = await getDb();
+    const rows = await db.query(
+      "SELECT COUNT(*) AS n, MAX(amount) AS amount FROM pending_captures WHERE status = 'pending'",
+    );
+    const count = Number(rows[0]?.n ?? 0);
+    return { count, singleAmount: count === 1 ? Number(rows[0]?.amount ?? 0) : null };
+  },
+
   async getPendingById(id: string): Promise<PendingCapture | null> {
     const db = await getDb();
     const rows = await db.query(`SELECT ${COLUMNS} FROM pending_captures WHERE id = ? AND status = 'pending'`, [id]);

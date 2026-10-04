@@ -10,10 +10,15 @@ let rerun = false;
  * Le cuenta al lado nativo cómo quedó el recordatorio: así, si llega un gasto automático con la app CERRADA (cuando
  * este código no corre), el servicio nativo sabe si debe programar él mismo el recordatorio. Nunca lanza errores.
  */
-async function publishNativeReminder(enabled: boolean, intervalMinutes: number, plan: PlannedPendingReminder[]): Promise<void> {
+async function publishNativeReminder(
+  enabled: boolean,
+  intervalMinutes: number,
+  plan: PlannedPendingReminder[],
+  pendingCount: number,
+): Promise<void> {
   try {
     const coveredUntil = plan.length > 0 ? Math.max(...plan.map((item) => item.at.getTime())) : 0;
-    await captureBridge.setPendingReminder({ enabled, intervalMinutes, coveredUntil });
+    await captureBridge.setPendingReminder({ enabled, intervalMinutes, coveredUntil, pendingCount });
   } catch (error) {
     console.warn('[avisos] No se pudo informar al lado nativo', error);
   }
@@ -24,12 +29,12 @@ async function syncPendingOnce(): Promise<void> {
   const permission = await reminderBridge.permission();
   if (!settings.enabled || permission !== 'granted') {
     await pendingReminderBridge.cancelAll();
-    await publishNativeReminder(false, settings.intervalMinutes, []);
+    await publishNativeReminder(false, settings.intervalMinutes, [], 0);
     return;
   }
   const plan = await reminderService.buildPendingPlan();
   await pendingReminderBridge.replaceAll(plan);
-  await publishNativeReminder(true, settings.intervalMinutes, plan);
+  await publishNativeReminder(true, settings.intervalMinutes, plan, await reminderService.countPending());
 }
 
 async function syncPaymentsOnce(): Promise<number> {

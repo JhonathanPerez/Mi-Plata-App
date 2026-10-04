@@ -30,11 +30,19 @@ final class CaptureStore {
     private static final String KEY_REM_ENABLED = "rem_enabled";
     private static final String KEY_REM_MINUTES = "rem_minutes";
     private static final String KEY_REM_COVERED = "rem_covered_until";
+    private static final String KEY_REM_PENDING = "rem_pending_count";
     private static final String KEY_UNSEEN = "unseen_expenses";
+    private static final String KEY_UNSEEN_AMOUNT = "unseen_last_amount";
+    private static final String KEY_RECENT = "recent_expenses";
     private static final String KEY_FB_START = "fb_start";
     private static final String KEY_FB_SENT = "fb_sent";
     private static final String KEY_FB_NEXT = "fb_next_at";
     private static final int MAX_QUEUE = 200;
+    /** Mensajes de gasto ya contados que se recuerdan (aunque la app los recoja) para no contar dos veces el mismo. */
+    private static final int MAX_RECENT = 50;
+    private static final long RECENT_KEEP_MS = 6L * 3_600_000L;
+    /** Igual que `CAPTURE_DEDUPE_WINDOW_MS` en `config/capture.ts`: el mismo texto dentro de este margen es el mismo gasto. */
+    private static final long DUPLICATE_WINDOW_MS = 2L * 60_000L;
     private static final Object LOCK = new Object();
     private static volatile Listener listener;
 
@@ -65,13 +73,19 @@ final class CaptureStore {
 
     // ---- Recordatorio de pendientes con la app cerrada (ver PendingReminderReceiver) ----
 
-    /** La parte web publica aquí su configuración y hasta cuándo dejó avisos programados. */
-    static void setReminderConfig(Context context, boolean enabled, int minutes, long coveredUntil) {
+    /** La parte web publica aquí su configuración, hasta cuándo dejó avisos programados y cuántos gastos hay por categorizar. */
+    static void setReminderConfig(Context context, boolean enabled, int minutes, long coveredUntil, int pendingCount) {
         prefs(context).edit()
                 .putBoolean(KEY_REM_ENABLED, enabled)
                 .putInt(KEY_REM_MINUTES, minutes)
                 .putLong(KEY_REM_COVERED, coveredUntil)
+                .putInt(KEY_REM_PENDING, Math.max(0, pendingCount))
                 .commit();
+    }
+
+    /** Gastos por categorizar que la parte web ya tenía guardados la última vez que se abrió. */
+    static int getReminderPendingCount(Context context) {
+        return prefs(context).getInt(KEY_REM_PENDING, 0);
     }
 
     static boolean isReminderEnabled(Context context) {
@@ -91,10 +105,52 @@ final class CaptureStore {
         return prefs(context).getInt(KEY_UNSEEN, 0);
     }
 
-    static void incrementUnseenExpenses(Context context) {
+    /** Valor del último gasto detectado sin recoger (0 si no se pudo leer). Solo sirve cuando es el único pendiente. */
+    static long getLastUnseenAmount(Context context) {
+        return prefs(context).getLong(KEY_UNSEEN_AMOUNT, 0L);
+    }
+
+    /**
+     * Cuenta un gasto detectado que la app todavía no ha recogido. Devuelve false (y no suma) si es el mismo mensaje
+     * que ya se contó: las apps de SMS y de bancos suelen volver a publicar la notificación, y la parte web lo
+     * descartaría como repetido (mismo texto, a menos de 2 minutos), así que contarlo daría "2 compras" con un solo gasto.
+     * `foldedText` es el texto sin tildes ni mayúsculas ni espacios repetidos (igual que la huella de `parseNotification.ts`).
+     * La lista de recientes NO se vacía en drain: el repetido puede llegar después de que la app ya recogió el original.
+     */
+    static boolean registerUnseenExpense(Context context, String foldedText, long time, long amount) {
         synchronized (LOCK) {
             SharedPreferences p = prefs(context);
-            p.edit().putInt(KEY_UNSEEN, p.getInt(KEY_UNSEEN, 0) + 1).commit();
+            long now = System.currentTimeMillis();
+            JSONArray recent = readArray(p.getString(KEY_RECENT, null));
+            List<JSONObject> kept = new ArrayList<JSONObject>();
+            boolean duplicate = false;
+            for (int i = 0; i < recent.length(); i++) {
+                JSONObject entry = recent.optJSONObject(i);
+                if (entry == null || now - entry.optLong("seenAt") > RECENT_KEEP_MS) continue;
+                kept.add(entry);
+                if (foldedText.equals(entry.optString("k")) && Math.abs(time - entry.optLong("t")) <= DUPLICATE_WINDOW_MS) {
+                    duplicate = true;
+                }
+            }
+            if (!duplicate) {
+                try {
+                    JSONObject entry = new JSONObject();
+                    entry.put("k", foldedText);
+                    entry.put("t", time);
+                    entry.put("seenAt", now);
+                    kept.add(entry);
+                } catch (JSONException error) {
+                    return false;
+                }
+            }
+            JSONArray saved = new JSONArray();
+            for (int i = Math.max(0, kept.size() - MAX_RECENT); i < kept.size(); i++) saved.put(kept.get(i));
+            SharedPreferences.Editor editor = p.edit().putString(KEY_RECENT, saved.toString());
+            if (!duplicate) {
+                editor.putInt(KEY_UNSEEN, p.getInt(KEY_UNSEEN, 0) + 1).putLong(KEY_UNSEEN_AMOUNT, amount);
+            }
+            editor.commit();
+            return !duplicate;
         }
     }
 
@@ -156,13 +212,16 @@ final class CaptureStore {
                 JSONObject event = queue.optJSONObject(i);
                 if (event != null) events.add(event);
             }
-            prefs(context).edit().remove(KEY_QUEUE).remove(KEY_UNSEEN).commit();
+            prefs(context).edit().remove(KEY_QUEUE).remove(KEY_UNSEEN).remove(KEY_UNSEEN_AMOUNT).commit();
             return events;
         }
     }
 
     private static JSONArray readQueue(Context context) {
-        String raw = prefs(context).getString(KEY_QUEUE, null);
+        return readArray(prefs(context).getString(KEY_QUEUE, null));
+    }
+
+    private static JSONArray readArray(String raw) {
         if (raw == null) return new JSONArray();
         try {
             return new JSONArray(raw);
