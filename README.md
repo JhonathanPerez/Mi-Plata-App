@@ -41,6 +41,7 @@ nativo propio vive en `native/android/` y `scripts/`).
 
 Solo en Android. Un lector de notificaciones (`native/android/CaptureListenerService.java`) mira las apps que elijas
 y guarda únicamente los mensajes que traen un monto en pesos. El texto se interpreta en `src/lib/parseNotification.ts`
+(el aviso al instante con la app cerrada lo arma su gemelo nativo, `native/android/ExpenseTextParser.java`: mantén ambos en sintonía)
 y el gasto queda en **Por categorizar**, donde solo eliges la categoría. No se pide permiso de SMS: los mensajes del
 banco se leen como notificaciones de la app de mensajes.
 
