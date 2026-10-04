@@ -1,7 +1,7 @@
 import { Capacitor, type PluginListenerHandle } from '@capacitor/core';
 import { LocalNotifications } from '@capacitor/local-notifications';
 import type { PendingCapture } from '@/types/models';
-import { formatCOP } from './money';
+import { CAPTURE_NOTIFICATION_TITLE, captureNotificationBody } from './captureCopy';
 import { isPendingReminderId, type PlannedPendingReminder } from './pendingReminders';
 import type { PlannedReminder } from './reminders';
 
@@ -169,15 +169,14 @@ export const captureNotifications = {
     if (!this.isSupported()) return;
     if (!(await this.ensurePermission())) return;
     await ensureCaptureChannel();
-    const where = item.merchant ? ` en ${item.merchant}` : '';
     await LocalNotifications.schedule({
       notifications: [
         {
           // Mismo id que el aviso "al instante" del lado nativo (ver captureNotificationId): lo reemplaza
           // en vez de sumarse a él.
           id: captureNotificationId(item.rawText),
-          title: 'Gasto registrado',
-          body: `${formatCOP(item.amount)}${where} · Toca para asignarle categoría`,
+          title: CAPTURE_NOTIFICATION_TITLE,
+          body: captureNotificationBody(item.amount, item.merchant),
           channelId: CAPTURE_CHANNEL_ID,
           schedule: { at: new Date(Date.now() + 300), allowWhileIdle: true },
           extra: { route: `/gasto/nuevo?pendiente=${item.id}` },
