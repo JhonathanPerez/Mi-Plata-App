@@ -45,24 +45,24 @@ describe("pendingReminderBody", () => {
   it("con una sola compra pendiente dice su valor", () => {
     expect(PENDING_REMINDER_TITLE).toBe("Gastos por categorizar");
     expect(pendingReminderBody(1, 25000)).toBe(
-      "Tienes una compra por $25.000 pendiente por categorizar",
+      "Tienes una compra por $25.000 pendiente por categorizar.",
     );
     expect(pendingReminderBody(1, 1250000)).toBe(
-      "Tienes una compra por $1.250.000 pendiente por categorizar",
+      "Tienes una compra por $1.250.000 pendiente por categorizar.",
     );
   });
 
   it("con varias dice cuántas son, sin valores", () => {
     expect(pendingReminderBody(2)).toBe(
-      "Tienes 2 compras pendientes por categorizar",
+      "Tienes 2 compras pendientes por categorizar.",
     );
     expect(pendingReminderBody(12, 25000)).toBe(
-      "Tienes 12 compras pendientes por categorizar",
+      "Tienes 12 compras pendientes por categorizar.",
     );
   });
 
   it("con una sola de valor desconocido no inventa una cifra", () => {
-    const solo = "Tienes una compra pendiente por categorizar";
+    const solo = "Tienes una compra pendiente por categorizar.";
     expect(pendingReminderBody(1)).toBe(solo);
     expect(pendingReminderBody(1, null)).toBe(solo);
     expect(pendingReminderBody(1, 0)).toBe(solo);
