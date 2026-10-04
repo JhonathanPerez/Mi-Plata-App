@@ -11,6 +11,10 @@ import { normalizeText } from '@/lib/text';
  *   - El VALOR es lo único obligatorio (un monto en pesos, ignorando saldos y cupos).
  *   - El COMERCIO es opcional: si no se reconoce queda vacío y lo completas al categorizar.
  * Si un mensaje real no se detecta, agrégalo como caso en `parseNotification.test.ts` y ajusta las listas.
+ *
+ * Gemelo nativo: `native/android/ExpenseTextParser.java` repite la lectura del valor y del comercio (`findAmount`,
+ * `findBareAmount`, `extractMerchant` y sus listas de palabras) para el aviso al instante con la app cerrada, cuando
+ * este archivo no se ejecuta. Si cambias esas reglas aquí, cámbialas también allí.
  */
 
 export interface CaptureInput {
