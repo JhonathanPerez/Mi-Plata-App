@@ -1,9 +1,10 @@
 import { useEffect, useRef, useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { CategoryBars } from '@/components/charts/CategoryBars';
 import { DailyBars } from '@/components/charts/DailyBars';
 import { DonutChart } from '@/components/charts/DonutChart';
 import { MethodSingle } from '@/components/charts/MethodSingle';
+import { SavingsBars } from '@/components/charts/SavingsBars';
 import { StatsSkeleton } from '@/components/charts/StatsSkeleton';
 import { Button } from '@/components/ui/Button';
 import { EmojiTile } from '@/components/ui/EmojiTile';
@@ -22,6 +23,7 @@ import { categoryHistoryPath } from '@/lib/historyLink';
 import { readStatsMonth, statsReturnTarget } from '@/lib/navigationState';
 import { pluralize } from '@/lib/text';
 import { useAmountFormat } from '@/app/providers/PrivacyProvider';
+import type { SavingsMonthSummary } from '@/lib/savings';
 import { statsService, type MonthlySummary } from '@/services/statsService';
 
 /** En los tiles de dos columnas una cifra de siete dígitos o más no cabe (menos aún con la letra grande): se abrevia ($18,7 M). */
@@ -38,16 +40,80 @@ function ComparisonLine({ summary }: { summary: MonthlySummary }) {
   );
 }
 
+/** Cifra con su signo: «+» si el ahorro creció, «−» si bajó. El signo va escrito, no solo en el color. */
+function SignedAmount({ value, compact }: { value: number; compact?: boolean }) {
+  return (
+    <>
+      {value > 0 ? '+' : value < 0 ? '−' : ''}
+      <Amount value={Math.abs(value)} compact={compact} />
+    </>
+  );
+}
+
+/**
+ * Ahorros del mes: cuánto creció el ahorro, de dónde sale esa cifra (lo que se metió, lo que se sacó y lo que pagó gastos,
+ * que ya cuenta en «Total gastado») y cuánto tiene cada cuenta. Sigue al mes elegido arriba.
+ */
+function SavingsSection({ summary, isCurrentMonth }: { summary: SavingsMonthSummary; isCurrentMonth: boolean }) {
+  const tile = (value: number) => <Amount value={value} compact={Math.abs(value) >= TILE_COMPACT_FROM} />;
+  return (
+    <section className="section section--anchor" id="ahorros">
+      <div className="section__head">
+        <div className="section__heading">
+          <h2 className="section__title">Ahorros</h2>
+          <p className="section__hint">Lo que metiste y sacaste de tus cuentas en el mes</p>
+        </div>
+        <Link className="link" to="/ahorros">
+          Ver cuentas
+        </Link>
+      </div>
+
+      <Stat as="section" aria-label="Ahorro neto del mes" label="Ahorro neto del mes" value={<SignedAmount value={summary.net} />}>
+        <p className="compare">
+          <span>
+            {summary.hasActivity ? (
+              summary.previousNet !== 0 ? (
+                <>
+                  Mes anterior: <SignedAmount value={summary.previousNet} />
+                </>
+              ) : (
+                'Sin ahorro el mes anterior'
+              )
+            ) : (
+              'Sin movimientos de ahorro este mes'
+            )}
+          </span>
+        </p>
+      </Stat>
+
+      <div className="tiles tiles--2x2">
+        <Stat size="sm" label="Metiste" value={tile(summary.deposited)} />
+        <Stat size="sm" label="Sacaste" value={tile(summary.withdrawn)} />
+        <Stat size="sm" label="Pagado con ahorro" value={tile(summary.spent)} foot="ya está en tus gastos" />
+        <Stat size="sm" label="Total en cuentas" value={tile(summary.balance)} foot={isCurrentMonth ? 'hoy' : 'al cerrar el mes'} />
+      </div>
+
+      {summary.accounts.length > 0 && (
+        <div className="card">
+          <SavingsBars items={summary.accounts} />
+        </div>
+      )}
+    </section>
+  );
+}
+
 export function StatsPage() {
   const navigate = useNavigate();
   // Estado de la ubicación: `scrollTo` lo manda Inicio; `yearMonth` lo deja el botón Atrás al volver desde Gastos (se abre en el mes que se veía).
   const location = useLocation();
   const [yearMonth, setYearMonth] = useState(() => readStatsMonth(location.state) ?? currentYearMonth());
   const { data, error, retry } = useQuery(() => statsService.getMonthlySummary(yearMonth), [yearMonth]);
+  // Los ahorros se leen aparte: si fallan, el resto de Estadísticas sigue funcionando y la sección simplemente no aparece.
+  const { data: savings } = useQuery(() => statsService.getSavingsMonth(yearMonth), [yearMonth]);
 
   // Inicio puede mandar aquí con `state.scrollTo` (HashRouter no admite anclas #): se baja a esa sección una sola vez, cuando ya hay datos.
   const scrollTo = (location.state as { scrollTo?: string } | null)?.scrollTo;
-  const hasSections = Boolean(data && data.transactions > 0);
+  const hasSections = Boolean((data && data.transactions > 0) || savings?.hasAccounts);
   const scrolled = useRef(false);
   useEffect(() => {
     if (!scrollTo || !hasSections || scrolled.current) return;
@@ -158,6 +224,8 @@ export function StatsPage() {
           </section>
         </>
       )}
+
+      {data && savings?.hasAccounts && <SavingsSection summary={savings} isCurrentMonth={isCurrentMonth} />}
     </div>
   );
 }
