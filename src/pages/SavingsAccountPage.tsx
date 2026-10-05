@@ -35,6 +35,8 @@ function MovementRow({ movement, onRemove }: { movement: MovementWithBalance; on
     </span>
   );
   const common = {
+    className: 'savings-move',
+    tight: true,
     leading,
     title: movementTitle(movement),
     detail: `${MOVEMENT_LABELS[movement.kind].title} · ${formatShortDate(movement.date)}`,

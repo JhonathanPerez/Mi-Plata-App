@@ -1,14 +1,19 @@
 /* Ahorros: cuentas de ahorro, botones de meter y sacar plata, y el historial de movimientos. */
 
-/* Dos botones del mismo ancho bajo el saldo, sobre el fondo verde de la cabecera. */
+/*
+ * Dos botones bajo el saldo, sobre el fondo verde de la cabecera. Cada uno mide lo que su texto y reparten el ancho;
+ * si en una pantalla angosta no caben lado a lado, el segundo baja a su propia línea en vez de partir el texto en dos renglones.
+ */
 .savings-actions {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
+  display: flex;
+  flex-wrap: wrap;
   gap: var(--space-3);
 }
 
 .savings-actions .btn {
-  width: 100%;
+  flex: 1 1 max-content;
+  padding-inline: var(--space-3);
+  white-space: nowrap;
 }
 
 /* Icono de la fila de un movimiento: «+» si entró plata, «−» si salió. No depende solo del color. */
@@ -29,6 +34,13 @@
 .savings-move__icon--withdrawal {
   background: var(--surface-2);
   color: var(--ink-2);
+}
+
+/* Pantallas angostas: el signo del monto ya dice si entró o salió plata; sin el icono, la descripción y las cifras tienen más sitio. */
+@media (max-width: 360px) {
+  .savings-move .savings-move__icon {
+    display: none;
+  }
 }
 
 /* El ingreso va en el color de la marca; el retiro, en el color normal del texto (sacar plata no es un error). */
