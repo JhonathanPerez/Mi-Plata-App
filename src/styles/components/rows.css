@@ -171,8 +171,11 @@
   white-space: nowrap;
 }
 
+/* El monto ocupa lo que mide, pero cede si es larguísimo (un saldo de miles de millones) para no sacar el texto de la fila. */
 .row__side {
-  flex: none;
+  flex: 0 1 auto;
+  min-width: 0;
+  max-width: 50%;
   display: flex;
   flex-direction: column;
   align-items: flex-end;
@@ -184,6 +187,18 @@
   font-size: var(--fs-md);
   font-weight: 700;
   font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+}
+
+/* Pantallas angostas (360 dp o menos): cifras un punto más pequeñas para que quepan junto al título. */
+@media (max-width: 360px) {
+  .row__amount {
+    font-size: var(--fs-sm);
+  }
+
+  .row__side > .row__detail {
+    font-size: var(--fs-xs);
+  }
 }
 
 .row__chevron {
