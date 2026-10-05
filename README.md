@@ -9,6 +9,7 @@ Funciona 100 % sin Internet: tus datos viven solo en el teléfono (la red solo s
 - Bloqueo con huella, rostro o PIN al abrir la app.
 - **Captura automática** de compras desde SMS y notificaciones de las apps que elijas.
 - Pagado / por pagar y extractos de tarjeta de crédito.
+- **Cuentas de ahorro** de tus bancos: lleva su saldo, mete y saca plata, ajústalo con el del banco, sigue cada movimiento y paga gastos con ellas (ver [Ahorros](#cuentas-de-ahorro)).
 - **Actualizaciones desde la app**: avisa de una versión nueva al abrirla (Descargar / Cancelar) y también desde _Ajustes ▸ Datos y acerca de ▸ Comprobar actualizaciones_.
 
 ## Requisitos
@@ -80,6 +81,21 @@ consulta `https://api.github.com/repos/<UPDATE_REPO>/releases/latest` y compara 
 - Siempre el mismo keystore (ver arriba). Un APK de debug no se actualiza a uno de release (firmas distintas).
 - No compilar con `harden-android.mjs --no-internet`: sin permiso de Internet la app no puede buscar versiones.
 - Cambiar de repositorio: `UPDATE_REPO` en `src/config/constants.ts`.
+
+## Cuentas de ahorro
+
+Tus cuentas de ahorro de los bancos y billeteras (Bancolombia, Nequi, Davivienda…). _Ajustes ▸ Cuentas de ahorro_ o la tarjeta «Cuentas de ahorro» de Inicio. Cada cuenta tiene nombre, últimos 4 dígitos (opcionales, nunca el número completo), icono y color. Su saldo **no se guarda: se calcula** sumando sus movimientos (`savings_movements`), así nunca se desfasa.
+
+- **Saldo inicial:** al crear la cuenta se puede escribir el saldo de hoy en el banco; queda como el primer movimiento.
+- **Meter / sacar plata:** quedan como movimientos con fecha, nota y el saldo que dejaron. Un retiro no puede superar el saldo. Un movimiento manual se puede borrar para corregir un error (nunca si el saldo quedaría en negativo).
+- **Ajustar saldo:** si el banco dice otra cosa (un sueldo, un interés, un débito automático), se escribe el saldo del banco y la app crea el ingreso o el retiro por la diferencia como «Ajuste de saldo». El historial no se sobrescribe.
+- **Pagar un gasto con una cuenta:** al registrar el gasto, la cuenta aparece en «Método de pago» con su saldo. El gasto queda **pagado** y en la cuenta aparece el retiro enlazado (tocarlo abre el gasto). Editar el gasto ajusta el retiro; cambiar el método o eliminar el gasto devuelve la plata. Si el saldo no alcanza, no se guarda nada.
+- **Compras detectadas:** una compra de «Por categorizar» se sugiere con la cuenta solo si sus últimos 4 dígitos coinciden con los de la notificación (nunca por el nombre del banco, porque un banco puede tener tarjeta y cuenta a la vez).
+- **En Estadísticas:** la sección «Ahorros» sigue al mes elegido: ahorro neto (metiste − sacaste − pagado con ahorro), esas tres cifras, el total en cuentas al cerrar el mes y el reparto por cuenta. Lo pagado con ahorro ya cuenta en «Total gastado», así que no se duplica. Solo cuentan las cuentas activas (`summarizeSavingsMonth` en `lib/savings.ts`).
+- **Cómo está hecho:** cada cuenta tiene un método de pago «espejo» (`payment_methods.savings_account_id`, oculto en «Métodos de pago»), así el gasto entra al historial, las estadísticas y la exportación sin tocar esas consultas. Gasto y retiro se guardan en una sola transacción.
+- Ocultar una cuenta la saca de la lista al pagar; una cuenta que ya pagó gastos no se puede eliminar. La importación de Excel nunca usa una cuenta de ahorro.
+- La copia de seguridad pasa a la versión 3 e incluye cuentas y movimientos; las copias anteriores se siguen restaurando.
+- Código: `src/services/savingsService.ts`, `src/lib/savings.ts` (reglas puras), `src/repositories/savingsRepository.ts`, migraciones `006_savings_accounts.ts` y `007_savings_account_last4.ts`, pantallas `SavingsPage` y `SavingsAccountPage`.
 
 ## Arquitectura
 
