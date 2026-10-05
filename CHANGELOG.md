@@ -1,3 +1,10 @@
+## [1.3.1](https://github.com/JhonathanPerez/Mi-Plata-App/compare/v1.3.0...v1.3.1) (2026-10-05)
+
+
+### Bug Fixes
+
+* **ui:** corrige textos pantallas pequeñas ([#42](https://github.com/JhonathanPerez/Mi-Plata-App/issues/42)) ([1a28efa](https://github.com/JhonathanPerez/Mi-Plata-App/commit/1a28efa2862ed442b9225f7ba7d3768deb794b8b))
+
 # [1.3.0](https://github.com/JhonathanPerez/Mi-Plata-App/compare/v1.2.12...v1.3.0) (2026-10-05)
 
 
