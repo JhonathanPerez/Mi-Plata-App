@@ -26,8 +26,10 @@ import {
   ListBullets,
   Lock,
   MagnifyingGlass,
+  Minus,
   Moon,
   PencilSimple,
+  PiggyBank,
   Plus,
   ShieldCheck,
   SlidersHorizontal,
@@ -48,7 +50,7 @@ export type IconName =
   | 'home' | 'list' | 'chart' | 'sliders' | 'plus' | 'back' | 'close' | 'chevronRight' | 'chevronLeft'
   | 'check' | 'trash' | 'edit' | 'search' | 'filter' | 'calendar' | 'download' | 'upload' | 'warning'
   | 'arrowUp' | 'arrowDown' | 'shield' | 'info' | 'moon' | 'tag' | 'card' | 'target' | 'refresh' | 'save'
-  | 'lock' | 'bell' | 'bellRinging' | 'clockCountdown' | 'inbox' | 'apps' | 'phone' | 'eye' | 'eyeOff' | 'flag' | 'user' | 'more' | 'update';
+  | 'lock' | 'bell' | 'bellRinging' | 'clockCountdown' | 'inbox' | 'apps' | 'phone' | 'eye' | 'eyeOff' | 'flag' | 'user' | 'more' | 'update' | 'piggy' | 'minus';
 
 /**
  * Íconos Phosphor. Los de "contenido" (casa, tarjeta, campana…) van en duotono, con un tono suave de relleno;
@@ -96,6 +98,8 @@ const ICONS: Record<IconName, { Component: PhosphorIcon; weight: IconWeight }> =
   user: { Component: User, weight: 'duotone' },
   more: { Component: DotsThreeVertical, weight: 'bold' },
   update: { Component: ArrowCircleUp, weight: 'duotone' },
+  piggy: { Component: PiggyBank, weight: 'duotone' },
+  minus: { Component: Minus, weight: 'bold' },
 };
 
 interface IconProps {

@@ -7,7 +7,7 @@
  *   base        reset, tipografía, estructura y navegación
  *   components  piezas reutilizables (botones, campos, paneles, gráficos…)
  *   screens     ajustes propios de cada pantalla
- *   features    dominios de negocio (tarjetas de crédito, pagos)
+ *   features    dominios de negocio (tarjetas de crédito, pagos, ahorros)
  *
  * Un archivo nuevo se agrega aquí, dentro de su capa. La lista de capas debe ser idéntica a la de index.html.
  */
@@ -32,3 +32,4 @@
 
 @import './features/credit-cards.css' layer(features);
 @import './features/payments.css' layer(features);
+@import './features/savings.css' layer(features);
