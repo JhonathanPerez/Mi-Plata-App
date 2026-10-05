@@ -21,10 +21,16 @@ describe('decideBackAction', () => {
     expect(decideBackAction('/tarjetas/pm_nubank/pagar', true)).toEqual({ type: 'back' });
     expect(decideBackAction('/tarjetas/pm_nubank/pagar', false)).toEqual({ type: 'goto', to: '/' });
   });
+  it('las cuentas de ahorro vuelven a la pantalla desde la que se abrieron (Inicio, Estadísticas o Ajustes)', () => {
+    expect(decideBackAction('/ahorros', true)).toEqual({ type: 'back' });
+    expect(decideBackAction('/ahorros/sa_nequi', true)).toEqual({ type: 'back' });
+  });
   it('sin historial, las secundarias van a su pantalla padre', () => {
     expect(decideBackAction('/gasto/abc', false)).toEqual({ type: 'goto', to: '/' });
     expect(decideBackAction('/ajustes/exportar', false)).toEqual({ type: 'goto', to: '/ajustes' });
     expect(decideBackAction('/pendientes', false)).toEqual({ type: 'goto', to: '/ajustes' });
+    expect(decideBackAction('/ahorros', false)).toEqual({ type: 'goto', to: '/' });
+    expect(decideBackAction('/ahorros/sa_nequi', false)).toEqual({ type: 'goto', to: '/ahorros' });
   });
 });
 
