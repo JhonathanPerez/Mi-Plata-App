@@ -11,7 +11,7 @@ import { PrivacyToggle } from '@/components/ui/PrivacyToggle';
 import { Row } from '@/components/ui/Row';
 import { Stat } from '@/components/ui/Stat';
 import { useQuery } from '@/hooks/useQuery';
-import { pluralize } from '@/lib/text';
+import { movementCountLabel } from '@/lib/savings';
 import { savingsService } from '@/services/savingsService';
 
 /** Cuentas de ahorro: cuánta plata hay en cada una y cuánto en total. Tocar una abre sus movimientos. */
@@ -69,7 +69,7 @@ export function SavingsPage() {
                 chevron="chevronRight"
               >
                 <span className="row__detail row__detail--truncate">
-                  {account.movementCount} {pluralize(account.movementCount, 'movimiento', 'movimientos')}
+                  {movementCountLabel(account.movementCount)}
                 </span>
                 {!account.isActive && <span className="row__detail">No aparece al registrar un gasto</span>}
               </Row>
