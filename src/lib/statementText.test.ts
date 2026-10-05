@@ -18,7 +18,7 @@ describe('textos de extractos', () => {
     expect(relativeDays(-3)).toBe('hace 3 días');
   });
   it('etiqueta de vencimiento', () => {
-    expect(dueLabel('2026-09-20', 0)).toBe('Vence hoy');
+    expect(dueLabel('2026-09-20', 0)).toBe('Pago hoy');
     expect(dueLabel('2026-09-17', -3)).toBe('Vencido hace 3 días');
     expect(dueLabel('2026-09-19', -1)).toBe('Vencido hace 1 día');
     expect(dueLabel('2026-10-20', 10)).toBe('Hasta el mar 20 oct · en 10 días');
@@ -26,7 +26,7 @@ describe('textos de extractos', () => {
   it('etiqueta corta de vencimiento para la tarjeta de crédito', () => {
     expect(dueShortLabel('2026-10-06', 6)).toBe('Pago en 6 días · mar 6 oct');
     expect(dueShortLabel('2026-10-01', 1)).toBe('Pago mañana · jue 1 oct');
-    expect(dueShortLabel('2026-09-30', 0)).toBe('Vence hoy');
+    expect(dueShortLabel('2026-09-30', 0)).toBe('Pago hoy');
     expect(dueShortLabel('2026-09-27', -3)).toBe('Vencido hace 3 días');
   });
   it('fechas de un ciclo abierto', () => {

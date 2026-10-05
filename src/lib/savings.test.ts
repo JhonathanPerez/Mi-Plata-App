@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { adjustmentFor, balanceOf, describeAccount, insufficientMessage, movementTitle, summarizeSavingsMonth, totalsOf, validateMovement, withRunningBalance } from './savings';
+import { adjustmentFor, balanceOf, describeAccount, insufficientMessage, movementCountLabel, movementTitle, summarizeSavingsMonth, totalsOf, validateMovement, withRunningBalance } from './savings';
 import type { SavingsMovement } from '@/types/models';
 
 function movement(partial: Partial<SavingsMovement> & Pick<SavingsMovement, 'id' | 'kind' | 'amount' | 'date'>): SavingsMovement {
@@ -78,6 +78,12 @@ describe('textos', () => {
     expect(movementTitle({ kind: 'withdrawal', note: null, expenseId: 'e1' })).toBe('Pago de un gasto');
     expect(movementTitle({ kind: 'deposit', note: null, expenseId: null })).toBe('Ingreso');
     expect(movementTitle({ kind: 'withdrawal', note: null, expenseId: null })).toBe('Retiro');
+  });
+
+  it('la cantidad de movimientos dice «Sin movimientos» cuando no hay ninguno', () => {
+    expect(movementCountLabel(0)).toBe('Sin movimientos');
+    expect(movementCountLabel(1)).toBe('1 movimiento');
+    expect(movementCountLabel(12)).toBe('12 movimientos');
   });
 });
 

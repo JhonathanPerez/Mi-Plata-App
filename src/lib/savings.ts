@@ -98,6 +98,12 @@ export function adjustmentFor(currentBalance: number, bankBalance: number): { ki
   return { kind: difference > 0 ? 'deposit' : 'withdrawal', amount: Math.abs(difference) };
 }
 
+/** «Sin movimientos», «1 movimiento» o «12 movimientos»: el cero se dice con palabras en vez de «0 movimientos». */
+export function movementCountLabel(count: number): string {
+  if (count === 0) return 'Sin movimientos';
+  return `${count} ${count === 1 ? 'movimiento' : 'movimientos'}`;
+}
+
 /** Nota de los movimientos que crea «Ajustar saldo». */
 export const ADJUSTMENT_NOTE = 'Ajuste de saldo';
 

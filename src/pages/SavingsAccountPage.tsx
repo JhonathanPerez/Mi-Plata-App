@@ -20,8 +20,7 @@ import { useQuery } from '@/hooks/useQuery';
 import { cx } from '@/lib/cx';
 import { formatShortDate } from '@/lib/dates';
 import { errorMessage } from '@/lib/errors';
-import { describeAccount, MOVEMENT_LABELS, movementTitle, type MovementWithBalance } from '@/lib/savings';
-import { pluralize } from '@/lib/text';
+import { describeAccount, MOVEMENT_LABELS, movementCountLabel, movementTitle, type MovementWithBalance } from '@/lib/savings';
 import { savingsService } from '@/services/savingsService';
 import type { SavingsMovementKind } from '@/types/models';
 
@@ -162,7 +161,7 @@ export function SavingsAccountPage() {
           <div className="section__heading">
             <h2 className="section__title">Movimientos</h2>
             <p className="section__hint">
-              {movements.length} {pluralize(movements.length, 'movimiento', 'movimientos')}
+              {movementCountLabel(movements.length)}
             </p>
           </div>
           <LinkButton onClick={() => setAdjusting(true)}>Ajustar saldo</LinkButton>

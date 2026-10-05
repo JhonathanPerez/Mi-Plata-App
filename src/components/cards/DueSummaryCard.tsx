@@ -35,11 +35,11 @@ function DueLabel({ tone, children }: { tone: DueTone; children: string }) {
   );
 }
 
-/** «Próximo pago en 6 días» (la fecha va aparte, bajo el monto): cabe en un renglón. Hoy y vencido siguen diciendo «Vence hoy» y «Vencido hace…». */
+/** «Próximo pago en 6 días» (la fecha va aparte, bajo el monto): cabe en un renglón. Hoy y vencido siguen diciendo «Pago hoy» y «Vencido hace…». */
 function dueText(daysLeft: number): string {
   if (daysLeft < 0)
     return `Vencido hace ${-daysLeft} ${-daysLeft === 1 ? "día" : "días"}`;
-  if (daysLeft === 0) return "Vence hoy";
+  if (daysLeft === 0) return "Pago hoy";
   return `Pago ${relativeDays(daysLeft)}`;
 }
 

@@ -19,7 +19,7 @@ describe('estado de un extracto cerrado', () => {
     expect(statementStatus({ ...base, dueDate: '2026-10-03' }, TODAY).label).toBe('Pago mañana · sáb 3 oct');
   });
   it('hoy o vencido: urgente', () => {
-    expect(statementStatus({ ...base, dueDate: '2026-10-02' }, TODAY)).toMatchObject({ tone: 'danger', label: 'Vence hoy' });
+    expect(statementStatus({ ...base, dueDate: '2026-10-02' }, TODAY)).toMatchObject({ tone: 'danger', label: 'Pago hoy' });
     expect(statementStatus({ ...base, dueDate: '2026-09-29' }, TODAY)).toMatchObject({ tone: 'danger', label: 'Vencido · hace 3 días' });
     expect(statementStatus({ ...base, dueDate: '2026-10-01' }, TODAY).label).toBe('Vencido · hace 1 día');
   });
