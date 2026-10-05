@@ -16,6 +16,15 @@
   white-space: nowrap;
 }
 
+/* Título y detalle de un movimiento («Ajuste de saldo», «Ingreso · 5 oct») en un solo renglón: si no caben junto al monto se recortan con «…»
+   en vez de partirse en dos y dejar filas de distinta altura. El texto completo sigue en el DOM, así que los lectores de pantalla lo leen entero. */
+.savings-move .row__title,
+.savings-move .row__body > .row__detail {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 /* Icono de la fila de un movimiento: «+» si entró plata, «−» si salió. No depende solo del color. */
 .savings-move__icon {
   flex: none;
