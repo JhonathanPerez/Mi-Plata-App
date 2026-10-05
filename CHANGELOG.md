@@ -1,3 +1,10 @@
+## [1.3.2](https://github.com/JhonathanPerez/Mi-Plata-App/compare/v1.3.1...v1.3.2) (2026-10-05)
+
+
+### Bug Fixes
+
+* **ui:** cambia textos ([#43](https://github.com/JhonathanPerez/Mi-Plata-App/issues/43)) ([c4cf63f](https://github.com/JhonathanPerez/Mi-Plata-App/commit/c4cf63f4d575f5389387ced7c3467974156ccf69))
+
 ## [1.3.1](https://github.com/JhonathanPerez/Mi-Plata-App/compare/v1.3.0...v1.3.1) (2026-10-05)
 
 
