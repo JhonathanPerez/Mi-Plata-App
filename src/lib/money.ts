@@ -16,19 +16,22 @@ export const HIDDEN_AMOUNT = '$ ••••••';
 /** Igual, para espacios reducidos (centro de la dona). */
 export const HIDDEN_AMOUNT_COMPACT = '$ •••';
 
-/** Versión corta para espacios reducidos: $350 mil, $1,3 M. */
+/**
+ * Cifra de millones con los decimales justos para no cambiar el monto a ojo: dos por debajo de 10 M ($1,95 M, no «$2 M»),
+ * uno hasta 100 M ($18,7 M) y ninguno desde ahí. Los ceros sobrantes se quitan ($2 M, no «$2,00 M»).
+ */
+function formatMillions(millions: number): string {
+  const decimals = millions >= 100 ? 0 : millions >= 10 ? 1 : 2;
+  const factor = 10 ** decimals;
+  return (Math.round(millions * factor) / factor).toString().replace('.', ',');
+}
+
+/** Versión corta para espacios reducidos: $350 mil, $1,95 M. */
 export function formatCOPCompact(value: number): string {
   const rounded = Math.round(value);
   const sign = rounded < 0 ? '-' : '';
   const abs = Math.abs(rounded);
-  if (abs >= 999_500) {
-    const millions = abs / 1_000_000;
-    const text =
-      millions >= 100
-        ? Math.round(millions).toString()
-        : (Math.round(millions * 10) / 10).toString().replace('.', ',');
-    return `${sign}$${text} M`;
-  }
+  if (abs >= 999_500) return `${sign}$${formatMillions(abs / 1_000_000)} M`;
   if (abs >= 1_000) return `${sign}$${Math.round(abs / 1_000)} mil`;
   return `${sign}$${abs}`;
 }
