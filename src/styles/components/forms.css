@@ -98,6 +98,7 @@
 /* Los atajos miden lo mismo que el campo (48 px). */
 .date-field .chip {
   min-height: var(--tap);
+  white-space: nowrap;
 }
 
 /* «Otra fecha»: el campo nativo va oculto bajo el atajo y solo sirve para anclar el calendario. */
@@ -167,12 +168,13 @@
   font-variant-numeric: tabular-nums;
 }
 
+/* La cifra grande se encoge en pantallas angostas (hasta ~360 dp) para que un valor de millones se vea completo. */
 .money--hero .money__symbol {
-  font-size: var(--fs-3xl);
+  font-size: clamp(var(--fs-xl), 8vw, var(--fs-3xl));
 }
 
 .money--hero .money__input {
-  font-size: var(--fs-hero);
+  font-size: clamp(var(--fs-2xl), 10vw, var(--fs-hero));
   letter-spacing: -0.02em;
 }
 

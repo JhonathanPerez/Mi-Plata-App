@@ -60,13 +60,17 @@ export function SavingsPage() {
               <Row
                 key={account.id}
                 to={`/ahorros/${account.id}`}
+                tight
                 className={account.isActive ? undefined : 'row--dim'}
                 leading={<EmojiTile emoji={account.icon} color={account.color} />}
                 title={account.name}
-                detail={`${account.last4 ? `••••\u00a0${account.last4} · ` : ''}${account.movementCount} ${pluralize(account.movementCount, 'movimiento', 'movimientos')}`}
+                detail={account.last4 ? <span className="row__nowrap">••••&nbsp;{account.last4}</span> : undefined}
                 amount={<Amount value={account.balance} />}
                 chevron="chevronRight"
               >
+                <span className="row__detail row__detail--truncate">
+                  {account.movementCount} {pluralize(account.movementCount, 'movimiento', 'movimientos')}
+                </span>
                 {!account.isActive && <span className="row__detail">No aparece al registrar un gasto</span>}
               </Row>
             ))}
