@@ -1,15 +1,18 @@
 import { MAX_AMOUNT, NOTE_MAX_LENGTH, SETTING_KEYS } from '@/config/constants';
+import { getDb } from '@/db/connection';
 import { isValidIsoDate, isValidTime, todayIso } from '@/lib/dates';
 import { notifyDataChanged } from '@/lib/dataBus';
 import { ValidationError } from '@/lib/errors';
 import { newId, nowIso } from '@/lib/ids';
 import { formatCOP } from '@/lib/money';
+import { insufficientMessage } from '@/lib/savings';
 import { normalizeText } from '@/lib/text';
 import { categoryRepository } from '@/repositories/categoryRepository';
 import { expenseRepository } from '@/repositories/expenseRepository';
 import { paymentMethodRepository } from '@/repositories/paymentMethodRepository';
+import { savingsRepository } from '@/repositories/savingsRepository';
 import { settingsRepository } from '@/repositories/settingsRepository';
-import type { Expense, ExpenseFilters, ExpenseInput, ExpenseWithRefs, IsoDate, PaymentMethodType } from '@/types/models';
+import type { Expense, ExpenseFilters, ExpenseInput, ExpenseWithRefs, IsoDate, PaymentMethodType, SavingsMovement } from '@/types/models';
 
 export type ExpenseField = 'amount' | 'category' | 'method' | 'date' | 'time' | 'note';
 export type ExpenseFieldErrors = Partial<Record<ExpenseField, string>>;
@@ -62,6 +65,8 @@ export function validateExpenseInput(input: ExpenseInput, options: ValidateExpen
 interface Prepared {
   input: ExpenseInput;
   methodType: PaymentMethodType;
+  /** Cuenta de ahorro con la que se paga, si el método elegido es el espejo de una cuenta. */
+  savingsAccountId: string | null;
 }
 
 /**
@@ -95,7 +100,35 @@ async function prepare(input: ExpenseInput): Promise<Prepared> {
   if (!method) throw new ValidationError('El método de pago elegido ya no existe.', 'method');
 
   const note = input.note ? input.note.trim() : '';
-  return { input: { ...input, note: note.length > 0 ? note : null }, methodType: method.type };
+  const savingsAccountId = method.savingsAccountId;
+  // Pagar con una cuenta de ahorro es pagar en el acto: el gasto siempre queda como pagado.
+  const paid = savingsAccountId ? true : input.paid;
+  return { input: { ...input, paid, note: note.length > 0 ? note : null }, methodType: method.type, savingsAccountId };
+}
+
+/**
+ * Revisa que la cuenta alcance para pagar el gasto. Al editar, la plata que ese mismo gasto ya había sacado
+ * de la cuenta (`releasing`) cuenta como disponible: cambiar el valor no puede dejarlo sin fondos por su propio retiro.
+ */
+async function assertAccountCovers(accountId: string, amount: number, releasing = 0): Promise<void> {
+  const [account, balance] = await Promise.all([savingsRepository.getAccount(accountId), savingsRepository.getBalance(accountId)]);
+  if (!account) throw new ValidationError('La cuenta de ahorro elegida ya no existe.', 'method');
+  const available = balance + releasing;
+  if (amount > available) throw new ValidationError(insufficientMessage(account.name, available), 'amount');
+}
+
+/** El retiro de la cuenta que corresponde a un gasto pagado con ahorro. */
+function withdrawalFor(expense: Expense, accountId: string): SavingsMovement {
+  return {
+    id: newId(),
+    accountId,
+    kind: 'withdrawal',
+    amount: expense.amount,
+    date: expense.date,
+    note: expense.note,
+    expenseId: expense.id,
+    createdAt: expense.updatedAt,
+  };
 }
 
 export const expenseService = {
@@ -104,7 +137,8 @@ export const expenseService = {
    * categorizado en la misma transacción: nunca queda el gasto guardado y el pendiente vivo (ni al revés).
    */
   async create(input: ExpenseInput, options: { fromPendingId?: string } = {}): Promise<Expense> {
-    const { input: clean, methodType } = await prepare(input);
+    const { input: clean, methodType, savingsAccountId } = await prepare(input);
+    if (savingsAccountId) await assertAccountCovers(savingsAccountId, clean.amount);
     const now = nowIso();
     const expense: Expense = {
       id: newId(),
@@ -118,8 +152,13 @@ export const expenseService = {
       createdAt: now,
       updatedAt: now,
     };
-    if (options.fromPendingId) await expenseRepository.insertFromPending(expense, options.fromPendingId);
-    else await expenseRepository.insert(expense);
+    // El gasto y el retiro de la cuenta se guardan juntos o no se guarda ninguno.
+    const db = await getDb();
+    await db.transaction(async () => {
+      if (options.fromPendingId) await expenseRepository.insertFromPending(expense, options.fromPendingId);
+      else await expenseRepository.insert(expense);
+      if (savingsAccountId) await savingsRepository.insertMovement(withdrawalFor(expense, savingsAccountId));
+    });
     // Recuerda el último método usado para dejarlo preseleccionado la próxima vez.
     await settingsRepository.set(SETTING_KEYS.lastPaymentMethodId, expense.paymentMethodId);
     notifyDataChanged();
@@ -129,7 +168,13 @@ export const expenseService = {
   async update(id: string, input: ExpenseInput): Promise<Expense> {
     const existing = await expenseRepository.getById(id);
     if (!existing) throw new ValidationError('Este gasto ya no existe.');
-    const { input: clean, methodType } = await prepare(input);
+    const { input: clean, methodType, savingsAccountId } = await prepare(input);
+    // Si el gasto ya había salido de una cuenta, esa plata se devuelve y se vuelve a sacar con los datos nuevos.
+    const previous = await savingsRepository.getMovementByExpense(id);
+    if (savingsAccountId) {
+      const releasing = previous && previous.accountId === savingsAccountId ? previous.amount : 0;
+      await assertAccountCovers(savingsAccountId, clean.amount, releasing);
+    }
     const updated: Expense = {
       ...existing,
       amount: clean.amount,
@@ -141,7 +186,12 @@ export const expenseService = {
       paidAt: decidePaidAt(clean, methodType, existing, todayIso()),
       updatedAt: nowIso(),
     };
-    await expenseRepository.update(updated);
+    const db = await getDb();
+    await db.transaction(async () => {
+      await expenseRepository.update(updated);
+      if (previous) await savingsRepository.removeMovement(previous.id);
+      if (savingsAccountId) await savingsRepository.insertMovement(withdrawalFor(updated, savingsAccountId));
+    });
     notifyDataChanged();
     return updated;
   },
@@ -150,12 +200,21 @@ export const expenseService = {
   async setPaid(id: string, paid: boolean, today: IsoDate = todayIso()): Promise<void> {
     const existing = await expenseRepository.getById(id);
     if (!existing) throw new ValidationError('Este gasto ya no existe.');
+    // Un gasto pagado con ahorro ya salió de la cuenta: «por pagar» no tendría sentido mientras siga siendo así.
+    if (!paid && (await savingsRepository.getMovementByExpense(id))) {
+      throw new ValidationError('Este gasto se pagó con una cuenta de ahorro. Edítalo para cambiar el método de pago.');
+    }
     await expenseRepository.setPaid([id], paid ? (existing.paidAt ?? today) : null, nowIso());
     notifyDataChanged();
   },
 
+  /** Elimina el gasto. Si se pagó con una cuenta de ahorro, el retiro desaparece y la plata vuelve a la cuenta. */
   async remove(id: string): Promise<void> {
-    await expenseRepository.remove(id);
+    const db = await getDb();
+    await db.transaction(async () => {
+      await savingsRepository.removeMovementByExpense(id);
+      await expenseRepository.remove(id);
+    });
     notifyDataChanged();
   },
 

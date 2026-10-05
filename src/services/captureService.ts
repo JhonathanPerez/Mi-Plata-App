@@ -63,19 +63,24 @@ async function addIfNew(event: { pkg: string; title: string; text: string; time:
  * (comparando con el nombre de tus métodos). Devuelve null si no hay una coincidencia clara.
  */
 export function suggestPaymentMethodId(
-  methods: Array<Pick<PaymentMethod, 'id' | 'name' | 'last4' | 'isActive'>>,
+  methods: Array<Pick<PaymentMethod, 'id' | 'name' | 'last4' | 'isActive'> & Partial<Pick<PaymentMethod, 'savingsAccountId'>>>,
   hint: { bank: string | null; last4: string | null },
 ): string | null {
   const active = methods.filter((method) => method.isActive);
 
+  // Los últimos 4 dígitos identifican una tarjeta o una cuenta de ahorro del banco.
   if (hint.last4) {
     const byCard = active.filter((method) => method.last4 === hint.last4);
     if (byCard.length === 1) return byCard[0].id;
   }
 
+  // Por el nombre del banco solo se sugieren los métodos normales: una cuenta de ahorro se sugiere únicamente por sus 4 dígitos,
+  // porque un banco puede tener tarjeta y cuenta a la vez y adivinar movería plata de la cuenta equivocada.
+  const named = active.filter((method) => !method.savingsAccountId);
+
   const aliases = hint.bank ? BANK_ALIASES[hint.bank as BankKey] : undefined;
   if (aliases) {
-    const found = active.find((method) => {
+    const found = named.find((method) => {
       const words = normalizeText(method.name).split(/[^a-z0-9]+/).filter(Boolean);
       return aliases.some((alias) => words.includes(alias));
     });
