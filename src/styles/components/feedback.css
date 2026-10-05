@@ -223,6 +223,7 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-0);
+  overflow-wrap: anywhere;
 }
 
 .notice__title {
@@ -383,6 +384,7 @@
 .stat__foot {
   font-size: var(--fs-xs);
   color: var(--ink-2);
+  overflow-wrap: anywhere;
 }
 
 /* Cuadrículas de dos columnas: a 32 px una cifra de siete dígitos no cabe en 360 dp. */
