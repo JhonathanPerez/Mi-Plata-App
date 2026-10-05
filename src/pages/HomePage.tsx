@@ -5,12 +5,14 @@ import { BudgetStrip } from '@/components/charts/BudgetStrip';
 import { CategoryBars } from '@/components/charts/CategoryBars';
 import { BudgetSheet } from '@/components/expenses/BudgetSheet';
 import { ExpenseRow } from '@/components/expenses/ExpenseRow';
+import { EmojiTile } from '@/components/ui/EmojiTile';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { Icon } from '@/components/ui/Icon';
 import { Amount, Money } from '@/components/ui/Money';
 import { Notice } from '@/components/ui/Notice';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { PrivacyToggle } from '@/components/ui/PrivacyToggle';
+import { Row } from '@/components/ui/Row';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { Stat } from '@/components/ui/Stat';
 import { useQuery } from '@/hooks/useQuery';
@@ -23,6 +25,7 @@ import { pluralize } from '@/lib/text';
 import { DueSummaryCard } from '@/components/cards/DueSummaryCard';
 import { cardService } from '@/services/cardService';
 import { captureService } from '@/services/captureService';
+import { savingsService } from '@/services/savingsService';
 import { statsService } from '@/services/statsService';
 
 export function HomePage() {
@@ -30,6 +33,7 @@ export function HomePage() {
   const { data, loading, error } = useQuery(() => statsService.getDashboard());
   const { data: pendingCount } = useQuery(() => captureService.countPending());
   const { data: dueSummary } = useQuery(() => cardService.dueSummary());
+  const { data: saved } = useQuery(() => savingsService.totalSaved());
   const [budgetOpen, setBudgetOpen] = useState(false);
   const { cop } = useAmountFormat();
 
@@ -143,6 +147,21 @@ export function HomePage() {
 
       {dueSummary && dueSummary.total + dueSummary.other.total > 0 && (
         <DueSummaryCard summary={dueSummary} onPay={() => navigate('/tarjetas')} />
+      )}
+
+      {/* Cuentas de ahorro: lo que hay en total; tocar abre las cuentas. Sin cuentas, invita a agregar la primera. */}
+      {saved && (
+        <div className="card card--flush">
+          <Row
+            to="/ahorros"
+            tight
+            leading={<EmojiTile emoji="🏦" color="var(--primary)" />}
+            title="Cuentas de ahorro"
+            detail={saved.accounts > 0 ? `${saved.accounts} ${pluralize(saved.accounts, 'cuenta', 'cuentas')}` : 'Agrega tu primera cuenta de ahorro'}
+            amount={saved.accounts > 0 ? <Amount value={saved.total} /> : undefined}
+            chevron="chevronRight"
+          />
+        </div>
       )}
 
       {!hasSpending ? (

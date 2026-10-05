@@ -8,8 +8,10 @@ import {
   todayIso,
 } from '@/lib/dates';
 import { percentOf } from '@/lib/money';
+import { summarizeSavingsMonth, type SavingsMonthSummary } from '@/lib/savings';
 import { budgetRepository } from '@/repositories/budgetRepository';
 import { expenseRepository } from '@/repositories/expenseRepository';
+import { savingsRepository } from '@/repositories/savingsRepository';
 import type {
   CategoryTotal,
   DailyTotal,
@@ -152,5 +154,13 @@ export const statsService = {
       previousTransactions: previousTotals.count,
       changeAmount: totals.total - previousTotals.total,
     };
+  },
+
+  /** Lo que se ahorró en el mes (para la sección «Ahorros» de Estadísticas). */
+  async getSavingsMonth(yearMonth: YearMonth): Promise<SavingsMonthSummary> {
+    const { from, to } = monthRange(yearMonth);
+    const previous = monthRange(addMonths(yearMonth, -1));
+    const [accounts, movements] = await Promise.all([savingsRepository.listAccountsRaw(), savingsRepository.listMovementsRaw()]);
+    return summarizeSavingsMonth({ accounts, movements, from, to, previousFrom: previous.from, previousTo: previous.to });
   },
 };

@@ -1,0 +1,42 @@
+/* Ahorros: cuentas de ahorro, botones de meter y sacar plata, y el historial de movimientos. */
+
+/* Dos botones del mismo ancho bajo el saldo, sobre el fondo verde de la cabecera. */
+.savings-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-3);
+}
+
+.savings-actions .btn {
+  width: 100%;
+}
+
+/* Icono de la fila de un movimiento: «+» si entró plata, «−» si salió. No depende solo del color. */
+.savings-move__icon {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-s);
+}
+
+.savings-move__icon--deposit {
+  background: var(--primary-tint);
+  color: var(--primary);
+}
+
+.savings-move__icon--withdrawal {
+  background: var(--surface-2);
+  color: var(--ink-2);
+}
+
+/* El ingreso va en el color de la marca; el retiro, en el color normal del texto (sacar plata no es un error). */
+.savings-move__amount--deposit {
+  color: var(--primary);
+  font-weight: 700;
+}
+
+.savings-move__amount--withdrawal {
+  color: var(--ink);
+}

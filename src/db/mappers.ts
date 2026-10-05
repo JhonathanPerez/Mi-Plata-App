@@ -7,6 +7,9 @@ import type {
   PaymentMethodType,
   PendingCapture,
   PendingCaptureStatus,
+  SavingsAccount,
+  SavingsMovement,
+  SavingsMovementKind,
 } from '@/types/models';
 import { parseCycleRules } from '@/lib/cycles';
 import type { Row } from './types';
@@ -41,6 +44,8 @@ export function toPaymentMethod(row: Row): PaymentMethod {
     cutoffDay: toNullableNumber(row.cutoff_day),
     dueDay: toNullableNumber(row.due_day),
     cycle: parseCycleRules(row.cycle_rules === null || row.cycle_rules === undefined ? null : String(row.cycle_rules)),
+    savingsAccountId:
+      row.savings_account_id === null || row.savings_account_id === undefined ? null : String(row.savings_account_id),
     createdAt: String(row.created_at),
     updatedAt: String(row.updated_at),
   };
@@ -99,5 +104,32 @@ export function toPendingCapture(row: Row): PendingCapture {
     status: String(row.status) as PendingCaptureStatus,
     createdAt: String(row.created_at),
     resolvedAt: nullableText(row.resolved_at),
+  };
+}
+
+export function toSavingsAccount(row: Row): SavingsAccount {
+  return {
+    id: String(row.id),
+    name: String(row.name),
+    last4: row.last4 === null || row.last4 === undefined ? null : String(row.last4),
+    icon: String(row.icon),
+    color: String(row.color),
+    isActive: Number(row.is_active) === 1,
+    sortOrder: Number(row.sort_order),
+    createdAt: String(row.created_at),
+    updatedAt: String(row.updated_at),
+  };
+}
+
+export function toSavingsMovement(row: Row): SavingsMovement {
+  return {
+    id: String(row.id),
+    accountId: String(row.account_id),
+    kind: String(row.kind) as SavingsMovementKind,
+    amount: Number(row.amount),
+    date: String(row.movement_date),
+    note: row.note === null || row.note === undefined ? null : String(row.note),
+    expenseId: row.expense_id === null || row.expense_id === undefined ? null : String(row.expense_id),
+    createdAt: String(row.created_at),
   };
 }

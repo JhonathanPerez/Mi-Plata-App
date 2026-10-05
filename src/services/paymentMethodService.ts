@@ -64,6 +64,7 @@ export const paymentMethodService = {
       cutoffDay: null,
       dueDay: null,
       cycle: null,
+      savingsAccountId: null,
       createdAt: now,
       updatedAt: now,
     };

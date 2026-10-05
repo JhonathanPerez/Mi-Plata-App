@@ -10,8 +10,17 @@ import { budgetRepository } from '@/repositories/budgetRepository';
 import { categoryRepository } from '@/repositories/categoryRepository';
 import { expenseRepository } from '@/repositories/expenseRepository';
 import { paymentMethodRepository } from '@/repositories/paymentMethodRepository';
+import { savingsRepository } from '@/repositories/savingsRepository';
 import { settingsRepository } from '@/repositories/settingsRepository';
-import type { Budget, Category, Expense, PaymentMethod, PaymentMethodType } from '@/types/models';
+import type {
+  Budget,
+  Category,
+  Expense,
+  PaymentMethod,
+  PaymentMethodType,
+  SavingsAccount,
+  SavingsMovement,
+} from '@/types/models';
 
 export interface BackupFile {
   format: string;
@@ -69,6 +78,7 @@ function readMethod(raw: unknown, index: number): PaymentMethod {
     cutoffDay: asNullableNumber(raw.cutoffDay),
     dueDay: asNullableNumber(raw.dueDay),
     cycle: isCycleRules(raw.cycle) ? raw.cycle : null,
+    savingsAccountId: isText(raw.savingsAccountId) ? raw.savingsAccountId : null,
     createdAt: asStamp(raw.createdAt),
     updatedAt: asStamp(raw.updatedAt),
   };
@@ -96,6 +106,43 @@ function readExpense(raw: unknown, index: number): Expense {
     paidAt,
     createdAt: asStamp(raw.createdAt),
     updatedAt: asStamp(raw.updatedAt),
+  };
+}
+
+function readSavingsAccount(raw: unknown, index: number): SavingsAccount {
+  if (!isRecord(raw) || !isText(raw.id) || !isText(raw.name) || !isText(raw.icon) || !isText(raw.color)) {
+    return fail('cuenta de ahorro', index);
+  }
+  return {
+    id: raw.id,
+    name: raw.name,
+    last4: typeof raw.last4 === 'string' && /^\d{4}$/.test(raw.last4) ? raw.last4 : null,
+    icon: raw.icon,
+    color: raw.color,
+    isActive: raw.isActive !== false,
+    sortOrder: typeof raw.sortOrder === 'number' ? raw.sortOrder : index,
+    createdAt: asStamp(raw.createdAt),
+    updatedAt: asStamp(raw.updatedAt),
+  };
+}
+
+function readSavingsMovement(raw: unknown, index: number): SavingsMovement {
+  if (
+    !isRecord(raw) || !isText(raw.id) || !isText(raw.accountId) || (raw.kind !== 'deposit' && raw.kind !== 'withdrawal') ||
+    typeof raw.amount !== 'number' || !Number.isInteger(raw.amount) || raw.amount <= 0 || raw.amount > MAX_AMOUNT ||
+    typeof raw.date !== 'string' || !isValidIsoDate(raw.date)
+  ) {
+    return fail('movimiento de ahorro', index);
+  }
+  return {
+    id: raw.id,
+    accountId: raw.accountId,
+    kind: raw.kind,
+    amount: raw.amount,
+    date: raw.date,
+    note: typeof raw.note === 'string' && raw.note.trim() ? raw.note : null,
+    expenseId: isText(raw.expenseId) ? raw.expenseId : null,
+    createdAt: asStamp(raw.createdAt),
   };
 }
 
@@ -154,6 +201,9 @@ export function parseBackup(text: string): BackupFile {
   const expenses = list(raw.data.expenses, 'gastos').map(readExpense);
   const budgets = list(raw.data.budgets, 'presupuestos').map(readBudget);
   const cardStatementDates = (Array.isArray(raw.data.cardStatementDates) ? raw.data.cardStatementDates : []).map(readStatementDates);
+  // Las copias anteriores a la v3 no traen cuentas de ahorro.
+  const savingsAccounts = (Array.isArray(raw.data.savingsAccounts) ? raw.data.savingsAccounts : []).map(readSavingsAccount);
+  const savingsMovements = (Array.isArray(raw.data.savingsMovements) ? raw.data.savingsMovements : []).map(readSavingsMovement);
   const settings = (Array.isArray(raw.data.settings) ? raw.data.settings : [])
     .filter((item): item is Json => isRecord(item) && isText(item.key) && typeof item.value === 'string')
     .map((item) => ({ key: String(item.key), value: String(item.value) }));
@@ -164,12 +214,31 @@ export function parseBackup(text: string): BackupFile {
   assertUnique(paymentMethods.map((m) => m.name.toLowerCase()), 'La copia tiene métodos de pago con el mismo nombre.');
   assertUnique(expenses.map((e) => e.id), 'La copia tiene gastos repetidos.');
   assertUnique(budgets.map((b) => b.yearMonth), 'La copia tiene presupuestos repetidos.');
+  assertUnique(savingsAccounts.map((a) => a.id), 'La copia tiene cuentas de ahorro repetidas.');
+  assertUnique(savingsAccounts.map((a) => a.name.toLowerCase()), 'La copia tiene cuentas de ahorro con el mismo nombre.');
+  assertUnique(savingsMovements.map((m) => m.id), 'La copia tiene movimientos de ahorro repetidos.');
 
   const categoryIds = new Set(categories.map((c) => c.id));
   const methodIds = new Set(paymentMethods.map((m) => m.id));
   expenses.forEach((expense, index) => {
     if (!categoryIds.has(expense.categoryId) || !methodIds.has(expense.paymentMethodId)) fail('gasto', index);
   });
+  const accountIds = new Set(savingsAccounts.map((a) => a.id));
+  const expenseIds = new Set(expenses.map((e) => e.id));
+  paymentMethods.forEach((method, index) => {
+    if (method.savingsAccountId && !accountIds.has(method.savingsAccountId)) fail('método de pago', index);
+  });
+  assertUnique(
+    paymentMethods.filter((m) => m.savingsAccountId).map((m) => m.savingsAccountId as string),
+    'La copia tiene dos métodos de pago para la misma cuenta de ahorro.',
+  );
+  savingsMovements.forEach((movement, index) => {
+    if (!accountIds.has(movement.accountId) || (movement.expenseId && !expenseIds.has(movement.expenseId))) fail('movimiento de ahorro', index);
+  });
+  assertUnique(
+    savingsMovements.filter((m) => m.expenseId).map((m) => m.expenseId as string),
+    'La copia tiene dos retiros para el mismo gasto.',
+  );
   cardStatementDates.forEach((item, index) => {
     if (!methodIds.has(item.paymentMethodId)) fail('fechas de extracto', index);
   });
@@ -180,26 +249,28 @@ export function parseBackup(text: string): BackupFile {
     version: raw.version,
     app: typeof raw.app === 'string' ? raw.app : APP_NAME,
     exportedAt: typeof raw.exportedAt === 'string' ? raw.exportedAt : nowIso(),
-    data: { categories, paymentMethods, expenses, budgets, settings, cardStatementDates },
+    data: { categories, paymentMethods, expenses, budgets, settings, cardStatementDates, savingsAccounts, savingsMovements },
   };
 }
 
 export const backupService = {
   async createBackup(): Promise<BackupFile> {
-    const [categories, paymentMethods, expenses, budgets, settings, cardStatementDates] = await Promise.all([
+    const [categories, paymentMethods, expenses, budgets, settings, cardStatementDates, savingsAccounts, savingsMovements] = await Promise.all([
       categoryRepository.list(true),
       paymentMethodRepository.list(true),
       expenseRepository.listAllRaw(),
       budgetRepository.listAll(),
       settingsRepository.listAll(),
       cardCycleRepository.listAll(),
+      savingsRepository.listAccountsRaw(),
+      savingsRepository.listMovementsRaw(),
     ]);
     return {
       format: BACKUP_FORMAT,
       version: BACKUP_VERSION,
       app: APP_NAME,
       exportedAt: nowIso(),
-      data: { categories, paymentMethods, expenses, budgets, settings, cardStatementDates },
+      data: { categories, paymentMethods, expenses, budgets, settings, cardStatementDates, savingsAccounts, savingsMovements },
     };
   },
 

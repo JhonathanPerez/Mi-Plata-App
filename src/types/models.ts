@@ -40,6 +40,11 @@ export interface PaymentMethod {
   dueDay: number | null;
   /** Reglas de corte y pago de una tarjeta de crédito; null = sin configurar. */
   cycle: CycleRules | null;
+  /**
+   * Si no es null, este método es el «espejo» de una cuenta de ahorro: pagar con él descuenta de esa cuenta.
+   * Lo administra el servicio de ahorros; no aparece en «Métodos de pago».
+   */
+  savingsAccountId: Id | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -170,4 +175,56 @@ export interface PendingCapture {
   status: PendingCaptureStatus;
   createdAt: string;
   resolvedAt: string | null;
+}
+
+export type SavingsMovementKind = 'deposit' | 'withdrawal';
+
+/** Cuenta de ahorro de un banco o billetera (Bancolombia, Nequi, Davivienda…). */
+export interface SavingsAccount {
+  id: Id;
+  name: string;
+  /** Solo los últimos 4 dígitos (opcional). Nunca se guarda el número completo. */
+  last4: string | null;
+  icon: string;
+  color: string;
+  isActive: boolean;
+  sortOrder: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+/** Cuenta con su saldo (suma de ingresos menos retiros) y la cantidad de movimientos. */
+export interface SavingsAccountWithBalance extends SavingsAccount {
+  /** Pesos colombianos enteros. */
+  balance: number;
+  movementCount: number;
+}
+
+export interface SavingsMovement {
+  id: Id;
+  accountId: Id;
+  kind: SavingsMovementKind;
+  /** Pesos colombianos enteros, siempre positivos: el signo lo da `kind`. */
+  amount: number;
+  date: IsoDate;
+  note: string | null;
+  /** Gasto que se pagó con este retiro; null en los movimientos manuales. */
+  expenseId: Id | null;
+  createdAt: string;
+}
+
+export interface SavingsAccountInput {
+  name: string;
+  last4: string | null;
+  icon: string;
+  color: string;
+  isActive: boolean;
+}
+
+export interface SavingsMovementInput {
+  accountId: Id;
+  kind: SavingsMovementKind;
+  amount: number;
+  date: IsoDate;
+  note: string | null;
 }

@@ -39,6 +39,11 @@ interface RowProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'title'
   variant?: 'list' | 'flush' | 'card';
   /** `start` pega el contenido arriba; útil cuando hay líneas de texto que pueden ocupar varios renglones. */
   align?: 'center' | 'start';
+  /**
+   * Menos espacio entre las piezas de la fila. Para cuando el título compite con una cifra ancha ($1.950.000) y,
+   * con el espacio normal, se partiría en dos renglones.
+   */
+  tight?: boolean;
   tone?: 'default' | 'danger';
   selected?: boolean;
   /** La fila abre algo al mantenerla presionada: evita que se seleccione el texto o salga el menú del sistema. */
@@ -60,6 +65,7 @@ export function Row({
   chevron,
   variant = 'list',
   align = 'center',
+  tight,
   tone = 'default',
   selected,
   holdable,
@@ -74,6 +80,7 @@ export function Row({
         'row',
         `row--${variant}`,
         align === 'start' && 'row--start',
+        tight && 'row--tight',
         tone === 'danger' && 'row--danger',
         holdable && 'row--holdable',
         !to && as === 'div' && 'row--static',

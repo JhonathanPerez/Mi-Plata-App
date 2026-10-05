@@ -4,7 +4,7 @@ import { serializeCycleRules } from '@/lib/cycles';
 import type { PaymentMethod, PaymentMethodWithCount } from '@/types/models';
 
 const COLUMNS =
-  'id, name, type, icon, color, last4, is_active, sort_order, credit_limit, cutoff_day, due_day, cycle_rules, created_at, updated_at';
+  'id, name, type, icon, color, last4, is_active, sort_order, credit_limit, cutoff_day, due_day, cycle_rules, savings_account_id, created_at, updated_at';
 
 export const paymentMethodRepository = {
   async list(includeInactive = false): Promise<PaymentMethod[]> {
@@ -18,9 +18,10 @@ export const paymentMethodRepository = {
     const db = await getDb();
     const rows = await db.query(
       `SELECT p.id, p.name, p.type, p.icon, p.color, p.last4, p.is_active, p.sort_order,
-              p.credit_limit, p.cutoff_day, p.due_day, p.cycle_rules, p.created_at, p.updated_at,
+              p.credit_limit, p.cutoff_day, p.due_day, p.cycle_rules, p.savings_account_id, p.created_at, p.updated_at,
               (SELECT COUNT(*) FROM expenses e WHERE e.payment_method_id = p.id) AS expense_count
        FROM payment_methods p
+       WHERE p.savings_account_id IS NULL
        ORDER BY p.sort_order, p.name`,
     );
     return rows.map((row) => ({ ...toPaymentMethod(row), expenseCount: Number(row.expense_count) }));
@@ -38,6 +39,13 @@ export const paymentMethodRepository = {
     return rows.length ? toPaymentMethod(rows[0]) : null;
   },
 
+  /** El método «espejo» de una cuenta de ahorro. */
+  async getBySavingsAccount(accountId: string): Promise<PaymentMethod | null> {
+    const db = await getDb();
+    const rows = await db.query(`SELECT ${COLUMNS} FROM payment_methods WHERE savings_account_id = ?`, [accountId]);
+    return rows.length ? toPaymentMethod(rows[0]) : null;
+  },
+
   async nextSortOrder(): Promise<number> {
     const db = await getDb();
     const rows = await db.query('SELECT COALESCE(MAX(sort_order), -1) + 1 AS next FROM payment_methods');
@@ -46,7 +54,7 @@ export const paymentMethodRepository = {
 
   async insert(method: PaymentMethod): Promise<void> {
     const db = await getDb();
-    await db.run(`INSERT INTO payment_methods (${COLUMNS}) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`, [
+    await db.run(`INSERT INTO payment_methods (${COLUMNS}) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`, [
       method.id,
       method.name,
       method.type,
@@ -59,6 +67,7 @@ export const paymentMethodRepository = {
       method.cutoffDay,
       method.dueDay,
       method.cycle ? serializeCycleRules(method.cycle) : null,
+      method.savingsAccountId,
       method.createdAt,
       method.updatedAt,
     ]);
@@ -69,7 +78,7 @@ export const paymentMethodRepository = {
     await db.run(
       `UPDATE payment_methods
          SET name = ?, type = ?, icon = ?, color = ?, last4 = ?, is_active = ?, sort_order = ?,
-             credit_limit = ?, cutoff_day = ?, due_day = ?, cycle_rules = ?, updated_at = ?
+             credit_limit = ?, cutoff_day = ?, due_day = ?, cycle_rules = ?, savings_account_id = ?, updated_at = ?
        WHERE id = ?`,
       [
         method.name,
@@ -83,6 +92,7 @@ export const paymentMethodRepository = {
         method.cutoffDay,
         method.dueDay,
         method.cycle ? serializeCycleRules(method.cycle) : null,
+        method.savingsAccountId,
         method.updatedAt,
         method.id,
       ],

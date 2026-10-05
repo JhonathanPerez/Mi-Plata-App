@@ -15,6 +15,8 @@ import { PaymentRemindersPage } from '@/pages/PaymentRemindersPage';
 import { PaymentMethodsPage } from '@/pages/PaymentMethodsPage';
 import { PendingPage } from '@/pages/PendingPage';
 import { PendingRemindersPage } from '@/pages/PendingRemindersPage';
+import { SavingsAccountPage } from '@/pages/SavingsAccountPage';
+import { SavingsPage } from '@/pages/SavingsPage';
 import { StatementsPage } from '@/pages/StatementsPage';
 import { TrackedAppsPage } from '@/pages/TrackedAppsPage';
 import { SettingsPage } from '@/pages/SettingsPage';
@@ -57,6 +59,8 @@ export function App() {
                   <Route path="gasto/nuevo" element={<PageTransition><ExpenseFormPage /></PageTransition>} />
                   <Route path="gasto/:id" element={<PageTransition><ExpenseFormPage /></PageTransition>} />
                   <Route path="pendientes" element={<PageTransition><PendingPage /></PageTransition>} />
+                  <Route path="ahorros" element={<PageTransition><SavingsPage /></PageTransition>} />
+                  <Route path="ahorros/:id" element={<PageTransition><SavingsAccountPage /></PageTransition>} />
                   <Route path="tarjetas" element={<PageTransition><CardsPage /></PageTransition>} />
                   <Route path="tarjetas/:id/pagar" element={<PageTransition><PayCardPage /></PageTransition>} />
                   <Route path="tarjetas/:id/extractos" element={<PageTransition><StatementsPage /></PageTransition>} />

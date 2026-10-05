@@ -176,7 +176,10 @@ export async function importRows(rows: ParsedImportRow[]): Promise<Omit<ImportRe
     const categories = new Map<string, Category>();
     (await categoryRepository.list(true)).forEach((c) => categories.set(normalizeText(c.name), c));
     const methods = new Map<string, PaymentMethod>();
-    (await paymentMethodRepository.list(true)).forEach((m) => methods.set(normalizeText(m.name), m));
+    // Los métodos «espejo» de las cuentas de ahorro no se usan al importar: un gasto importado no descuenta de ninguna cuenta.
+    const allMethods = await paymentMethodRepository.list(true);
+    allMethods.filter((m) => m.savingsAccountId === null).forEach((m) => methods.set(normalizeText(m.name), m));
+    const savingsNames = new Set(allMethods.filter((m) => m.savingsAccountId !== null).map((m) => normalizeText(m.name)));
 
     let categoryOrder = await categoryRepository.nextSortOrder();
     let methodOrder = await paymentMethodRepository.nextSortOrder();
@@ -204,11 +207,13 @@ export async function importRows(rows: ParsedImportRow[]): Promise<Omit<ImportRe
       const found = methods.get(key);
       if (found) return found;
       const isCash = key === 'efectivo';
+      // El nombre de una cuenta de ahorro ya está tomado (los nombres de métodos no se repiten): el método importado lleva una marca.
+      const uniqueName = savingsNames.has(key) ? shorten(`${name.slice(0, NAME_MAX_LENGTH - 12)} (importado)`, name) : name;
       const created: PaymentMethod = {
-        id: newId(), name, type: isCash ? 'cash' : 'other', icon: isCash ? '💵' : DEFAULT_PAYMENT_ICON,
+        id: newId(), name: uniqueName, type: isCash ? 'cash' : 'other', icon: isCash ? '💵' : DEFAULT_PAYMENT_ICON,
         color: CATEGORY_COLORS[(methods.size + createdMethods + 4) % CATEGORY_COLORS.length],
         last4: null, isActive: true, sortOrder: methodOrder++,
-        creditLimit: null, cutoffDay: null, dueDay: null, cycle: null, createdAt: now, updatedAt: now,
+        creditLimit: null, cutoffDay: null, dueDay: null, cycle: null, savingsAccountId: null, createdAt: now, updatedAt: now,
       };
       await paymentMethodRepository.insert(created);
       methods.set(key, created);

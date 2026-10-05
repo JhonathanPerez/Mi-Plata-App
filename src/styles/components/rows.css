@@ -69,6 +69,11 @@
   align-items: flex-start;
 }
 
+/* Menos espacio entre piezas: deja más ancho al título cuando a su lado va una cifra larga. */
+.row--tight {
+  gap: var(--space-3);
+}
+
 /* Fila que solo muestra datos (no se toca) y fila que envuelve una casilla. */
 .row--label {
   cursor: pointer;

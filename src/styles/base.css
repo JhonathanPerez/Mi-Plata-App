@@ -144,6 +144,18 @@ ul {
   display: flex;
   align-items: baseline;
   justify-content: space-between;
+  gap: var(--space-3);
+}
+
+/* El enlace de la cabecera ocupa lo que mide su texto y en una sola línea; es el título (y su ayuda) el que cede y se acomoda. */
+.section__head > .link {
+  flex: none;
+  white-space: nowrap;
+}
+
+.section__head > .section__heading {
+  flex: 1;
+  min-width: 0;
 }
 
 .section__title {

@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useLocation, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { useConfirm } from '@/app/providers/ConfirmProvider';
+import { useAmountFormat } from '@/app/providers/PrivacyProvider';
 import { useToast } from '@/app/providers/ToastProvider';
 import { haptics } from '@/lib/haptics';
 import { Button, IconButton } from '@/components/ui/Button';
@@ -16,13 +17,15 @@ import { Segmented } from '@/components/ui/Segmented';
 import { NOTE_MAX_LENGTH } from '@/config/constants';
 import { useQuery } from '@/hooks/useQuery';
 import { todayIso } from '@/lib/dates';
-import { errorMessage } from '@/lib/errors';
+import { errorMessage, ValidationError } from '@/lib/errors';
 import { pushBackHandler } from '@/lib/backStack';
 import { describePaymentMethod, statusHint } from '@/lib/payment';
+import { describeAccount } from '@/lib/savings';
 import { captureService, suggestPaymentMethodId } from '@/services/captureService';
 import { categoryService } from '@/services/categoryService';
 import { expenseService, validateExpenseInput, type ExpenseFieldErrors } from '@/services/expenseService';
 import { paymentMethodService } from '@/services/paymentMethodService';
+import { savingsService } from '@/services/savingsService';
 import { settingsService } from '@/services/settingsService';
 import type { ExpenseInput } from '@/types/models';
 
@@ -37,14 +40,15 @@ interface FormValues {
 }
 
 async function loadFormData(id: string | undefined, pendingId: string | null) {
-  const [categories, methods, lastMethodId, existing, pending] = await Promise.all([
+  const [categories, methods, accounts, lastMethodId, existing, pending] = await Promise.all([
     categoryService.list(true),
     paymentMethodService.list(true),
+    savingsService.listAccounts(true),
     settingsService.getLastPaymentMethodId(),
     id ? expenseService.getById(id) : Promise.resolve(null),
     pendingId ? captureService.getPending(pendingId) : Promise.resolve(null),
   ]);
-  return { categories, methods, lastMethodId, existing, pending };
+  return { categories, methods, accounts, lastMethodId, existing, pending };
 }
 
 export function ExpenseFormPage() {
@@ -56,6 +60,7 @@ export function ExpenseFormPage() {
   const location = useLocation();
   const toast = useToast();
   const confirm = useConfirm();
+  const { cop } = useAmountFormat();
   const { data, loading } = useQuery(() => loadFormData(id, pendingId), [id, pendingId]);
 
   const [amount, setAmount] = useState(0);
@@ -129,13 +134,20 @@ export function ExpenseFormPage() {
     () => (data?.categories ?? []).filter((c) => c.isActive || c.id === categoryId),
     [data, categoryId],
   );
-  const methods = useMemo(
-    () => (data?.methods ?? []).filter((m) => m.isActive || m.id === methodId),
-    [data, methodId],
-  );
+  // Los métodos normales primero y, después, las cuentas de ahorro (cada una es un método «espejo» de su cuenta).
+  const methods = useMemo(() => {
+    const visible = (data?.methods ?? []).filter((m) => m.isActive || m.id === methodId);
+    return [...visible.filter((m) => !m.savingsAccountId), ...visible.filter((m) => m.savingsAccountId)];
+  }, [data, methodId]);
+  const balances = useMemo(() => new Map((data?.accounts ?? []).map((account) => [account.id, account.balance])), [data]);
 
   const categoryOptions: PickerOption[] = categories.map((c) => ({ id: c.id, icon: c.icon, color: c.color, name: c.name }));
   const methodOptions: PickerOption[] = methods.map((m) => {
+    if (m.savingsAccountId) {
+      // Al editar un gasto ya pagado con esta cuenta, su propio valor ya salió del saldo: se suma para mostrar lo que de verdad hay disponible.
+      const returning = data?.existing?.paymentMethodId === m.id ? (data?.existing?.amount ?? 0) : 0;
+      return { id: m.id, icon: m.icon, color: m.color, name: m.name, description: `${describeAccount(m.last4)} · Saldo ${cop((balances.get(m.savingsAccountId) ?? 0) + returning)}` };
+    }
     const description = describePaymentMethod(m.type, m.last4);
     // Si el nombre ya dice lo mismo ("Efectivo"), no se repite en la segunda línea.
     return {
@@ -148,6 +160,8 @@ export function ExpenseFormPage() {
   });
   const selectedCategory = categoryOptions.find((o) => o.id === categoryId) ?? null;
   const selectedMethod = methodOptions.find((o) => o.id === methodId) ?? null;
+  // Pagar con una cuenta de ahorro: el gasto sale de su saldo y queda pagado, así que no se pregunta el estado.
+  const savingsMethod = methods.find((m) => m.id === methodId && m.savingsAccountId) ?? null;
 
   // Cambios sin guardar. El estado «pagado» solo cuenta al editar: en un gasto nuevo se sugiere solo según el método.
   const hasChanges =
@@ -233,7 +247,13 @@ export function ExpenseFormPage() {
         else navigate('/', { replace: true });
       }, 850);
     } catch (error) {
-      toast.show(errorMessage(error), 'error');
+      // Saldo insuficiente: el mensaje se muestra bajo el valor, que es lo que hay que corregir.
+      if (error instanceof ValidationError && error.field === 'amount') {
+        setErrors({ amount: error.message });
+        setTimeout(() => document.querySelector('.field__error')?.scrollIntoView({ block: 'center', behavior: 'smooth' }), 60);
+      } else {
+        toast.show(errorMessage(error), 'error');
+      }
       setSaving(false);
     }
   };
@@ -242,7 +262,9 @@ export function ExpenseFormPage() {
     if (!id) return;
     const ok = await confirm({
       title: '¿Eliminar este gasto?',
-      message: 'Se quitará de tu historial y de tus estadísticas. Esta acción no se puede deshacer.',
+      message: savingsMethod
+        ? `Se quitará de tu historial y de tus estadísticas, y la plata volverá a «${savingsMethod.name}». Esta acción no se puede deshacer.`
+        : 'Se quitará de tu historial y de tus estadísticas. Esta acción no se puede deshacer.',
       confirmLabel: 'Eliminar',
       danger: true,
     });
@@ -319,24 +341,30 @@ export function ExpenseFormPage() {
             onOpen={() => setPicker('method')}
           />
 
-          <div className="field">
-            <span className="field__label">Estado</span>
-            <Segmented<string>
-              label="Estado del gasto"
-              value={paid ? 'paid' : 'due'}
-              onChange={(value) => {
-                statusTouched.current = true;
-                setPaid(value === 'paid');
-              }}
-              options={[
-                { value: 'paid', label: 'Pagado' },
-                { value: 'due', label: 'Por pagar' },
-              ]}
-            />
-            <Notice tone={paid ? 'info' : 'warning'} icon={paid ? 'check' : 'info'}>
-              {statusHint(paid, methodType)}
+          {savingsMethod ? (
+            <Notice tone="info" icon="piggy" title="Se descuenta de tu cuenta de ahorro">
+              {isEdit ? 'El gasto queda pagado y el cambio se refleja en los movimientos de' : 'El gasto queda pagado y el retiro aparece en los movimientos de'} «{savingsMethod.name}».
             </Notice>
-          </div>
+          ) : (
+            <div className="field">
+              <span className="field__label">Estado</span>
+              <Segmented<string>
+                label="Estado del gasto"
+                value={paid ? 'paid' : 'due'}
+                onChange={(value) => {
+                  statusTouched.current = true;
+                  setPaid(value === 'paid');
+                }}
+                options={[
+                  { value: 'paid', label: 'Pagado' },
+                  { value: 'due', label: 'Por pagar' },
+                ]}
+              />
+              <Notice tone={paid ? 'info' : 'warning'} icon={paid ? 'check' : 'info'}>
+                {statusHint(paid, methodType)}
+              </Notice>
+            </div>
+          )}
 
           <div className="form__footer">
             <Button type="submit" size="lg" block loading={saving} icon="check">

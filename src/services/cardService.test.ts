@@ -190,7 +190,7 @@ suite('estado pagado / por pagar y extractos de tarjeta', () => {
 
   it('el respaldo conserva estados, reglas y fechas fijas, y una copia antigua se restaura como pagada', async () => {
     const backup = await backupService.createBackup();
-    expect(backup.version).toBe(2);
+    expect(backup.version).toBe(3);
     expect(backup.data.cardStatementDates.length).toBeGreaterThan(0);
     const dueBefore = (await expenseService.list({ status: 'due' })).length;
 

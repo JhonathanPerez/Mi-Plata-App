@@ -17,9 +17,23 @@ describe('formatCOP', () => {
 describe('formatCOPCompact', () => {
   it('abrevia miles y millones', () => {
     expect(formatCOPCompact(350000)).toBe('$350 mil');
-    expect(formatCOPCompact(1250000)).toBe('$1,3 M');
+    expect(formatCOPCompact(1250000)).toBe('$1,25 M');
     expect(formatCOPCompact(2000000)).toBe('$2 M');
     expect(formatCOPCompact(900)).toBe('$900');
+  });
+  it('no redondea los millones hasta cambiar la cifra a ojo', () => {
+    expect(formatCOPCompact(1950000)).toBe('$1,95 M');
+    expect(formatCOPCompact(1000000)).toBe('$1 M');
+    expect(formatCOPCompact(9990000)).toBe('$9,99 M');
+    expect(formatCOPCompact(18750000)).toBe('$18,8 M');
+    expect(formatCOPCompact(123456789)).toBe('$123 M');
+  });
+  it('cerca del millón sube de mil a millón sin escribir «$1000 mil»', () => {
+    expect(formatCOPCompact(999499)).toBe('$999 mil');
+    expect(formatCOPCompact(999500)).toBe('$1 M');
+  });
+  it('maneja negativos', () => {
+    expect(formatCOPCompact(-1950000)).toBe('-$1,95 M');
   });
 });
 

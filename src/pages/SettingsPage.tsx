@@ -23,6 +23,7 @@ import { backupService, parseBackup } from '@/services/backupService';
 import { budgetService } from '@/services/budgetService';
 import { captureAppsService } from '@/services/captureAppsService';
 import { captureService } from '@/services/captureService';
+import { savingsService } from '@/services/savingsService';
 import { importService } from '@/services/importService';
 import { lockService } from '@/services/lockService';
 import type { ThemeMode } from '@/types/models';
@@ -80,6 +81,7 @@ export function SettingsPage() {
   const yearMonth = currentYearMonth();
   const { data: budget } = useQuery(() => budgetService.getAmount(yearMonth), [yearMonth]);
   const { data: lock } = useQuery(() => lockService.getConfig());
+  const { data: saved } = useQuery(() => savingsService.totalSaved());
   const { data: pendingCount } = useQuery(() => captureService.countPending());
   const { data: trackedApps } = useQuery(() => captureAppsService.getSelected());
   const reminders = useReminderStatus();
@@ -161,6 +163,13 @@ export function SettingsPage() {
         />
         <Row to="/ajustes/categorias" icon="tag" title="Categorías" detail="Crear y editar" chevron="chevronRight" />
         <Row to="/ajustes/metodos" icon="card" title="Métodos de pago" detail="Efectivo y tarjetas" chevron="chevronRight" />
+        <Row
+          to="/ahorros"
+          icon="piggy"
+          title="Cuentas de ahorro"
+          detail={saved ? (saved.accounts > 0 ? `${saved.accounts} ${pluralize(saved.accounts, 'cuenta', 'cuentas')}` : 'Tus cuentas de bancos') : undefined}
+          chevron="chevronRight"
+        />
         <Row to="/tarjetas" icon="calendar" title="Tarjetas y extractos" detail="Cortes, pagos y qué debes" chevron="chevronRight" />
       </Group>
 

@@ -134,6 +134,11 @@ describe('suggestPaymentMethodId', () => {
     expect(suggestPaymentMethodId(methods, { bank: 'davivienda', last4: null })).toBe('pm_davibank');
     expect(suggestPaymentMethodId(methods, { bank: 'nubank', last4: '0000' })).toBe('pm_nubank');
   });
+  it('una cuenta de ahorro no se sugiere por el nombre del banco, solo por sus últimos 4 dígitos', () => {
+    const withSavings = [...methods, { id: 'pm_ahorro', name: 'Nequi ahorro', last4: '5555', isActive: true, savingsAccountId: 'acc1' }];
+    expect(suggestPaymentMethodId(withSavings, { bank: 'nequi', last4: null })).toBeNull();
+    expect(suggestPaymentMethodId(withSavings, { bank: 'nequi', last4: '5555' })).toBe('pm_ahorro');
+  });
   it('ignora métodos ocultos y devuelve null sin coincidencia clara', () => {
     expect(suggestPaymentMethodId(methods, { bank: 'bancolombia', last4: null })).toBeNull();
     expect(suggestPaymentMethodId(methods, { bank: null, last4: null })).toBeNull();
