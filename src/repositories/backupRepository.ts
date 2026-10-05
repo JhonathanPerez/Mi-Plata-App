@@ -1,7 +1,7 @@
 import { SETTING_KEYS } from '@/config/constants';
 import { getDb } from '@/db/connection';
 import { serializeCycleRules } from '@/lib/cycles';
-import type { Budget, Category, Expense, PaymentMethod } from '@/types/models';
+import type { Budget, Category, Expense, PaymentMethod, SavingsAccount, SavingsMovement } from '@/types/models';
 import type { StoredStatementDates } from './cardCycleRepository';
 
 export interface BackupData {
@@ -12,6 +12,9 @@ export interface BackupData {
   settings: Array<{ key: string; value: string }>;
   /** Fechas de extractos ajustadas o fijadas al pagar (copias antiguas no las traen). */
   cardStatementDates: StoredStatementDates[];
+  /** Cuentas de ahorro y sus movimientos (copias anteriores a la v3 no los traen). */
+  savingsAccounts: SavingsAccount[];
+  savingsMovements: SavingsMovement[];
 }
 
 export const backupRepository = {
@@ -19,11 +22,13 @@ export const backupRepository = {
   async replaceAll(data: BackupData): Promise<void> {
     const db = await getDb();
     await db.transaction(async () => {
+      await db.run('DELETE FROM savings_movements');
       await db.run('DELETE FROM card_statement_dates');
       await db.run('DELETE FROM expenses');
       await db.run('DELETE FROM budgets');
       await db.run('DELETE FROM categories');
       await db.run('DELETE FROM payment_methods');
+      await db.run('DELETE FROM savings_accounts');
       await db.run('DELETE FROM settings');
 
       await db.runMany(
@@ -33,18 +38,28 @@ export const backupRepository = {
       );
       await db.runMany(
         `INSERT INTO payment_methods
-           (id, name, type, icon, color, last4, is_active, sort_order, credit_limit, cutoff_day, due_day, cycle_rules, created_at, updated_at)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+           (id, name, type, icon, color, last4, is_active, sort_order, credit_limit, cutoff_day, due_day, cycle_rules, savings_account_id, created_at, updated_at)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
         data.paymentMethods.map((m) => [
           m.id, m.name, m.type, m.icon, m.color, m.last4, m.isActive ? 1 : 0, m.sortOrder,
-          m.creditLimit, m.cutoffDay, m.dueDay, m.cycle ? serializeCycleRules(m.cycle) : null, m.createdAt, m.updatedAt,
+          m.creditLimit, m.cutoffDay, m.dueDay, m.cycle ? serializeCycleRules(m.cycle) : null, m.savingsAccountId, m.createdAt, m.updatedAt,
         ]),
+      );
+      await db.runMany(
+        `INSERT INTO savings_accounts (id, name, last4, icon, color, is_active, sort_order, created_at, updated_at)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        data.savingsAccounts.map((a) => [a.id, a.name, a.last4, a.icon, a.color, a.isActive ? 1 : 0, a.sortOrder, a.createdAt, a.updatedAt]),
       );
       await db.runMany(
         `INSERT INTO expenses
            (id, amount, category_id, payment_method_id, expense_date, expense_time, note, paid_at, created_at, updated_at)
          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
         data.expenses.map((e) => [e.id, e.amount, e.categoryId, e.paymentMethodId, e.date, e.time, e.note, e.paidAt, e.createdAt, e.updatedAt]),
+      );
+      await db.runMany(
+        `INSERT INTO savings_movements (id, account_id, kind, amount, movement_date, note, expense_id, created_at)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+        data.savingsMovements.map((m) => [m.id, m.accountId, m.kind, m.amount, m.date, m.note, m.expenseId, m.createdAt]),
       );
       await db.runMany(
         'INSERT INTO card_statement_dates (payment_method_id, period, cut_date, due_date) VALUES (?, ?, ?, ?)',

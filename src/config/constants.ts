@@ -27,8 +27,8 @@ export const NOTE_MAX_LENGTH = 200;
 export const NAME_MAX_LENGTH = 30;
 
 export const BACKUP_FORMAT = 'mi-plata-backup';
-/** v2: estado pagado/por pagar de los gastos, reglas de ciclo de las tarjetas y fechas de extractos. */
-export const BACKUP_VERSION = 2;
+/** v2: estado pagado/por pagar de los gastos, reglas de ciclo de las tarjetas y fechas de extractos. v3: cuentas de ahorro y sus movimientos. */
+export const BACKUP_VERSION = 3;
 
 export const SETTING_KEYS = {
   theme: 'theme',
@@ -94,6 +94,12 @@ export const PAYMENT_TYPES: PaymentMethodType[] = ['cash', 'debit_card', 'credit
 /** Interruptor de «Categorías» y «Métodos de pago»: el mismo texto en las dos hojas de edición. */
 export const VISIBLE_TOGGLE_LABEL = 'Aparece al registrar un gasto';
 export const VISIBLE_TOGGLE_HINT = 'Si lo apagas, no sale en la lista al registrar un gasto, pero sus gastos siguen en tu historial.';
+
+/** Iconos que se proponen para una cuenta de ahorro de un banco (la persona también puede escribir el suyo). */
+export const SAVINGS_ICONS = ['🏦', '💰', '📱', '💳', '🪙', '🏠', '🚗', '🎓', '✈️', '🛟'];
+export const DEFAULT_SAVINGS_ICON = '🏦';
+export const SAVINGS_VISIBLE_HINT =
+  'Si la ocultas, no sale al elegir cómo pagar un gasto, pero su saldo y sus movimientos siguen aquí.';
 
 export const DEFAULT_CATEGORY_ICON = '📦';
 export const DEFAULT_PAYMENT_ICON = '💳';
