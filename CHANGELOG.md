@@ -1,3 +1,10 @@
+# [1.3.0](https://github.com/JhonathanPerez/Mi-Plata-App/compare/v1.2.12...v1.3.0) (2026-10-05)
+
+
+### Features
+
+* **app:** Integra cuentas de ahorros ([#41](https://github.com/JhonathanPerez/Mi-Plata-App/issues/41)) ([5868b47](https://github.com/JhonathanPerez/Mi-Plata-App/commit/5868b47ba137c5d143c0e6ecfa8b9e7e7afe4135))
+
 ## [1.2.12](https://github.com/JhonathanPerez/Mi-Plata-App/compare/v1.2.11...v1.2.12) (2026-10-04)
 
 
