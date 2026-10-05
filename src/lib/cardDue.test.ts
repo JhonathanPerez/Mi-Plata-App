@@ -43,7 +43,7 @@ describe('avance del ciclo abierto', () => {
 describe('vencimiento en voz alta', () => {
   it('fecha completa, hoy y vencido', () => {
     expect(dueSpoken('2026-10-06', 4, NOW)).toBe('vence el martes 6 de octubre');
-    expect(dueSpoken('2026-10-02', 0, NOW)).toBe('vence hoy');
+    expect(dueSpoken('2026-10-02', 0, NOW)).toBe('pago hoy');
     expect(dueSpoken('2026-09-29', -3, NOW)).toBe('venció hace 3 días');
     expect(dueSpoken('2026-10-01', -1, NOW)).toBe('venció hace 1 día');
   });

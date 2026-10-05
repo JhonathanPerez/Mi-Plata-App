@@ -20,10 +20,10 @@ export function relativeDays(days: number): string {
   return days > 0 ? `en ${days} días` : `hace ${-days} días`;
 }
 
-/** Texto corto para la fecha límite de pago: "Vence hoy", "Vencido hace 3 días", "Hasta el mar 20 oct · en 10 días". */
+/** Texto corto para la fecha límite de pago: "Pago hoy", "Vencido hace 3 días", "Hasta el mar 20 oct · en 10 días". */
 export function dueLabel(dueDate: IsoDate, daysLeft: number): string {
   if (daysLeft < 0) return `Vencido hace ${-daysLeft} ${-daysLeft === 1 ? 'día' : 'días'}`;
-  if (daysLeft === 0) return 'Vence hoy';
+  if (daysLeft === 0) return 'Pago hoy';
   return `Hasta el ${formatDayMonth(dueDate)} · ${relativeDays(daysLeft)}`;
 }
 

@@ -62,9 +62,9 @@ export function openCycleProgress(overview: CardOverview, today: IsoDate): Cycle
   return cycleProgress({ today, previousCut, cut: open.cutDate });
 }
 
-/** Cómo se dice el vencimiento en voz alta: «vence el martes 6 de octubre», «vence hoy», «venció hace 3 días». */
+/** Cómo se dice el vencimiento en voz alta: «vence el martes 6 de octubre», «pago hoy», «venció hace 3 días». */
 export function dueSpoken(dueDate: IsoDate, daysLeft: number, now: Date = new Date()): string {
   if (daysLeft < 0) return `venció hace ${-daysLeft} ${-daysLeft === 1 ? 'día' : 'días'}`;
-  if (daysLeft === 0) return 'vence hoy';
+  if (daysLeft === 0) return 'pago hoy';
   return `vence el ${formatWeekdayDate(dueDate, now)}`;
 }
