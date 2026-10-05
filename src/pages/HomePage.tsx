@@ -154,6 +154,7 @@ export function HomePage() {
         <div className="card card--flush">
           <Row
             to="/ahorros"
+            tight
             leading={<EmojiTile emoji="🏦" color="var(--primary)" />}
             title="Cuentas de ahorro"
             detail={saved.accounts > 0 ? `${saved.accounts} ${pluralize(saved.accounts, 'cuenta', 'cuentas')}` : 'Agrega tu primera cuenta de ahorro'}
