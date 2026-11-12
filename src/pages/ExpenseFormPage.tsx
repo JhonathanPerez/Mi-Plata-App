@@ -4,7 +4,7 @@ import { useConfirm } from '@/app/providers/ConfirmProvider';
 import { useAmountFormat } from '@/app/providers/PrivacyProvider';
 import { useToast } from '@/app/providers/ToastProvider';
 import { haptics } from '@/lib/haptics';
-import { Button, IconButton } from '@/components/ui/Button';
+import { Button } from '@/components/ui/Button';
 import { DateField } from '@/components/ui/DateField';
 import { OptionSheet, type PickerOption } from '@/components/expenses/OptionSheet';
 import { Field } from '@/components/ui/Field';
@@ -258,26 +258,6 @@ export function ExpenseFormPage() {
     }
   };
 
-  const remove = async () => {
-    if (!id) return;
-    const ok = await confirm({
-      title: '¿Eliminar este gasto?',
-      message: savingsMethod
-        ? `Se quitará de tu historial y de tus estadísticas, y la plata volverá a «${savingsMethod.name}». Esta acción no se puede deshacer.`
-        : 'Se quitará de tu historial y de tus estadísticas. Esta acción no se puede deshacer.',
-      confirmLabel: 'Eliminar',
-      danger: true,
-    });
-    if (!ok) return;
-    try {
-      await expenseService.remove(id);
-      toast.show('Gasto eliminado');
-      navigate(-1);
-    } catch (error) {
-      toast.show(errorMessage(error), 'error');
-    }
-  };
-
   return (
     <div className="page page--form">
       <PageHeader
@@ -285,7 +265,6 @@ export function ExpenseFormPage() {
         close
         closeLabel="Cerrar sin guardar"
         onClose={() => void requestClose()}
-        actions={isEdit ? <IconButton icon="trash" label="Eliminar gasto" onClick={remove} /> : undefined}
       />
 
       {loading && !data ? (

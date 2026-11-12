@@ -25,6 +25,10 @@ describe('decideBackAction', () => {
     expect(decideBackAction('/ahorros', true)).toEqual({ type: 'back' });
     expect(decideBackAction('/ahorros/sa_nequi', true)).toEqual({ type: 'back' });
   });
+  it('el recibo de un gasto y su edición vuelven a la pantalla anterior', () => {
+    expect(decideBackAction('/gasto/abc', true)).toEqual({ type: 'back' });
+    expect(decideBackAction('/gasto/abc/editar', true)).toEqual({ type: 'back' });
+  });
   it('sin historial, las secundarias van a su pantalla padre', () => {
     expect(decideBackAction('/gasto/abc', false)).toEqual({ type: 'goto', to: '/' });
     expect(decideBackAction('/ajustes/exportar', false)).toEqual({ type: 'goto', to: '/ajustes' });

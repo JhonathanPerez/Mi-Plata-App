@@ -1,13 +1,10 @@
-import { Fragment, useState, type ReactNode } from 'react';
+import { Fragment, type ReactNode } from 'react';
 import { EmojiTile } from '@/components/ui/EmojiTile';
 import { Row } from '@/components/ui/Row';
 import { formatShortDate, formatTime } from '@/lib/dates';
 import { formatCOP } from '@/lib/money';
 import { usePrivacy } from '@/app/providers/PrivacyProvider';
 import { Amount } from '@/components/ui/Money';
-import { ExpensePreviewCard } from './ExpensePreviewCard';
-import { useLongPress } from '@/hooks/useLongPress';
-import { haptics } from '@/lib/haptics';
 import type { ExpenseWithRefs } from '@/types/models';
 
 interface ExpenseRowProps {
@@ -31,13 +28,6 @@ interface ExpenseRowProps {
 
 export function ExpenseRow({ expense, onSelect, showDate, compact = false, stacked = false, showMethod = true }: ExpenseRowProps) {
   const { hidden } = usePrivacy();
-  const [previewing, setPreviewing] = useState(false);
-  const longPress = useLongPress({
-    onLongPress: () => {
-      setPreviewing(true);
-      void haptics.tap();
-    },
-  });
   const time = expense.time ? formatTime(expense.time) : null;
   // El método (ícono + nombre) va en un bloque que no se parte: si la meta no cabe en un renglón,
   // salta entero al siguiente en vez de dejar el ícono solo al final del primero.
@@ -55,32 +45,24 @@ export function ExpenseRow({ expense, onSelect, showDate, compact = false, stack
     ));
 
   return (
-    <>
-      <Row
-        holdable
-        onClick={() => onSelect(expense.id)}
-        aria-label={`${expense.categoryName}${hidden ? '' : `, ${formatCOP(expense.amount)}`}${expense.paidAt === null ? ', por pagar' : ''}. Editar gasto`}
-        {...longPress}
-        leading={<EmojiTile emoji={expense.categoryIcon} color={expense.categoryColor} />}
-        className={compact ? (stacked ? 'row--compact row--stacked' : 'row--compact') : undefined}
-        title={compact ? (expense.note || expense.categoryName) : expense.categoryName}
-        amount={<Amount value={expense.amount} />}
-        aside={showDate ? formatShortDate(expense.date) : undefined}
-      >
-        {!compact && expense.note && <span className="row__note">{expense.note}</span>}
-        {compact && stacked ? (
-          <>
-            {expense.note && <span className="row__detail row__detail--truncate">{expense.categoryName}</span>}
-            {stackedMethod && <span className="row__detail row__detail--truncate">{stackedMethod}</span>}
-          </>
-        ) : (
-          parts.length > 0 && <span className="row__detail">{joined(parts)}</span>
-        )}
-      </Row>
-      {/* Fuera del <button>: un portal renderiza su contenido en otro punto del DOM, pero en React
-          los clics dentro de él siguen "burbujeando" por el árbol de componentes. Si quedara dentro
-          del botón, un clic en la X o en el fondo también dispararía el onClick de la fila (editar). */}
-      {previewing && <ExpensePreviewCard expense={expense} onClose={() => setPreviewing(false)} />}
-    </>
+    <Row
+      onClick={() => onSelect(expense.id)}
+      aria-label={`${expense.categoryName}${hidden ? '' : `, ${formatCOP(expense.amount)}`}${expense.paidAt === null ? ', por pagar' : ''}. Ver detalle del gasto`}
+      leading={<EmojiTile emoji={expense.categoryIcon} color={expense.categoryColor} />}
+      className={compact ? (stacked ? 'row--compact row--stacked' : 'row--compact') : undefined}
+      title={compact ? (expense.note || expense.categoryName) : expense.categoryName}
+      amount={<Amount value={expense.amount} />}
+      aside={showDate ? formatShortDate(expense.date) : undefined}
+    >
+      {!compact && expense.note && <span className="row__note">{expense.note}</span>}
+      {compact && stacked ? (
+        <>
+          {expense.note && <span className="row__detail row__detail--truncate">{expense.categoryName}</span>}
+          {stackedMethod && <span className="row__detail row__detail--truncate">{stackedMethod}</span>}
+        </>
+      ) : (
+        parts.length > 0 && <span className="row__detail">{joined(parts)}</span>
+      )}
+    </Row>
   );
 }
