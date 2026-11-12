@@ -93,8 +93,11 @@ suite('servicios con SQLite real', () => {
     const temp = await expenseService.create({
       amount: 500, categoryId: 'cat_otros', paymentMethodId: 'pm_efectivo', date: '2026-09-01', time: null, note: null,
     });
+    const detail = await expenseService.getDetail(temp.id);
+    expect(detail).toMatchObject({ id: temp.id, amount: 500, categoryName: 'Otros', paymentMethodName: 'Efectivo' });
     await expenseService.remove(temp.id);
     expect(await expenseService.getById(temp.id)).toBeNull();
+    expect(await expenseService.getDetail(temp.id)).toBeNull();
   });
 
   it('protege categorías y métodos con gastos', async () => {

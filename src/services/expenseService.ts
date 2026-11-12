@@ -222,6 +222,11 @@ export const expenseService = {
     return expenseRepository.getById(id);
   },
 
+  /** Un gasto con los datos de su categoría y su método de pago, para mostrarlo completo (recibo). */
+  getDetail(id: string): Promise<ExpenseWithRefs | null> {
+    return expenseRepository.getWithRefsById(id);
+  },
+
   /** Lista gastos con filtros. La búsqueda de texto ignora mayúsculas y tildes. */
   async list(filters: ExpenseFilters = {}): Promise<ExpenseWithRefs[]> {
     const { search, limit, ...sqlFilters } = filters;
