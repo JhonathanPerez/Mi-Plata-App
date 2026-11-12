@@ -1,3 +1,10 @@
+# [1.4.0](https://github.com/JhonathanPerez/Mi-Plata-App/compare/v1.3.2...v1.4.0) (2026-11-12)
+
+
+### Features
+
+* **gastos:** detalle del gasto en forma de recibo con acciones de editar y eliminar ([#44](https://github.com/JhonathanPerez/Mi-Plata-App/issues/44)) ([2d2539a](https://github.com/JhonathanPerez/Mi-Plata-App/commit/2d2539a59269fbe14fda0c64df2dda5c216e988f))
+
 ## [1.3.2](https://github.com/JhonathanPerez/Mi-Plata-App/compare/v1.3.1...v1.3.2) (2026-10-05)
 
 
