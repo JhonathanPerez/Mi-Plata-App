@@ -5,6 +5,7 @@ import { CaptureSetupPage } from '@/pages/CaptureSetupPage';
 import { CardRulesPage } from '@/pages/CardRulesPage';
 import { CardsPage } from '@/pages/CardsPage';
 import { CategoriesPage } from '@/pages/CategoriesPage';
+import { ExpenseDetailPage } from '@/pages/ExpenseDetailPage';
 import { ExpenseFormPage } from '@/pages/ExpenseFormPage';
 import { ExportPage } from '@/pages/ExportPage';
 import { HistoryPage } from '@/pages/HistoryPage';
@@ -57,7 +58,8 @@ export function App() {
                     <Route path="ajustes" element={<SettingsPage />} />
                   </Route>
                   <Route path="gasto/nuevo" element={<PageTransition><ExpenseFormPage /></PageTransition>} />
-                  <Route path="gasto/:id" element={<PageTransition><ExpenseFormPage /></PageTransition>} />
+                  <Route path="gasto/:id" element={<PageTransition><ExpenseDetailPage /></PageTransition>} />
+                  <Route path="gasto/:id/editar" element={<PageTransition><ExpenseFormPage /></PageTransition>} />
                   <Route path="pendientes" element={<PageTransition><PendingPage /></PageTransition>} />
                   <Route path="ahorros" element={<PageTransition><SavingsPage /></PageTransition>} />
                   <Route path="ahorros/:id" element={<PageTransition><SavingsAccountPage /></PageTransition>} />

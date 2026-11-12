@@ -103,6 +103,13 @@ export const expenseRepository = {
     return rows.length ? toExpense(rows[0]) : null;
   },
 
+  /** Un gasto con el nombre, ícono y color de su categoría y de su método de pago (lo que muestra el recibo). */
+  async getWithRefsById(id: string): Promise<ExpenseWithRefs | null> {
+    const db = await getDb();
+    const rows = await db.query(`${SELECT_WITH_REFS} WHERE e.id = ?`, [id]);
+    return rows.length ? toExpenseWithRefs(rows[0]) : null;
+  },
+
   /** Consulta con filtros de SQL. La búsqueda de texto se resuelve en el servicio (sin tildes). */
   async query(filters: ExpenseFilters = {}): Promise<ExpenseWithRefs[]> {
     const db = await getDb();
