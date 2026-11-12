@@ -60,6 +60,7 @@ export function toExpense(row: Row): Expense {
     date: String(row.expense_date),
     time: row.expense_time === null || row.expense_time === undefined ? null : String(row.expense_time),
     note: row.note === null || row.note === undefined ? null : String(row.note),
+    observations: row.observations === null || row.observations === undefined ? null : String(row.observations),
     paidAt: row.paid_at === null || row.paid_at === undefined ? null : String(row.paid_at),
     createdAt: String(row.created_at),
     updatedAt: String(row.updated_at),

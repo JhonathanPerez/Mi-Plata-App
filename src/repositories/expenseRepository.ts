@@ -13,11 +13,11 @@ import type {
 } from '@/types/models';
 
 const EXPENSE_COLUMNS =
-  'id, amount, category_id, payment_method_id, expense_date, expense_time, note, paid_at, created_at, updated_at';
-const EXPENSE_PLACEHOLDERS = '?, ?, ?, ?, ?, ?, ?, ?, ?, ?';
+  'id, amount, category_id, payment_method_id, expense_date, expense_time, note, observations, paid_at, created_at, updated_at';
+const EXPENSE_PLACEHOLDERS = '?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?';
 
 const SELECT_WITH_REFS = `
-  SELECT e.id, e.amount, e.category_id, e.payment_method_id, e.expense_date, e.expense_time, e.note, e.paid_at,
+  SELECT e.id, e.amount, e.category_id, e.payment_method_id, e.expense_date, e.expense_time, e.note, e.observations, e.paid_at,
          e.created_at, e.updated_at,
          c.name AS category_name, c.icon AS category_icon, c.color AS category_color,
          p.name AS pm_name, p.icon AS pm_icon, p.color AS pm_color, p.type AS pm_type
@@ -45,6 +45,7 @@ export const expenseRepository = {
       expense.date,
       expense.time,
       expense.note,
+      expense.observations,
       expense.paidAt,
       expense.createdAt,
       expense.updatedAt,
@@ -67,7 +68,7 @@ export const expenseRepository = {
     const db = await getDb();
     await db.runMany(
       `INSERT INTO expenses (${EXPENSE_COLUMNS}) VALUES (${EXPENSE_PLACEHOLDERS})`,
-      expenses.map((e) => [e.id, e.amount, e.categoryId, e.paymentMethodId, e.date, e.time, e.note, e.paidAt, e.createdAt, e.updatedAt]),
+      expenses.map((e) => [e.id, e.amount, e.categoryId, e.paymentMethodId, e.date, e.time, e.note, e.observations, e.paidAt, e.createdAt, e.updatedAt]),
     );
   },
 
@@ -76,7 +77,7 @@ export const expenseRepository = {
     await db.run(
       `UPDATE expenses
          SET amount = ?, category_id = ?, payment_method_id = ?, expense_date = ?, expense_time = ?,
-             note = ?, paid_at = ?, updated_at = ?
+             note = ?, observations = ?, paid_at = ?, updated_at = ?
        WHERE id = ?`,
       [
         expense.amount,
@@ -85,6 +86,7 @@ export const expenseRepository = {
         expense.date,
         expense.time,
         expense.note,
+        expense.observations,
         expense.paidAt,
         expense.updatedAt,
         expense.id,

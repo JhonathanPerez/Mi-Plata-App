@@ -1,4 +1,4 @@
-import { MAX_AMOUNT, NOTE_MAX_LENGTH, SETTING_KEYS } from '@/config/constants';
+import { MAX_AMOUNT, NOTE_MAX_LENGTH, OBSERVATIONS_MAX_LENGTH, SETTING_KEYS } from '@/config/constants';
 import { getDb } from '@/db/connection';
 import { isValidIsoDate, isValidTime, todayIso } from '@/lib/dates';
 import { notifyDataChanged } from '@/lib/dataBus';
@@ -14,7 +14,7 @@ import { savingsRepository } from '@/repositories/savingsRepository';
 import { settingsRepository } from '@/repositories/settingsRepository';
 import type { Expense, ExpenseFilters, ExpenseInput, ExpenseWithRefs, IsoDate, PaymentMethodType, SavingsMovement } from '@/types/models';
 
-export type ExpenseField = 'amount' | 'category' | 'method' | 'date' | 'time' | 'note';
+export type ExpenseField = 'amount' | 'category' | 'method' | 'date' | 'time' | 'note' | 'observations';
 export type ExpenseFieldErrors = Partial<Record<ExpenseField, string>>;
 
 export interface ValidateExpenseOptions {
@@ -59,6 +59,10 @@ export function validateExpenseInput(input: ExpenseInput, options: ValidateExpen
   } else if (input.note && input.note.trim().length > NOTE_MAX_LENGTH) {
     errors.note = `Máximo ${NOTE_MAX_LENGTH} caracteres.`;
   }
+  // Las observaciones nunca son obligatorias: solo se revisa el largo.
+  if (input.observations && input.observations.trim().length > OBSERVATIONS_MAX_LENGTH) {
+    errors.observations = `Máximo ${OBSERVATIONS_MAX_LENGTH} caracteres.`;
+  }
   return errors;
 }
 
@@ -100,10 +104,12 @@ async function prepare(input: ExpenseInput): Promise<Prepared> {
   if (!method) throw new ValidationError('El método de pago elegido ya no existe.', 'method');
 
   const note = input.note ? input.note.trim() : '';
+  // Sin indicar (`undefined`) se deja así para que al editar se conserven; vacío o solo espacios equivale a «sin observaciones».
+  const observations = input.observations === undefined ? undefined : input.observations?.trim() || null;
   const savingsAccountId = method.savingsAccountId;
   // Pagar con una cuenta de ahorro es pagar en el acto: el gasto siempre queda como pagado.
   const paid = savingsAccountId ? true : input.paid;
-  return { input: { ...input, paid, note: note.length > 0 ? note : null }, methodType: method.type, savingsAccountId };
+  return { input: { ...input, paid, note: note.length > 0 ? note : null, observations }, methodType: method.type, savingsAccountId };
 }
 
 /**
@@ -148,6 +154,7 @@ export const expenseService = {
       date: clean.date,
       time: clean.time,
       note: clean.note,
+      observations: clean.observations ?? null,
       paidAt: decidePaidAt(clean, methodType, null, todayIso()),
       createdAt: now,
       updatedAt: now,
@@ -183,6 +190,7 @@ export const expenseService = {
       date: clean.date,
       time: clean.time,
       note: clean.note,
+      observations: clean.observations === undefined ? existing.observations : clean.observations,
       paidAt: decidePaidAt(clean, methodType, existing, todayIso()),
       updatedAt: nowIso(),
     };
@@ -237,7 +245,7 @@ export const expenseService = {
     const numericTerm = /^[\d.$\s]+$/.test(term) ? term.replace(/\D/g, '') : '';
     const rows = await expenseRepository.query(sqlFilters);
     const matches = rows.filter((expense) => {
-      const haystack = normalizeText(`${expense.note ?? ''} ${expense.categoryName} ${expense.paymentMethodName}`);
+      const haystack = normalizeText(`${expense.note ?? ''} ${expense.observations ?? ''} ${expense.categoryName} ${expense.paymentMethodName}`);
       if (haystack.includes(term)) return true;
       return numericTerm.length > 0 && String(expense.amount).includes(numericTerm);
     });

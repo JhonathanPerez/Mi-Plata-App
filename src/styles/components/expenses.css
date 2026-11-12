@@ -136,6 +136,11 @@
   overflow-wrap: anywhere;
 }
 
+.receipt__text {
+  /* Respeta los saltos de línea que escribió la persona (las observaciones pueden tener varias líneas). */
+  white-space: pre-wrap;
+}
+
 .receipt__total {
   display: flex;
   align-items: baseline;

@@ -55,6 +55,11 @@ function Receipt({ expense }: { expense: ExpenseWithRefs }) {
           {expense.paymentMethodIcon} {expense.paymentMethodName}
         </ReceiptRow>
         {expense.paidAt && <ReceiptRow label="Pagado el">{formatLongDate(expense.paidAt)}</ReceiptRow>}
+        {expense.observations && (
+          <ReceiptRow label="Observaciones">
+            <span className="receipt__text">{expense.observations}</span>
+          </ReceiptRow>
+        )}
       </dl>
 
       <footer className="receipt__total">
