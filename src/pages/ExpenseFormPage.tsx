@@ -14,7 +14,7 @@ import { Notice } from '@/components/ui/Notice';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { PickerField } from '@/components/ui/PickerField';
 import { Segmented } from '@/components/ui/Segmented';
-import { NOTE_MAX_LENGTH } from '@/config/constants';
+import { NOTE_MAX_LENGTH, OBSERVATIONS_MAX_LENGTH } from '@/config/constants';
 import { useQuery } from '@/hooks/useQuery';
 import { todayIso } from '@/lib/dates';
 import { errorMessage, ValidationError } from '@/lib/errors';
@@ -36,6 +36,7 @@ interface FormValues {
   methodId: string | null;
   date: string;
   note: string;
+  observations: string;
   paid: boolean;
 }
 
@@ -69,6 +70,7 @@ export function ExpenseFormPage() {
   const [date, setDate] = useState(todayIso());
   const [picker, setPicker] = useState<'category' | 'method' | null>(null);
   const [note, setNote] = useState('');
+  const [observations, setObservations] = useState('');
   // Estado del gasto: true = pagado, false = por pagar.
   const [paid, setPaid] = useState(true);
   // Si el usuario ya tocó el estado, dejamos de sugerirlo según el método de pago.
@@ -85,13 +87,14 @@ export function ExpenseFormPage() {
   useEffect(() => {
     if (!data || initialized.current) return;
     initialized.current = true;
-    const start: FormValues = { amount: 0, categoryId: null, methodId: null, date: todayIso(), note: '', paid: true };
+    const start: FormValues = { amount: 0, categoryId: null, methodId: null, date: todayIso(), note: '', observations: '', paid: true };
     if (data.existing) {
       start.amount = data.existing.amount;
       start.categoryId = data.existing.categoryId;
       start.methodId = data.existing.paymentMethodId;
       start.date = data.existing.date;
       start.note = data.existing.note ?? '';
+      start.observations = data.existing.observations ?? '';
       start.paid = data.existing.paidAt !== null;
       statusTouched.current = true; // al editar se respeta el estado que ya tenía
     } else {
@@ -113,6 +116,7 @@ export function ExpenseFormPage() {
     setMethodId(start.methodId);
     setDate(start.date);
     setNote(start.note);
+    setObservations(start.observations);
     setPaid(start.paid);
     setInitial(start);
   }, [data]);
@@ -173,6 +177,7 @@ export function ExpenseFormPage() {
       methodId !== initial.methodId ||
       date !== initial.date ||
       note !== initial.note ||
+      observations !== initial.observations ||
       (isEdit && paid !== initial.paid));
 
   const requestClose = async () => {
@@ -225,6 +230,7 @@ export function ExpenseFormPage() {
       // La hora ya no se pide. Al editar se conserva la que el gasto ya tuviera para no perder datos.
       time: isEdit ? (data?.existing?.time ?? null) : null,
       note: note.trim() ? note.trim() : null,
+      observations: observations.trim() ? observations.trim() : null,
       paid,
     };
     const found = validateExpenseInput(input, { requireNote: true, maxDate: todayIso() });
@@ -344,6 +350,23 @@ export function ExpenseFormPage() {
               </Notice>
             </div>
           )}
+
+          <Field
+            label="Observaciones (opcional)"
+            htmlFor="expense-observations"
+            error={errors.observations}
+            hint="Detalles extra que quieras recordar de este gasto."
+          >
+            <textarea
+              id="expense-observations"
+              className="input input--textarea"
+              rows={3}
+              placeholder="Ej.: Cumpleaños de Laura, pagué la cuenta de todos"
+              maxLength={OBSERVATIONS_MAX_LENGTH}
+              value={observations}
+              onChange={(event) => setObservations(event.target.value)}
+            />
+          </Field>
 
           <div className="form__footer">
             <Button type="submit" size="lg" block loading={saving} icon="check">

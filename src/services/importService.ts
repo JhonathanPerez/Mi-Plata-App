@@ -245,7 +245,7 @@ export async function importRows(rows: ParsedImportRow[]): Promise<Omit<ImportRe
       }
       toInsert.push({
         id: newId(), amount: row.amount, categoryId: category.id, paymentMethodId: method.id,
-        date: row.date, time: null, note: row.note, paidAt: row.paid ? row.date : null, createdAt: now, updatedAt: now,
+        date: row.date, time: null, note: row.note, observations: null, paidAt: row.paid ? row.date : null, createdAt: now, updatedAt: now,
       });
     }
     await expenseRepository.insertMany(toInsert);

@@ -52,9 +52,9 @@ export const backupRepository = {
       );
       await db.runMany(
         `INSERT INTO expenses
-           (id, amount, category_id, payment_method_id, expense_date, expense_time, note, paid_at, created_at, updated_at)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-        data.expenses.map((e) => [e.id, e.amount, e.categoryId, e.paymentMethodId, e.date, e.time, e.note, e.paidAt, e.createdAt, e.updatedAt]),
+           (id, amount, category_id, payment_method_id, expense_date, expense_time, note, observations, paid_at, created_at, updated_at)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        data.expenses.map((e) => [e.id, e.amount, e.categoryId, e.paymentMethodId, e.date, e.time, e.note, e.observations, e.paidAt, e.createdAt, e.updatedAt]),
       );
       await db.runMany(
         `INSERT INTO savings_movements (id, account_id, kind, amount, movement_date, note, expense_id, created_at)

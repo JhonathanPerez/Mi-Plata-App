@@ -158,6 +158,37 @@ suite('migración 007: últimos 4 dígitos de la cuenta de ahorro', () => {
   });
 });
 
+suite('migración 008: observaciones del gasto', () => {
+  it('un gasto que ya existía queda sin observaciones y se pueden guardar después', async () => {
+    const db = createTestDb()!;
+    await db.execute(
+      'CREATE TABLE schema_migrations (version INTEGER PRIMARY KEY NOT NULL, name TEXT NOT NULL, applied_at TEXT NOT NULL)',
+    );
+    for (const migration of migrations.filter((m) => m.version <= 7)) {
+      for (const statement of migration.statements) {
+        if (typeof statement === 'string') await db.execute(statement);
+        else await db.run(statement.sql, statement.params ?? []);
+      }
+      await db.run('INSERT INTO schema_migrations VALUES (?, ?, ?)', [migration.version, migration.name, '2026-01-01T00:00:00.000Z']);
+    }
+    await db.run(
+      "INSERT INTO categories (id, name, icon, color, is_active, sort_order, created_at, updated_at) VALUES ('c1', 'Comida', '🍔', '#111111', 1, 0, 'x', 'x')",
+    );
+    await db.run(
+      "INSERT INTO payment_methods (id, name, type, icon, color, is_active, sort_order, created_at, updated_at) VALUES ('m1', 'Efectivo', 'cash', '💵', '#222222', 1, 0, 'x', 'x')",
+    );
+    await db.run(
+      "INSERT INTO expenses (id, amount, category_id, payment_method_id, expense_date, note, created_at, updated_at, paid_at) VALUES ('e1', 9000, 'c1', 'm1', '2026-09-01', 'Almuerzo', 'x', 'x', '2026-09-01')",
+    );
+
+    await runMigrations(db);
+    await runMigrations(db); // idempotente
+    expect(await db.query('SELECT note, observations FROM expenses')).toEqual([{ note: 'Almuerzo', observations: null }]);
+    await db.run("UPDATE expenses SET observations = 'Con el equipo' WHERE id = 'e1'");
+    expect(await db.query('SELECT observations FROM expenses')).toEqual([{ observations: 'Con el equipo' }]);
+  });
+});
+
 async function expectFails(work: Promise<unknown>): Promise<void> {
   let failed = false;
   try {

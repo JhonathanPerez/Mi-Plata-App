@@ -103,6 +103,8 @@ function readExpense(raw: unknown, index: number): Expense {
     date: raw.date,
     time,
     note: typeof raw.note === 'string' && raw.note.trim() ? raw.note : null,
+    // Copias hechas antes de existir las observaciones no traen el campo: quedan sin ellas.
+    observations: typeof raw.observations === 'string' && raw.observations.trim() ? raw.observations : null,
     paidAt,
     createdAt: asStamp(raw.createdAt),
     updatedAt: asStamp(raw.updatedAt),

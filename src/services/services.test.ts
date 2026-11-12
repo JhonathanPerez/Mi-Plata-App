@@ -100,6 +100,30 @@ suite('servicios con SQLite real', () => {
     expect(await expenseService.getDetail(temp.id)).toBeNull();
   });
 
+  it('guarda observaciones opcionales y las conserva al editar', async () => {
+    const base = { amount: 18000, categoryId: 'cat_alimentacion', paymentMethodId: 'pm_efectivo', date: '2026-09-10', time: null, note: 'Cena' };
+    expect(validateExpenseInput({ ...base, observations: null })).toEqual({});
+    expect(validateExpenseInput({ ...base, observations: 'a'.repeat(501) })).toHaveProperty('observations');
+
+    const created = await expenseService.create({ ...base, observations: '  Cumpleaños de Laura\npagué todo  ' });
+    expect(created.observations).toBe('Cumpleaños de Laura\npagué todo');
+    expect((await expenseService.getDetail(created.id))?.observations).toBe('Cumpleaños de Laura\npagué todo');
+    expect(await expenseService.list({ search: 'laura' })).toHaveLength(1);
+
+    // Sin indicar las observaciones, al editar se conservan.
+    const kept = await expenseService.update(created.id, { ...base, amount: 19000 });
+    expect(kept.observations).toBe('Cumpleaños de Laura\npagué todo');
+    // Vacías o solo con espacios equivalen a «sin observaciones».
+    const cleared = await expenseService.update(created.id, { ...base, observations: '   ' });
+    expect(cleared.observations).toBeNull();
+
+    const without = await expenseService.create(base);
+    expect(without.observations).toBeNull();
+    await expect(expenseService.create({ ...base, observations: 'a'.repeat(501) })).rejects.toThrow();
+    await expenseService.remove(created.id);
+    await expenseService.remove(without.id);
+  });
+
   it('protege categorías y métodos con gastos', async () => {
     await expect(categoryService.remove('cat_alimentacion')).rejects.toThrow(/no se puede eliminar/);
     await expect(paymentMethodService.remove('pm_nubank')).rejects.toThrow(/no se puede eliminar/);

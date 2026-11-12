@@ -63,6 +63,8 @@ export interface Expense {
   /** HH:MM (24 h) o null. */
   time: string | null;
   note: string | null;
+  /** Texto libre y opcional con más detalle del gasto; null = sin observaciones. */
+  observations: string | null;
   /** Fecha en que se pagó al banco (tarjetas) o se saldó; null = por pagar. */
   paidAt: IsoDate | null;
   createdAt: string;
@@ -94,6 +96,8 @@ export interface ExpenseInput {
   date: IsoDate;
   time: string | null;
   note: string | null;
+  /** Observaciones opcionales. Si se omite al editar, se conservan las que el gasto ya tenía; con `null` se borran. */
+  observations?: string | null;
   /** true = pagado, false = por pagar. Si se omite: por pagar con tarjeta de crédito, pagado en los demás casos. */
   paid?: boolean;
 }

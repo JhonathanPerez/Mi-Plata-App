@@ -24,6 +24,8 @@ export const CURRENCY = 'COP';
 export const MAX_AMOUNT = 999_999_999_999;
 
 export const NOTE_MAX_LENGTH = 200;
+/** Las observaciones de un gasto son un texto más libre que la descripción, por eso admiten más caracteres. */
+export const OBSERVATIONS_MAX_LENGTH = 500;
 export const NAME_MAX_LENGTH = 30;
 
 export const BACKUP_FORMAT = 'mi-plata-backup';
