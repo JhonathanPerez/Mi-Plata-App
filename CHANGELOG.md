@@ -1,3 +1,10 @@
+# [1.5.0](https://github.com/JhonathanPerez/Mi-Plata-App/compare/v1.4.0...v1.5.0) (2026-11-12)
+
+
+### Features
+
+* **gastos:** campo opcional de observaciones al registrar un gasto ([#45](https://github.com/JhonathanPerez/Mi-Plata-App/issues/45)) ([6dd7801](https://github.com/JhonathanPerez/Mi-Plata-App/commit/6dd7801491e8d34bbce3279c5bfe3e212cfa808f))
+
 # [1.4.0](https://github.com/JhonathanPerez/Mi-Plata-App/compare/v1.3.2...v1.4.0) (2026-11-12)
 
 
