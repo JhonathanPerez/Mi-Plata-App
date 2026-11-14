@@ -11,6 +11,8 @@
  *  4. Avisos de pago: permiso POST_NOTIFICATIONS (Android 13+) e ícono res/drawable/ic_stat_miplata.xml.
  *  5. Actualizaciones desde la app: permiso REQUEST_INSTALL_PACKAGES, UpdateFileProvider («.updates») y res/xml/update_paths.xml
  *     (los usa AppUpdatePlugin.java para entregarle el APK descargado al instalador de Android).
+ *  6. Copia en la nube: CloudFolderPlugin.java guarda las copias en una carpeta que la persona elige con el selector de Android
+ *     (Storage Access Framework). No necesita permisos ni cambios en el manifiesto.
  */
 import { existsSync, readFileSync, readdirSync, statSync, writeFileSync, mkdirSync } from 'node:fs';
 import { join, resolve } from 'node:path';
@@ -162,7 +164,7 @@ function findMainActivity(dir) {
   return null;
 }
 
-const PLUGINS = ['NotificationCapturePlugin', 'AppUpdatePlugin'];
+const PLUGINS = ['NotificationCapturePlugin', 'AppUpdatePlugin', 'CloudFolderPlugin'];
 
 const mainPath = findMainActivity(javaRoot);
 if (!mainPath) {

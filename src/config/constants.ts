@@ -32,6 +32,10 @@ export const BACKUP_FORMAT = 'mi-plata-backup';
 /** v2: estado pagado/por pagar de los gastos, reglas de ciclo de las tarjetas y fechas de extractos. v3: cuentas de ahorro y sus movimientos. */
 export const BACKUP_VERSION = 3;
 
+/** Copias automáticas: cuántas se conservan (las más antiguas se borran) y en qué carpeta privada de la app están las locales. */
+export const AUTO_BACKUP_KEEP = 5;
+export const AUTO_BACKUP_DIR = 'backups';
+
 export const SETTING_KEYS = {
   theme: 'theme',
   lastPaymentMethodId: 'last_payment_method_id',
@@ -46,6 +50,14 @@ export const SETTING_KEYS = {
   captureApps: 'capture_apps',
   hideAmounts: 'hide_amounts',
   swipeHintCount: 'swipe_hint_count',
+  autoBackupFrequency: 'auto_backup_frequency',
+  autoBackupTime: 'auto_backup_time',
+  autoBackupLast: 'auto_backup_last',
+  cloudBackupLast: 'cloud_backup_last',
+  /** '1' cuando las copias de la nube se cifran con contraseña (la contraseña NO se guarda aquí: iría dentro de las copias). */
+  cloudBackupEncrypted: 'cloud_backup_encrypted',
+  /** Motivo del último envío fallido a la nube; vacío si el último salió bien. */
+  cloudBackupError: 'cloud_backup_error',
   updateLastCheck: 'update_last_check',
   updateSkippedVersion: 'update_skipped_version',
   updateSkippedAt: 'update_skipped_at',

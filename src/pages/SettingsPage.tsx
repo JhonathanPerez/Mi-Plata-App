@@ -20,6 +20,8 @@ import { errorMessage } from '@/lib/errors';
 import { formatCOP } from '@/lib/money';
 import { pluralize } from '@/lib/text';
 import { backupService, parseBackup } from '@/services/backupService';
+import { BackupPasswordSheet } from '@/components/backup/BackupPasswordSheet';
+import { decryptBackup, isEncryptedBackup } from '@/lib/backupCrypto';
 import { budgetService } from '@/services/budgetService';
 import { captureAppsService } from '@/services/captureAppsService';
 import { captureService } from '@/services/captureService';
@@ -110,25 +112,11 @@ export function SettingsPage() {
     }
   };
 
-  const onBackup = async () => {
-    setBusy('Creando copia…');
-    try {
-      const result = await backupService.exportBackupFile();
-      if (result.outcome === 'downloaded') toast.show(`Copia descargada: ${result.fileName}`);
-      else if (result.outcome === 'shared') toast.show('Copia de seguridad lista');
-    } catch (error) {
-      toast.show(errorMessage(error), 'error');
-    } finally {
-      setBusy(null);
-    }
-  };
+  // Si la copia elegida está cifrada (las de la nube pueden estarlo), se guarda aquí mientras se pide la contraseña.
+  const [encryptedBackup, setEncryptedBackup] = useState<string | null>(null);
 
-  const onRestore = async (event: ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    event.target.value = '';
-    if (!file) return;
+  const restoreFromText = async (text: string) => {
     try {
-      const text = await file.text();
       const backup = parseBackup(text);
       const count = backup.data.expenses.length;
       const ok = await confirm({
@@ -145,6 +133,19 @@ export function SettingsPage() {
       toast.show(errorMessage(error), 'error');
     } finally {
       setBusy(null);
+    }
+  };
+
+  const onRestore = async (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    event.target.value = '';
+    if (!file) return;
+    try {
+      const text = await file.text();
+      if (isEncryptedBackup(text)) setEncryptedBackup(text);
+      else await restoreFromText(text);
+    } catch (error) {
+      toast.show(errorMessage(error), 'error');
     }
   };
 
@@ -245,7 +246,7 @@ export function SettingsPage() {
         />
       </Group>
 
-      {/* 6 · Datos y Acerca de. Importar, copia y restaurar abren el selector de archivos, y «Comprobar actualizaciones» un diálogo: por eso no llevan flecha. */}
+      {/* 6 · Datos y Acerca de. Importar y restaurar abren el selector de archivos, y «Comprobar actualizaciones» un diálogo: por eso no llevan flecha. */}
       <section className="section">
         <h2 className="section__title">Datos y acerca de</h2>
         <div className="card card--flush">
@@ -257,7 +258,7 @@ export function SettingsPage() {
             onClick={() => importRef.current?.click()}
             disabled={busy !== null}
           />
-          <Row icon="save" title="Crear copia de seguridad" detail="Para guardar o compartir" onClick={() => void onBackup()} disabled={busy !== null} />
+          <Row to="/ajustes/copias-de-seguridad" icon="save" title="Copias de seguridad" detail="Automáticas, en tu teléfono y en la nube" chevron="chevronRight" />
           <Row
             icon="refresh"
             title="Restaurar copia de seguridad"
@@ -305,6 +306,22 @@ export function SettingsPage() {
           {busy}
         </div>
       )}
+
+      <BackupPasswordSheet
+        open={encryptedBackup !== null}
+        onClose={() => setEncryptedBackup(null)}
+        title="Copia cifrada"
+        description="Esta copia está protegida con una contraseña. Escríbela para abrirla."
+        confirm={false}
+        submitLabel="Abrir copia"
+        onSubmit={async (password) => {
+          if (!encryptedBackup) return;
+          const plain = await decryptBackup(encryptedBackup, password);
+          setEncryptedBackup(null);
+          // Se restaura aparte: la hoja se cierra y aparece la confirmación de siempre.
+          void restoreFromText(plain);
+        }}
+      />
 
       <BudgetSheet open={budgetOpen} onClose={() => setBudgetOpen(false)} yearMonth={yearMonth} currentAmount={budget ?? 0} />
     </div>

@@ -10,6 +10,7 @@ public class MainActivity extends BridgeActivity {
         // Plugins propios: deben registrarse antes de super.onCreate().
         registerPlugin(NotificationCapturePlugin.class);
         registerPlugin(AppUpdatePlugin.class);
+        registerPlugin(CloudFolderPlugin.class);
         super.onCreate(savedInstanceState);
     }
 }
