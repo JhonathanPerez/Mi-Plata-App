@@ -1,6 +1,7 @@
 import { beforeAll, describe, expect, it } from 'vitest';
 import { initDatabase } from '@/db';
 import { setDbForTesting } from '@/db/connection';
+import { seedTestCards } from '@/test/fixtures';
 import { createTestDb } from '@/test/sqliteTestDb';
 import { cardService } from './cardService';
 import { expenseService } from './expenseService';
@@ -21,6 +22,7 @@ suite('avisos de pago con datos reales', () => {
   beforeAll(async () => {
     setDbForTesting(testDb);
     await initDatabase();
+    await seedTestCards();
     await add(NU, '2026-08-28', 50000); // extracto de agosto (vence hoy)
     await add(NU, '2026-09-03', 30000); // ciclo de septiembre (abierto)
     await add(DAVI, '2026-09-09', 20000); // extracto de septiembre de Davibank (cerró el 11 sep)

@@ -1,4 +1,3 @@
-import type { CycleRules } from '@/lib/cycles';
 import type { PaymentMethodType } from '@/types/models';
 
 export interface CategorySeed {
@@ -14,19 +13,7 @@ export interface PaymentMethodSeed {
   type: PaymentMethodType;
   icon: string;
   color: string;
-  /** Reglas de corte y pago (solo tarjetas de crédito). */
-  cycle?: CycleRules;
 }
-
-/** Nubank: corte el último día de cada mes; pago el día 20 del mes siguiente. */
-export const NUBANK_CYCLE: CycleRules = { cut: { kind: 'last' }, due: { kind: 'day', day: 20 }, dueNextMonth: true, weekend: 'keep' };
-/** Davibank: corte el segundo viernes de cada mes; pago máximo el segundo martes del mes siguiente. */
-export const DAVIBANK_CYCLE: CycleRules = {
-  cut: { kind: 'nth', nth: 2, weekday: 5 },
-  due: { kind: 'nth', nth: 2, weekday: 2 },
-  dueNextMonth: true,
-  weekend: 'keep',
-};
 
 /**
  * Categorías iniciales. Para agregar una por defecto basta con añadir una línea aquí
@@ -47,11 +34,11 @@ export const DEFAULT_CATEGORIES: CategorySeed[] = [
   { id: 'cat_otros', name: 'Otros', icon: '📦', color: '#4C5C68' },
 ];
 
-/** Métodos de pago iniciales. Para una tarjeta nueva por defecto, añade una línea. */
+/**
+ * Métodos de pago iniciales: solo los que no dependen del banco de cada persona.
+ * Las tarjetas y demás medios los crea el usuario desde «Métodos de pago».
+ */
 export const DEFAULT_PAYMENT_METHODS: PaymentMethodSeed[] = [
   { id: 'pm_efectivo', name: 'Efectivo', type: 'cash', icon: '💵', color: '#2A9D8F' },
-  { id: 'pm_davibank', name: 'Davibank', type: 'credit_card', icon: '💳', color: '#E4572E', cycle: DAVIBANK_CYCLE },
-  { id: 'pm_nubank', name: 'Nubank', type: 'credit_card', icon: '💳', color: '#9B5DE5', cycle: NUBANK_CYCLE },
-  { id: 'pm_rappicard', name: 'RappiCard', type: 'credit_card', icon: '💳', color: '#F29E4C' },
   { id: 'pm_transferencia', name: 'Transferencia', type: 'other', icon: '🏦', color: '#3D8FD1' },
 ];

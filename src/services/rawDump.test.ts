@@ -4,6 +4,7 @@ import { getDb, setDbForTesting } from '@/db/connection';
 import { RAW_DUMP_FORMAT } from '@/lib/rawDump';
 import { cardCycleRepository } from '@/repositories/cardCycleRepository';
 import { settingsRepository } from '@/repositories/settingsRepository';
+import { seedTestCards } from '@/test/fixtures';
 import { createTestDb } from '@/test/sqliteTestDb';
 import { backupService, parseBackup } from './backupService';
 import { budgetService } from './budgetService';
@@ -24,6 +25,7 @@ suite('un volcado de la base de datos se restaura igual que una copia normal', (
   beforeAll(async () => {
     setDbForTesting(testDb);
     await initDatabase();
+    await seedTestCards();
   });
 
   it('el volcado, ya convertido, tiene exactamente los mismos datos que la copia que arma la app', async () => {

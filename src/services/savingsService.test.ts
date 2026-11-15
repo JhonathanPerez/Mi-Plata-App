@@ -1,6 +1,7 @@
 import { beforeAll, describe, expect, it } from 'vitest';
 import { setDbForTesting } from '@/db/connection';
 import { initDatabase } from '@/db';
+import { seedTestCards } from '@/test/fixtures';
 import { createTestDb } from '@/test/sqliteTestDb';
 import { addDays, currentYearMonth, todayIso } from '@/lib/dates';
 import { backupService, parseBackup } from './backupService';
@@ -35,6 +36,7 @@ suite('cuentas de ahorro con SQLite real', () => {
   beforeAll(async () => {
     setDbForTesting(testDb);
     await initDatabase();
+    await seedTestCards();
   });
 
   it('crea cuentas con saldo inicial y su método de pago espejo', async () => {
