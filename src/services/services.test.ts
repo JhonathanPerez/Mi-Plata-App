@@ -1,6 +1,7 @@
 import { beforeAll, describe, expect, it } from 'vitest';
 import { setDbForTesting } from '@/db/connection';
 import { initDatabase } from '@/db';
+import { seedTestCards, TEST_CARDS } from '@/test/fixtures';
 import { createTestDb } from '@/test/sqliteTestDb';
 import { expenseService, validateExpenseInput } from './expenseService';
 import { categoryService } from './categoryService';
@@ -19,13 +20,18 @@ suite('servicios con SQLite real', () => {
   beforeAll(async () => {
     setDbForTesting(testDb);
     await initDatabase();
+    await seedTestCards();
   });
 
-  it('siembra categorías y métodos por defecto', async () => {
+  it('siembra todas las categorías pero solo Efectivo y Transferencia como métodos de pago', async () => {
     const categories = await categoryService.list();
-    const methods = await paymentMethodService.list();
+    // Las tarjetas de ejemplo las agrega la prueba; lo que queda es lo que trae la app de fábrica.
+    const cardIds = TEST_CARDS.map((c) => c.id);
+    const methods = (await paymentMethodService.list()).filter((m) => !cardIds.includes(m.id));
     expect(categories).toHaveLength(12);
-    expect(methods.map((m) => m.name)).toEqual(['Efectivo', 'Davibank', 'Nubank', 'RappiCard', 'Transferencia']);
+    expect(methods.map((m) => m.name)).toEqual(['Efectivo', 'Transferencia']);
+    expect(methods.map((m) => m.type)).toEqual(['cash', 'other']);
+    expect(methods.every((m) => m.cycle === null && m.isActive)).toBe(true);
   });
 
   it('valida gastos', () => {

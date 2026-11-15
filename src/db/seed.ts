@@ -1,6 +1,5 @@
 import { DEFAULT_CATEGORIES, DEFAULT_PAYMENT_METHODS } from '@/config/seeds';
 import { SETTING_KEYS } from '@/config/constants';
-import { serializeCycleRules } from '@/lib/cycles';
 import { nowIso } from '@/lib/ids';
 import type { Db } from './types';
 
@@ -22,10 +21,8 @@ export async function seedDefaults(db: Db): Promise<void> {
     await db.runMany(
       `INSERT OR IGNORE INTO payment_methods
          (id, name, type, icon, color, last4, is_active, sort_order, credit_limit, cutoff_day, due_day, cycle_rules, created_at, updated_at)
-       VALUES (?, ?, ?, ?, ?, NULL, 1, ?, NULL, NULL, NULL, ?, ?, ?)`,
-      DEFAULT_PAYMENT_METHODS.map((m, index) => [
-        m.id, m.name, m.type, m.icon, m.color, index, m.cycle ? serializeCycleRules(m.cycle) : null, now, now,
-      ]),
+       VALUES (?, ?, ?, ?, ?, NULL, 1, ?, NULL, NULL, NULL, NULL, ?, ?)`,
+      DEFAULT_PAYMENT_METHODS.map((m, index) => [m.id, m.name, m.type, m.icon, m.color, index, now, now]),
     );
     await db.run('INSERT OR REPLACE INTO settings (key, value) VALUES (?, ?)', [SETTING_KEYS.seeded, '1']);
   });

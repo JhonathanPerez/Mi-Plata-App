@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
-import { DEFAULT_PAYMENT_METHODS } from '@/config/seeds';
 import { runMigrations } from '@/db/migrate';
 import { seedDefaults } from '@/db/seed';
+import { LEGACY_PAYMENT_METHODS } from '@/test/fixtures';
 import { createTestDb } from '@/test/sqliteTestDb';
 import { migration001 } from './001_init';
 import { migrations } from './index';
@@ -19,7 +19,7 @@ suite('migración 002: método de pago Transferencia', () => {
     for (const statement of migration001.statements) await db.execute(statement as string);
     await db.run("INSERT INTO schema_migrations VALUES (1, 'init', '2026-01-01T00:00:00.000Z')");
     await db.run("INSERT INTO settings (key, value) VALUES ('seeded', '1')");
-    const old = DEFAULT_PAYMENT_METHODS.filter((m) => m.id !== 'pm_transferencia');
+    const old = LEGACY_PAYMENT_METHODS.filter((m) => m.id !== 'pm_transferencia');
     await db.runMany(
       `INSERT INTO payment_methods (id, name, type, icon, color, last4, is_active, sort_order, created_at, updated_at)
        VALUES (?, ?, ?, ?, ?, NULL, 1, ?, 'x', 'x')`,
@@ -55,6 +55,36 @@ suite('migración 002: método de pago Transferencia', () => {
   it('en una instalación nueva la siembra queda en el orden correcto y sin duplicados', async () => {
     const db = createTestDb()!;
     await runMigrations(db);
+    await seedDefaults(db);
+    await seedDefaults(db); // idempotente
+    const rows = await db.query<{ name: string }>('SELECT name FROM payment_methods ORDER BY sort_order');
+    expect(rows.map((r) => r.name)).toEqual(['Efectivo', 'Transferencia']);
+  });
+});
+
+suite('siembra de métodos de pago', () => {
+  it('una instalación nueva solo trae Efectivo y Transferencia, sin tarjetas ni reglas de corte', async () => {
+    const db = createTestDb()!;
+    await runMigrations(db);
+    await seedDefaults(db);
+    const rows = await db.query<{ id: string; type: string; cycle_rules: string | null; is_active: number }>(
+      'SELECT id, type, cycle_rules, is_active FROM payment_methods ORDER BY sort_order',
+    );
+    expect(rows).toEqual([
+      { id: 'pm_efectivo', type: 'cash', cycle_rules: null, is_active: 1 },
+      { id: 'pm_transferencia', type: 'other', cycle_rules: null, is_active: 1 },
+    ]);
+  });
+
+  it('una instalación que ya tenía tarjetas las conserva: la siembra no vuelve a correr ni borra nada', async () => {
+    const db = createTestDb()!;
+    await runMigrations(db);
+    await db.run("INSERT INTO settings (key, value) VALUES ('seeded', '1')");
+    await db.runMany(
+      `INSERT INTO payment_methods (id, name, type, icon, color, last4, is_active, sort_order, created_at, updated_at)
+       VALUES (?, ?, ?, ?, ?, NULL, 1, ?, 'x', 'x')`,
+      LEGACY_PAYMENT_METHODS.map((m, i) => [m.id, m.name, m.type, m.icon, m.color, i]),
+    );
     await seedDefaults(db);
     const rows = await db.query<{ name: string }>('SELECT name FROM payment_methods ORDER BY sort_order');
     expect(rows.map((r) => r.name)).toEqual(['Efectivo', 'Davibank', 'Nubank', 'RappiCard', 'Transferencia']);

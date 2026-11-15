@@ -1,5 +1,4 @@
 import { beforeAll, describe, expect, it } from 'vitest';
-import { DAVIBANK_CYCLE, NUBANK_CYCLE } from '@/config/seeds';
 import { initDatabase } from '@/db';
 import { setDbForTesting } from '@/db/connection';
 import { runMigrations } from '@/db/migrate';
@@ -7,6 +6,7 @@ import { migration001 } from '@/db/migrations/001_init';
 import { migration003 } from '@/db/migrations/003_pending_captures';
 import { migration004 } from '@/db/migrations/004_paid_status_and_cycles';
 import { parseCycleRules } from '@/lib/cycles';
+import { DAVIBANK_CYCLE, NUBANK_CYCLE, seedTestCards } from '@/test/fixtures';
 import { createTestDb } from '@/test/sqliteTestDb';
 import { backupService, parseBackup } from './backupService';
 import { cardService } from './cardService';
@@ -28,9 +28,10 @@ suite('estado pagado / por pagar y extractos de tarjeta', () => {
   beforeAll(async () => {
     setDbForTesting(testDb);
     await initDatabase();
+    await seedTestCards();
   });
 
-  it('las semillas traen las reglas de Nubank y Davibank', async () => {
+  it('las tarjetas de ejemplo traen las reglas de Nubank y Davibank', async () => {
     const methods = await paymentMethodService.list();
     expect(methods.find((m) => m.id === NU)?.cycle).toEqual(NUBANK_CYCLE);
     expect(methods.find((m) => m.id === DAVI)?.cycle).toEqual(DAVIBANK_CYCLE);
@@ -261,7 +262,7 @@ migrationSuite('migración 004 sobre una instalación existente', () => {
     expect(byId.get('pm_efectivo')).toBeNull();
   });
 
-  it('el JSON de la migración coincide con las semillas (no se desincronizan)', () => {
+  it('el JSON de la migración coincide con las reglas de ejemplo (no se desincronizan)', () => {
     const params = migration004.statements.flatMap((s) => (typeof s === 'string' ? [] : (s.params ?? [])));
     expect(params.map((p) => parseCycleRules(String(p)))).toEqual([NUBANK_CYCLE, DAVIBANK_CYCLE]);
   });

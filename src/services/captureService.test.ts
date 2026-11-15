@@ -1,6 +1,7 @@
 import { beforeAll, describe, expect, it } from 'vitest';
 import { setDbForTesting } from '@/db/connection';
 import { initDatabase } from '@/db';
+import { seedTestCards } from '@/test/fixtures';
 import { createTestDb } from '@/test/sqliteTestDb';
 import { captureService, suggestPaymentMethodId, type RawCaptureEvent } from './captureService';
 import { expenseService } from './expenseService';
@@ -24,6 +25,7 @@ suite('captura automática con SQLite real', () => {
   beforeAll(async () => {
     setDbForTesting(testDb);
     await initDatabase();
+    await seedTestCards();
   });
 
   it('la migración crea la tabla y arranca vacía', async () => {
