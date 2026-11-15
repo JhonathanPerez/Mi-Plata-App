@@ -11,6 +11,7 @@ public class MainActivity extends BridgeActivity {
         registerPlugin(NotificationCapturePlugin.class);
         registerPlugin(AppUpdatePlugin.class);
         registerPlugin(CloudFolderPlugin.class);
+        registerPlugin(BackupSchedulePlugin.class);
         super.onCreate(savedInstanceState);
     }
 }

@@ -1,8 +1,9 @@
-import { SETTING_KEYS } from '@/config/constants';
+import { AUTO_BACKUP_KEEP, SETTING_KEYS } from '@/config/constants';
 import { isValidTime, todayIso } from '@/lib/dates';
+import { backgroundBackup, type BackgroundStatus } from '@/lib/backgroundBackup';
 import { errorMessage } from '@/lib/errors';
 import {
-  BACKUP_SCHEDULE_CHANGED, backupFileName, computeNextBackup, DEFAULT_AUTO_BACKUP_FREQUENCY, DEFAULT_AUTO_BACKUP_TIME, isAutoBackupFrequency, isBackupDue, namesToPrune,
+  BACKUP_SCHEDULE_CHANGED, backupFileName, backupIntervalDays, computeNextBackup, DEFAULT_AUTO_BACKUP_FREQUENCY, DEFAULT_AUTO_BACKUP_TIME, isAutoBackupFrequency, isBackupDue, namesToPrune,
   type AutoBackupFrequency,
 } from '@/lib/autoBackup';
 import { backupStore, type StoredBackup } from '@/lib/backupStore';
@@ -10,6 +11,13 @@ import { settingsRepository } from '@/repositories/settingsRepository';
 import type { IsoDate } from '@/types/models';
 import { backupService } from './backupService';
 import { cloudBackupService } from './cloudBackupService';
+
+/** Sin datos no hay nada que guardar: una copia vacía solo serviría para desplazar a las buenas (se conservan las últimas). */
+const NO_DATA_MESSAGE = 'Todavía no hay datos que guardar. Registra algún gasto y vuelve a intentarlo.';
+
+async function requireData(): Promise<void> {
+  if (!(await backupService.hasUserData())) throw new Error(NO_DATA_MESSAGE);
+}
 
 /** Evita dos copias a la vez cuando coinciden el arranque y el regreso a la app. */
 let running: Promise<StoredBackup | null> | null = null;
@@ -76,9 +84,15 @@ export const autoBackupService = {
     return backupStore.isSupported() ? backupStore.list() : Promise.resolve([]);
   },
 
+  /** ¿Hay algo que guardar? Sin datos no se hacen copias (ni automáticas ni a mano). */
+  hasData(): Promise<boolean> {
+    return backupService.hasUserData();
+  },
+
   /** Hace una copia ahora, sin importar la frecuencia. */
-  runNow(today: IsoDate = todayIso()): Promise<StoredBackup | null> {
-    if (!backupStore.isSupported()) return Promise.resolve(null);
+  async runNow(today: IsoDate = todayIso()): Promise<StoredBackup | null> {
+    if (!backupStore.isSupported()) return null;
+    await requireData();
     running ??= createStoredBackup(today).finally(() => {
       running = null;
     });
@@ -90,6 +104,8 @@ export const autoBackupService = {
     if (!backupStore.isSupported()) return false;
     const [frequency, last, time] = await Promise.all([this.getFrequency(), this.getLastDate(), this.getTime()]);
     if (!isBackupDue(frequency, last, time, now)) return false;
+    // Instalación nueva (o sin datos todavía): no se hace copia; se hará apenas haya algo que guardar.
+    if (!(await this.hasData())) return false;
     return (await this.runNow(todayIso(now))) !== null;
   },
 
@@ -102,8 +118,9 @@ export const autoBackupService = {
   },
 
   /** Envía una copia a la carpeta de la nube ahora, sin importar la frecuencia. */
-  uploadToCloud(today: IsoDate = todayIso()): Promise<void> {
-    if (!cloudBackupService.isSupported()) return Promise.resolve();
+  async uploadToCloud(today: IsoDate = todayIso()): Promise<void> {
+    if (!cloudBackupService.isSupported()) return;
+    await requireData();
     uploading ??= backupTextFor(today)
       .then((text) => cloudBackupService.upload(text, today))
       .then(() => cloudBackupService.clearError())
@@ -123,6 +140,7 @@ export const autoBackupService = {
     if (!cloudBackupService.isSupported()) return false;
     const [frequency, last, time, folder] = await Promise.all([this.getFrequency(), cloudBackupService.getLastDate(), this.getTime(), cloudBackupService.getFolder()]);
     if (!folder || !isBackupDue(frequency, last, time, now)) return false;
+    if (!(await this.hasData())) return false;
     await this.uploadToCloud(todayIso(now));
     return true;
   },
@@ -140,6 +158,39 @@ export const autoBackupService = {
     );
     if (moments.length === 0) return null;
     return Math.max(0, Math.min(...moments.map((moment) => moment.getTime())) - now.getTime());
+  },
+
+  /**
+   * Deja la tarea en segundo plano de Android programada como el horario elegido: a la hora y con la frecuencia de las
+   * copias, y solo si hay carpeta de la nube (es donde escribe). Apagada o sin carpeta, la cancela. Es barato y no
+   * interrumpe una tarea en curso, así que se puede llamar cada vez que se abre la app.
+   */
+  async syncBackgroundSchedule(): Promise<void> {
+    if (!backgroundBackup.isSupported()) return;
+    const [frequency, time, folder] = await Promise.all([this.getFrequency(), this.getTime(), cloudBackupService.getFolder()]);
+    const days = backupIntervalDays(frequency);
+    if (days === null || !folder) await backgroundBackup.cancel();
+    else await backgroundBackup.schedule(time, days, AUTO_BACKUP_KEEP);
+  },
+
+  /** Cómo le fue a la tarea en segundo plano; null si no hay (no es Android, o el plugin es de una versión anterior). */
+  async getBackgroundStatus(): Promise<BackgroundStatus | null> {
+    if (!backgroundBackup.isSupported()) return null;
+    return backgroundBackup.getStatus().catch(() => null);
+  },
+
+  /**
+   * Pone al día lo que hizo la tarea en segundo plano mientras la app estaba cerrada: si dejó una copia en la carpeta más
+   * reciente que la que la app conocía, la anota (así no se repite ni se avisa de un atraso que no existe); y si falló, deja
+   * el motivo para mostrarlo.
+   */
+  async reconcileBackgroundBackup(): Promise<void> {
+    const status = await this.getBackgroundStatus();
+    if (!status) return;
+    const known = await cloudBackupService.getLastDate();
+    if (status.lastCloudDate && (!known || status.lastCloudDate > known)) await cloudBackupService.setLastDate(status.lastCloudDate);
+    if (status.lastOk === false && status.lastError) await cloudBackupService.recordError(status.lastError);
+    else if (status.lastOk === true && status.lastCloudDate) await cloudBackupService.clearError();
   },
 
   /** El contenido de una copia guardada (para compartirla o restaurarla). */

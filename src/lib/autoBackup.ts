@@ -20,6 +20,18 @@ export const BACKUP_SCHEDULE_CHANGED = 'miplata:backup-schedule-changed';
 
 const FREQUENCY_DAYS: Record<Exclude<AutoBackupFrequency, 'off'>, number> = { daily: 1, weekly: 7, monthly: 30 };
 
+/** Cada cuántos días se hace la copia según la frecuencia; null si está apagada. */
+export function backupIntervalDays(frequency: AutoBackupFrequency): number | null {
+  return frequency === 'off' ? null : FREQUENCY_DAYS[frequency];
+}
+
+/** Cómo le fue a la copia en segundo plano la última vez que se ejecutó (lo informa el plugin de Android). */
+export interface BackgroundRunInfo {
+  lastRunAt?: number;
+  lastOk?: boolean;
+  lastError?: string;
+}
+
 export function isAutoBackupFrequency(value: unknown): value is AutoBackupFrequency {
   return value === 'off' || value === 'daily' || value === 'weekly' || value === 'monthly';
 }

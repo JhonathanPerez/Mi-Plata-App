@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
-  backupFileName, cloudBackupFileName, computeNextBackup, dateFromBackupName, dateFromCloudBackupName, describeCloudLag, describeNextBackup, isAutoBackupFrequency, isBackupDue, namesToPrune,
+  backupFileName, cloudBackupFileName, backupIntervalDays, computeNextBackup, dateFromBackupName, dateFromCloudBackupName, describeCloudLag, describeNextBackup, isAutoBackupFrequency, isBackupDue, namesToPrune,
 } from './autoBackup';
 
 const at = (iso: string, time: string) => new Date(`${iso}T${time}:00`);
@@ -49,6 +49,15 @@ describe('isBackupDue', () => {
 
   it('la primera copia toca apenas se activa', () => {
     expect(isBackupDue('monthly', null, '21:00', at('2026-11-13', '10:00'))).toBe(true);
+  });
+});
+
+describe('backupIntervalDays', () => {
+  it('traduce la frecuencia a días y apagada a nada', () => {
+    expect(backupIntervalDays('daily')).toBe(1);
+    expect(backupIntervalDays('weekly')).toBe(7);
+    expect(backupIntervalDays('monthly')).toBe(30);
+    expect(backupIntervalDays('off')).toBeNull();
   });
 });
 

@@ -1,6 +1,7 @@
 import { AUTO_BACKUP_KEEP, SETTING_KEYS } from '@/config/constants';
 import { cloudBackupFileName, dateFromCloudBackupName, namesToPrune } from '@/lib/autoBackup';
 import { encryptBackup, MIN_PASSWORD_LENGTH } from '@/lib/backupCrypto';
+import { backupSecret } from '@/lib/backupSecret';
 import { cloudFolder, type CloudFolder } from '@/lib/cloudFolder';
 import { todayIso } from '@/lib/dates';
 import { ValidationError } from '@/lib/errors';
@@ -9,20 +10,6 @@ import type { IsoDate } from '@/types/models';
 
 /** `missing`: el cifrado está activado pero este teléfono no tiene la contraseña (por ejemplo, tras restaurar en uno nuevo). */
 export type CloudEncryption = 'off' | 'on' | 'missing';
-
-const PASSWORD_KEY = 'miplata.cloudBackupPassword';
-
-/**
- * La contraseña vive solo en el almacenamiento privado de la app (no en la base de datos): si estuviera allí, iría dentro
- * de cada copia de seguridad, junto a lo que protege. La carpeta de la nube nunca la recibe.
- */
-function readPassword(): string | null {
-  try {
-    return localStorage.getItem(PASSWORD_KEY);
-  } catch {
-    return null;
-  }
-}
 
 export const cloudBackupService = {
   isSupported(): boolean {
@@ -45,23 +32,28 @@ export const cloudBackupService = {
 
   async getEncryption(): Promise<CloudEncryption> {
     if ((await settingsRepository.get(SETTING_KEYS.cloudBackupEncrypted)) !== '1') return 'off';
-    return readPassword() ? 'on' : 'missing';
+    return (await backupSecret.get()) ? 'on' : 'missing';
   },
 
-  /** Activa el cifrado, o cambia la contraseña si ya estaba activo. */
+  /** Define la contraseña de cifrado, o la cambia si ya existía. Sin ella no sale ninguna copia del teléfono. */
   async enableEncryption(password: string): Promise<void> {
     if (password.length < MIN_PASSWORD_LENGTH) throw new ValidationError(`Usa al menos ${MIN_PASSWORD_LENGTH} caracteres.`);
-    localStorage.setItem(PASSWORD_KEY, password);
+    await backupSecret.set(password);
     await settingsRepository.set(SETTING_KEYS.cloudBackupEncrypted, '1');
   },
 
-  async disableEncryption(): Promise<void> {
-    try {
-      localStorage.removeItem(PASSWORD_KEY);
-    } catch {
-      // Sin almacenamiento no había contraseña guardada.
-    }
-    await settingsRepository.set(SETTING_KEYS.cloudBackupEncrypted, '0');
+  /** La contraseña, o un error que explica qué falta. Es lo único que deja salir una copia del teléfono. */
+  async requirePassword(): Promise<string> {
+    const encryption = await this.getEncryption();
+    const password = await backupSecret.get();
+    if (encryption === 'off') throw new Error('Define una contraseña de cifrado para sacar copias del teléfono.');
+    if (encryption === 'missing' || !password) throw new Error('Falta la contraseña de cifrado en este teléfono. Defínela de nuevo.');
+    return password;
+  },
+
+  /** Cifra el texto de una copia con la contraseña, para compartirla o subirla. Falla si no hay contraseña: nunca devuelve texto plano. */
+  async encryptForExport(backupText: string): Promise<string> {
+    return encryptBackup(backupText, await this.requirePassword());
   },
 
   /** Por qué falló el último envío; null si el último salió bien (o todavía no se ha intentado). */
@@ -77,23 +69,23 @@ export const cloudBackupService = {
     await settingsRepository.set(SETTING_KEYS.cloudBackupError, '');
   },
 
+  /** La fecha de la última copia enviada a la nube, cuando la hizo la tarea en segundo plano y la app se entera al abrirse. */
+  async setLastDate(date: IsoDate): Promise<void> {
+    await settingsRepository.set(SETTING_KEYS.cloudBackupLast, date);
+  },
+
   /** Fecha de la última copia enviada a la nube; null si todavía no se ha enviado ninguna. */
   getLastDate(): Promise<IsoDate | null> {
     return settingsRepository.get(SETTING_KEYS.cloudBackupLast);
   },
 
   /**
-   * Envía el texto de una copia a la carpeta elegida (cifrado si así se configuró) y conserva solo las últimas.
-   * Nunca envía sin cifrar si el cifrado está activado: sin contraseña, falla.
+   * Envía el texto de una copia a la carpeta elegida, siempre cifrado, y conserva solo las últimas.
+   * Sin contraseña no envía nada: falla en vez de subir la copia en texto plano.
    */
   async upload(backupText: string, today: IsoDate = todayIso()): Promise<void> {
     if (!(await cloudFolder.get())) throw new Error('No hay una carpeta de la nube elegida, o se perdió el acceso a ella.');
-    const encryption = await this.getEncryption();
-    const password = readPassword();
-    if (encryption === 'missing' || (encryption === 'on' && !password)) {
-      throw new Error('Falta la contraseña de cifrado en este teléfono. Defínela de nuevo para enviar copias.');
-    }
-    const payload = encryption === 'on' && password ? await encryptBackup(backupText, password) : backupText;
+    const payload = await this.encryptForExport(backupText);
     const name = cloudBackupFileName(today);
     await cloudFolder.write(name, payload);
     await settingsRepository.set(SETTING_KEYS.cloudBackupLast, today);
