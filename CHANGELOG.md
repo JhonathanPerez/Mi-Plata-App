@@ -1,3 +1,10 @@
+# [1.6.0](https://github.com/JhonathanPerez/Mi-Plata-App/compare/v1.5.0...v1.6.0) (2026-11-15)
+
+
+### Features
+
+* **ajustes:** copias de seguridad programadas por hora que se envían solas a la nube. ([#46](https://github.com/JhonathanPerez/Mi-Plata-App/issues/46)) ([c8d1dc6](https://github.com/JhonathanPerez/Mi-Plata-App/commit/c8d1dc6895b33db0346254e76ef667fbc18aa222))
+
 # [1.5.0](https://github.com/JhonathanPerez/Mi-Plata-App/compare/v1.4.0...v1.5.0) (2026-11-12)
 
 
