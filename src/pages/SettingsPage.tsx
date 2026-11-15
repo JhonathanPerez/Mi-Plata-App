@@ -1,5 +1,4 @@
 import { useRef, useState, type ChangeEvent, type ReactNode } from 'react';
-import { useConfirm } from '@/app/providers/ConfirmProvider';
 import { useTheme } from '@/app/providers/ThemeProvider';
 import { useToast } from '@/app/providers/ToastProvider';
 import { useUpdate } from '@/app/providers/UpdateProvider';
@@ -19,7 +18,6 @@ import { HOUR_LABELS } from '@/lib/reminders';
 import { errorMessage } from '@/lib/errors';
 import { formatCOP } from '@/lib/money';
 import { pluralize } from '@/lib/text';
-import { backupService, parseBackup } from '@/services/backupService';
 import { budgetService } from '@/services/budgetService';
 import { captureAppsService } from '@/services/captureAppsService';
 import { captureService } from '@/services/captureService';
@@ -76,7 +74,6 @@ function updateDetail({ supported, checking, available }: ReturnType<typeof useU
 
 export function SettingsPage() {
   const toast = useToast();
-  const confirm = useConfirm();
   const { mode, setMode } = useTheme();
   const yearMonth = currentYearMonth();
   const { data: budget } = useQuery(() => budgetService.getAmount(yearMonth), [yearMonth]);
@@ -90,7 +87,6 @@ export function SettingsPage() {
   const [budgetOpen, setBudgetOpen] = useState(false);
   const [busy, setBusy] = useState<string | null>(null);
   const importRef = useRef<HTMLInputElement>(null);
-  const restoreRef = useRef<HTMLInputElement>(null);
 
   const onImport = async (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -103,44 +99,6 @@ export function SettingsPage() {
       if (result.duplicates > 0) parts.push(`${result.duplicates} ya existían.`);
       if (result.invalid > 0) parts.push(`${result.invalid} filas se omitieron por datos inválidos.`);
       toast.show(parts.join(' '), result.invalid > 0 ? 'info' : 'success');
-    } catch (error) {
-      toast.show(errorMessage(error), 'error');
-    } finally {
-      setBusy(null);
-    }
-  };
-
-  const onBackup = async () => {
-    setBusy('Creando copia…');
-    try {
-      const result = await backupService.exportBackupFile();
-      if (result.outcome === 'downloaded') toast.show(`Copia descargada: ${result.fileName}`);
-      else if (result.outcome === 'shared') toast.show('Copia de seguridad lista');
-    } catch (error) {
-      toast.show(errorMessage(error), 'error');
-    } finally {
-      setBusy(null);
-    }
-  };
-
-  const onRestore = async (event: ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    event.target.value = '';
-    if (!file) return;
-    try {
-      const text = await file.text();
-      const backup = parseBackup(text);
-      const count = backup.data.expenses.length;
-      const ok = await confirm({
-        title: '¿Restaurar esta copia?',
-        message: `Se reemplazarán TODOS tus datos actuales por los de la copia (${count} ${pluralize(count, 'gasto', 'gastos')}, creada el ${backup.exportedAt.slice(0, 10)}). Esta acción no se puede deshacer.`,
-        confirmLabel: 'Restaurar',
-        danger: true,
-      });
-      if (!ok) return;
-      setBusy('Restaurando…');
-      await backupService.restore(text);
-      toast.show('Copia restaurada');
     } catch (error) {
       toast.show(errorMessage(error), 'error');
     } finally {
@@ -245,7 +203,7 @@ export function SettingsPage() {
         />
       </Group>
 
-      {/* 6 · Datos y Acerca de. Importar, copia y restaurar abren el selector de archivos, y «Comprobar actualizaciones» un diálogo: por eso no llevan flecha. */}
+      {/* 6 · Datos y Acerca de. Importar abre el selector de archivos, y «Comprobar actualizaciones» un diálogo: por eso no llevan flecha. */}
       <section className="section">
         <h2 className="section__title">Datos y acerca de</h2>
         <div className="card card--flush">
@@ -257,15 +215,7 @@ export function SettingsPage() {
             onClick={() => importRef.current?.click()}
             disabled={busy !== null}
           />
-          <Row icon="save" title="Crear copia de seguridad" detail="Para guardar o compartir" onClick={() => void onBackup()} disabled={busy !== null} />
-          <Row
-            icon="refresh"
-            title="Restaurar copia de seguridad"
-            detail="Reemplaza todos tus datos"
-            tone="danger"
-            onClick={() => restoreRef.current?.click()}
-            disabled={busy !== null}
-          />
+          <Row to="/ajustes/copias-de-seguridad" icon="save" title="Copias de seguridad" detail="Automáticas, en tu teléfono y en la nube" chevron="chevronRight" />
           <Row
             icon="update"
             title="Comprobar actualizaciones"
@@ -298,7 +248,6 @@ export function SettingsPage() {
         accept=".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
         onChange={onImport}
       />
-      <input ref={restoreRef} type="file" hidden accept=".json,application/json" onChange={onRestore} />
 
       {busy && (
         <div className="busy" role="status">

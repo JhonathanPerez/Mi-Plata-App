@@ -1,6 +1,7 @@
 import { HashRouter, Route, Routes } from 'react-router-dom';
 import { PageTransition } from '@/components/ui/PageTransition';
 import { ReminderSync } from './ReminderSync';
+import { AutoBackupPage } from '@/pages/AutoBackupPage';
 import { CaptureSetupPage } from '@/pages/CaptureSetupPage';
 import { CardRulesPage } from '@/pages/CardRulesPage';
 import { CardsPage } from '@/pages/CardsPage';
@@ -24,6 +25,7 @@ import { SettingsPage } from '@/pages/SettingsPage';
 import { StatsPage } from '@/pages/StatsPage';
 import { AppShell } from './AppShell';
 import { BackButtonHandler } from './BackButtonHandler';
+import { AutoBackupSync } from './AutoBackupSync';
 import { CaptureSync } from './CaptureSync';
 import { DatabaseGate } from './DatabaseGate';
 import { LockGate } from './LockGate';
@@ -38,6 +40,8 @@ export function App() {
     <DatabaseGate>
       {/* Recoge los gastos que detectó el teléfono; no tiene pantalla y no depende del bloqueo. */}
       <CaptureSync />
+      {/* Hace las copias de seguridad automáticas cuando toca; tampoco tiene pantalla. */}
+      <AutoBackupSync />
       <ThemeProvider>
         {/* LockGate: mientras la app esté bloqueada, no se monta nada de lo que hay debajo. */}
         <LockGate>
@@ -70,6 +74,7 @@ export function App() {
                   <Route path="ajustes/categorias" element={<PageTransition><CategoriesPage /></PageTransition>} />
                   <Route path="ajustes/metodos" element={<PageTransition><PaymentMethodsPage /></PageTransition>} />
                   <Route path="ajustes/exportar" element={<PageTransition><ExportPage /></PageTransition>} />
+                  <Route path="ajustes/copias-de-seguridad" element={<PageTransition><AutoBackupPage /></PageTransition>} />
                   <Route path="ajustes/captura" element={<PageTransition><CaptureSetupPage /></PageTransition>} />
                   <Route path="ajustes/apps" element={<PageTransition><TrackedAppsPage /></PageTransition>} />
                   <Route path="ajustes/bloqueo" element={<PageTransition><LockSettingsPage /></PageTransition>} />

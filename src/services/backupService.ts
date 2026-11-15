@@ -4,6 +4,7 @@ import { isValidIsoDate, isValidTime } from '@/lib/dates';
 import { notifyDataChanged } from '@/lib/dataBus';
 import { ValidationError } from '@/lib/errors';
 import { nowIso } from '@/lib/ids';
+import { isRawDump, rawDumpToBackup } from '@/lib/rawDump';
 import { backupRepository, type BackupData } from '@/repositories/backupRepository';
 import { cardCycleRepository, type StoredStatementDates } from '@/repositories/cardCycleRepository';
 import { budgetRepository } from '@/repositories/budgetRepository';
@@ -191,6 +192,8 @@ export function parseBackup(text: string): BackupFile {
   } catch {
     throw new ValidationError('Este archivo no es una copia de seguridad válida.');
   }
+  // Las copias de la tarea en segundo plano de Android son un volcado de la base de datos: se convierten a la copia normal.
+  if (isRawDump(raw)) raw = rawDumpToBackup(raw);
   if (!isRecord(raw) || raw.format !== BACKUP_FORMAT || !isRecord(raw.data)) {
     throw new ValidationError('Este archivo no es una copia de seguridad de Mi Plata.');
   }
@@ -256,6 +259,11 @@ export function parseBackup(text: string): BackupFile {
 }
 
 export const backupService = {
+  /** ¿Hay algo que guardar? Una instalación nueva no tiene datos: hacer una copia de ella solo reemplazaría copias buenas. */
+  hasUserData(): Promise<boolean> {
+    return backupRepository.hasUserData();
+  },
+
   async createBackup(): Promise<BackupFile> {
     const [categories, paymentMethods, expenses, budgets, settings, cardStatementDates, savingsAccounts, savingsMovements] = await Promise.all([
       categoryRepository.list(true),

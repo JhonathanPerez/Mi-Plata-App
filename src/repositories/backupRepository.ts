@@ -18,6 +18,19 @@ export interface BackupData {
 }
 
 export const backupRepository = {
+  /**
+   * ¿La persona ya registró algo? Gastos, presupuestos, cuentas de ahorro o fechas de extractos. Las categorías y métodos de
+   * pago de fábrica no cuentan: una instalación nueva los trae y aun así no hay nada que guardar.
+   */
+  async hasUserData(): Promise<boolean> {
+    const db = await getDb();
+    const rows = await db.query(
+      `SELECT (EXISTS (SELECT 1 FROM expenses) OR EXISTS (SELECT 1 FROM budgets) OR EXISTS (SELECT 1 FROM savings_accounts)
+               OR EXISTS (SELECT 1 FROM card_statement_dates)) AS has_data`,
+    );
+    return Number(rows[0]?.has_data) === 1;
+  },
+
   /** Reemplaza TODO el contenido de la base por el de la copia, en una sola transacción. */
   async replaceAll(data: BackupData): Promise<void> {
     const db = await getDb();

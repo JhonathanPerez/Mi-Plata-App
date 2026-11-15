@@ -11,6 +11,10 @@
  *  4. Avisos de pago: permiso POST_NOTIFICATIONS (Android 13+) e ícono res/drawable/ic_stat_miplata.xml.
  *  5. Actualizaciones desde la app: permiso REQUEST_INSTALL_PACKAGES, UpdateFileProvider («.updates») y res/xml/update_paths.xml
  *     (los usa AppUpdatePlugin.java para entregarle el APK descargado al instalador de Android).
+ *  6. Copia en la nube: CloudFolderPlugin.java guarda las copias en una carpeta que la persona elige con el selector de Android
+ *     (Storage Access Framework). No necesita permisos ni cambios en el manifiesto.
+ *  7. Copias en segundo plano: BackupSchedulePlugin.java y BackupWorker.java programan, con WorkManager, una tarea a la hora
+ *     elegida que corre aunque la app esté cerrada. Agrega androidx.work:work-runtime a android/app/build.gradle.
  */
 import { existsSync, readFileSync, readdirSync, statSync, writeFileSync, mkdirSync } from 'node:fs';
 import { join, resolve } from 'node:path';
@@ -162,7 +166,7 @@ function findMainActivity(dir) {
   return null;
 }
 
-const PLUGINS = ['NotificationCapturePlugin', 'AppUpdatePlugin'];
+const PLUGINS = ['NotificationCapturePlugin', 'AppUpdatePlugin', 'CloudFolderPlugin', 'BackupSchedulePlugin'];
 
 const mainPath = findMainActivity(javaRoot);
 if (!mainPath) {
@@ -187,6 +191,23 @@ if (!mainPath) {
       console.warn(`[nativo] Tu MainActivity.java está personalizada: agrega registerPlugin(X.class) antes de super.onCreate() para: ${missing.join(', ')}.`);
     }
   }
+}
+
+// 7) WorkManager (copias en segundo plano): una dependencia en el build.gradle de la app. Seguro de repetir.
+const appGradlePath = join(androidDir, 'app/build.gradle');
+const WORK_DEPENDENCY = 'androidx.work:work-runtime:2.9.1';
+if (existsSync(appGradlePath)) {
+  const gradle = readFileSync(appGradlePath, 'utf8');
+  if (!gradle.includes('androidx.work:work-runtime')) {
+    if (/^dependencies\s*\{/m.test(gradle)) {
+      writeFileSync(appGradlePath, gradle.replace(/^dependencies\s*\{/m, (match) => `${match}\n    implementation "${WORK_DEPENDENCY}"`));
+      changes.push('build.gradle: dependencia de WorkManager');
+    } else {
+      console.warn(`[nativo] No encontré el bloque dependencies { } en app/build.gradle. Agrega: implementation "${WORK_DEPENDENCY}"`);
+    }
+  }
+} else {
+  console.warn(`[nativo] No encontré android/app/build.gradle: agrega implementation "${WORK_DEPENDENCY}" a las dependencias de la app.`);
 }
 
 console.log(changes.length ? `[nativo] ${changes.join('; ')}.` : '[nativo] Sin cambios (ya estaba aplicado).');
