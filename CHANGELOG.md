@@ -1,3 +1,10 @@
+## [1.6.1](https://github.com/JhonathanPerez/Mi-Plata-App/compare/v1.6.0...v1.6.1) (2026-11-15)
+
+
+### Bug Fixes
+
+* **pagos:** instalaciones nuevas solo traen Efectivo y Transferencia como métodos de pago ([#47](https://github.com/JhonathanPerez/Mi-Plata-App/issues/47)) ([75bb2f5](https://github.com/JhonathanPerez/Mi-Plata-App/commit/75bb2f57d0beb191726fdbd0b316bf4fac4fb38d))
+
 # [1.6.0](https://github.com/JhonathanPerez/Mi-Plata-App/compare/v1.5.0...v1.6.0) (2026-11-15)
 
 
