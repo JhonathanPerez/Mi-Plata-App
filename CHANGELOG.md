@@ -1,3 +1,10 @@
+## [1.6.3](https://github.com/JhonathanPerez/Mi-Plata-App/compare/v1.6.2...v1.6.3) (2026-11-16)
+
+
+### Bug Fixes
+
+* **ui:** usa flecha hacia abajo en el icono de actualizaciones ([#49](https://github.com/JhonathanPerez/Mi-Plata-App/issues/49)) ([5e498f7](https://github.com/JhonathanPerez/Mi-Plata-App/commit/5e498f72b1be0f5ddf51d918f6de00a313d360ec))
+
 ## [1.6.2](https://github.com/JhonathanPerez/Mi-Plata-App/compare/v1.6.1...v1.6.2) (2026-11-16)
 
 
