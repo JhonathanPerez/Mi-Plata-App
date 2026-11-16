@@ -1,3 +1,10 @@
+## [1.6.2](https://github.com/JhonathanPerez/Mi-Plata-App/compare/v1.6.1...v1.6.2) (2026-11-16)
+
+
+### Bug Fixes
+
+* **android-backup:** respetar la hora configurada en copias automáticas. ([#48](https://github.com/JhonathanPerez/Mi-Plata-App/issues/48)) ([098f587](https://github.com/JhonathanPerez/Mi-Plata-App/commit/098f587e602f8ec34bcd60bde98b20a12cdcb838))
+
 ## [1.6.1](https://github.com/JhonathanPerez/Mi-Plata-App/compare/v1.6.0...v1.6.1) (2026-11-15)
 
 
