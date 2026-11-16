@@ -52,6 +52,22 @@ for (const file of readdirSync(sourceDir).filter((name) => name.endsWith('.java'
   }
 }
 
+// 1b) Pruebas unitarias de la lógica de horario (se ejecutan con las pruebas Android/JUnit).
+const nativeTestDir = resolve('native/android-test');
+if (existsSync(nativeTestDir)) {
+  const testRoot = join(androidDir, 'app/src/test/java');
+  const testPackageDir = join(testRoot, ...appId.split('.'));
+  mkdirSync(testPackageDir, { recursive: true });
+  for (const file of readdirSync(nativeTestDir).filter((name) => name.endsWith('.java'))) {
+    const target = join(testPackageDir, file);
+    const code = readFileSync(join(nativeTestDir, file), 'utf8').replaceAll('__PACKAGE__', appId);
+    if (!existsSync(target) || readFileSync(target, 'utf8') !== code) {
+      writeFileSync(target, code);
+      changes.push(`prueba nativa ${file}`);
+    }
+  }
+}
+
 // 2) Manifiesto
 let xml = readFileSync(manifestPath, 'utf8');
 const originalXml = xml;
