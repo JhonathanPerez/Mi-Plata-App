@@ -1,3 +1,10 @@
+## [1.6.4](https://github.com/JhonathanPerez/Mi-Plata-App/compare/v1.6.3...v1.6.4) (2026-11-16)
+
+
+### Bug Fixes
+
+* **ajustes:** aclara en el texto de privacidad que las copias cifradas salen a la carpeta elegida ([#50](https://github.com/JhonathanPerez/Mi-Plata-App/issues/50)) ([a16c450](https://github.com/JhonathanPerez/Mi-Plata-App/commit/a16c45088f90d6397ea3d486a73e0deb93ce84e6))
+
 ## [1.6.3](https://github.com/JhonathanPerez/Mi-Plata-App/compare/v1.6.2...v1.6.3) (2026-11-16)
 
 
