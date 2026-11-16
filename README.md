@@ -1,7 +1,7 @@
 # Mi Plata By Jhonathan Pérez Ortega 💚
 
 Control de gastos personales para Colombia. App para Android hecha con **React + TypeScript + Capacitor + SQLite**.
-Funciona 100 % sin Internet: tus datos viven solo en el teléfono (la red solo se usa para buscar versiones nuevas, ver [Actualizaciones](#actualizaciones-desde-la-app)).
+Funciona 100 % sin Internet: tus datos se guardan en el teléfono y solo salen en las copias de seguridad cifradas que tú configures, hacia la carpeta que elijas (la app solo usa la red para buscar versiones nuevas, ver [Actualizaciones](#actualizaciones-desde-la-app)).
 
 - Registro de gastos en pocos toques, en pesos colombianos (guardados como enteros).
 - Dashboard con presupuesto, historial con filtros, estadísticas y modo privacidad (oculta los valores).
@@ -110,7 +110,7 @@ UI (pages, components) → hooks (useQuery) → services (reglas de negocio) →
 
 ## Seguridad y privacidad
 
-- Sin servidores propios, cuentas ni analítica. Todo queda en la base SQLite privada de la app. La única conexión a Internet es la consulta pública a GitHub para buscar versiones nuevas.
+- Sin servidores propios, cuentas ni analítica. Todo queda en la base SQLite privada de la app; solo sale de ella en las copias de seguridad que tú configuras, siempre cifradas con tu contraseña y hacia la carpeta que elijas. La única conexión a Internet de la app es la consulta pública a GitHub para buscar versiones nuevas.
 - No se guardan credenciales bancarias; de las tarjetas solo los últimos 4 dígitos (opcionales).
 - El backup automático de Android está desactivado para que los datos no salgan a la nube de Google.
 - El texto de los mensajes del banco se borra al categorizar o descartar el gasto.

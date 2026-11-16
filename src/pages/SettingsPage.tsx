@@ -236,7 +236,7 @@ export function SettingsPage() {
           </p>
           <p className="about__line">
             <Icon name="shield" size={18} />
-            <span>Tus datos viven solo en este teléfono y la app funciona sin Internet; solo consulta GitHub para buscar versiones nuevas, sin enviar tus datos. No pedimos claves ni números de tarjeta.</span>
+            <span>Tus datos se guardan en este teléfono y la app funciona sin Internet. Las copias de seguridad salen siempre cifradas con tu contraseña y solo a la carpeta que tú elijas. La app solo consulta GitHub para buscar versiones nuevas, sin enviar tus datos. No pedimos claves ni números de tarjeta.</span>
           </p>
         </div>
       </section>
