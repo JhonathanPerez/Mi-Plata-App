@@ -1,7 +1,7 @@
 import {
   ArrowDown,
   ArrowLeft,
-  ArrowCircleUp,
+  ArrowCircleDown,
   ArrowUp,
   ArrowsClockwise,
   Bell,
@@ -97,7 +97,7 @@ const ICONS: Record<IconName, { Component: PhosphorIcon; weight: IconWeight }> =
   flag: { Component: Flag, weight: 'duotone' },
   user: { Component: User, weight: 'duotone' },
   more: { Component: DotsThreeVertical, weight: 'bold' },
-  update: { Component: ArrowCircleUp, weight: 'duotone' },
+  update: { Component: ArrowCircleDown, weight: 'duotone' },
   piggy: { Component: PiggyBank, weight: 'duotone' },
   minus: { Component: Minus, weight: 'bold' },
 };
