@@ -41,7 +41,10 @@ public class BackupWorker extends Worker {
 
     private void runIfDue(Context context) {
         long now = System.currentTimeMillis();
-        if (!BackupTiming.isDue(BackupScheduleStore.lastOkAt(context), now, TimeZone.getDefault(), BackupScheduleStore.intervalDays(context))) return;
+        if (!BackupTiming.isDue(
+            BackupScheduleStore.lastOkAt(context), now, TimeZone.getDefault(),
+            BackupScheduleStore.intervalDays(context), BackupScheduleStore.hour(context), BackupScheduleStore.minute(context)
+        )) return;
         try {
             runBackup(context, now);
         } catch (Exception e) {
